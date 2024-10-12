@@ -1,0 +1,261 @@
+body {
+    margin: 0;
+    font-family: Inter;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f4f4f4; /* Light mode background */
+    color: #333; /* Light mode text color */
+}
+
+nav {
+    background-color: #f4f4f4;
+    height: 30px;
+    color: white;
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between logo and buttons */
+    border-bottom: 2px #E5E8EB solid;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+nav .logo {
+    height: 36px;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 15px; /* Space between buttons */
+}
+
+.login-button {
+    margin-top: 5px;
+    padding: 10px 15px;
+    height: 36px;
+    border: none;
+    cursor: pointer;
+    border-radius: 12px;
+    background-color: #1A80E5;
+    font-weight: 600;
+    color: white;
+}
+
+.login-button:hover {
+    background-color: #1569C7;
+}
+
+.mode-toggle-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+}
+
+/* Text styling above toggle */
+.mode-text {
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px; /* Space between text and toggle button */
+}
+
+/* Toggle button styling */
+.toggle-container {
+    background-color: #ddd;
+    border-radius: 25px;
+    width: 40px;
+    height: 18px;
+    padding: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.toggle-circle {
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    transition: left 0.3s;
+}
+
+/* When dark mode is active */
+.dark-mode .toggle-circle {
+    left: 20px;
+}
+
+.content {
+    flex: 1 0 auto;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align items to start to position correctly below nav */
+    margin-top: 10px;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: -30px;
+}
+
+.image-container {
+    position: relative;
+    width: 100%; /* Full width */
+    max-width: 960px; /* Optional: Set a max width */
+    margin: 0 auto; /* Center the image container */
+}
+
+.welcome-image {
+    width: 100%; /* Make the image responsive */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 600px; /* Set max height */
+    display: block; /* Ensure it's a block element */
+    opacity: 78%;
+}
+
+.on-image-button {
+    position: absolute;
+    bottom: 12%; /* Adjust button position from the bottom */
+    left: 6%; /* Center horizontally */
+    background-color: #1A80E5;
+    color: white;
+    border: none;
+    padding: 1% 2%;
+    cursor: pointer;
+    border-radius: 12px;
+    font-size: 1.2vw;
+    font-weight: 600;
+}
+
+.on-image-button:hover {
+    background-color: #1569C7;
+}
+
+.offer-heading {
+    text-align: center; /* Center the text */
+    font-size: 30px; /* Adjust the font size as needed */
+    color: #333; /* Change color according to your design */
+    margin-top: 36px;
+    margin-bottom: -3px;
+}
+
+.feature-boxes {
+    display: grid; /* Use CSS Grid to create a layout */
+    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+    gap: 20px; /* Space between boxes */
+    margin: 20px auto; /* Center the grid and add vertical margin */
+    max-width: 1200px; /* Optional: Limit the maximum width */
+}
+
+.feature-box {
+    background-color: #f9f9f9; /* Light background color for boxes */
+    border: 1px solid #bbb; /* Border around boxes */
+    border-radius: 12px; /* Rounded corners */
+    padding: 20px; /* Inner spacing */
+    text-align: center; /* Center-align text */
+    transition: transform 0.3s; /* Smooth scale effect on hover */
+}
+
+.feature-box:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.feature-box h4 {
+    margin: 0 0 10px; /* Space below the heading */
+    font-size: 1.2rem; /* Heading size */
+}
+
+.feature-box p {
+    font-size: 0.9rem; /* Description size */
+    color: #999; /* Description text color */
+}
+
+footer {
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: center;
+    padding: 1em;
+    display: flex; /* Use flexbox to center content */
+    flex-direction: column; /* Stack content vertically */
+    align-items: center; /* Horizontally center content */
+    justify-content: center; /* Vertically center content */
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: -10px;
+}
+
+.footer-links {
+    margin-left: 24px; /* Adds some space between copyright and the links */
+}
+
+footer a.footer-link {
+    color: #333;
+    text-decoration: none; /* Remove underline */
+}
+
+footer .divider {
+    margin-left: 2px;
+    margin-right: 2px;
+    color: #333; /* Divider color */
+}
+
+footer a.footer-link:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
+
+.contact-info {
+    margin-top: 15px; /* Space between social media icons and contact info */
+    text-align: center; /* Center the contact info */
+}
+
+.contact-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 6px; /* Space between rows */
+}
+
+.contact-icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#email-icon {
+    width: 24px; /* Adjust size as needed */
+    height: 18px;
+    margin-right: 6px;
+}
+
+/* Specific size for phone icon */
+#phone-icon {
+    width: 27px; /* Adjust size as needed */
+    height: 27px;
+}
+
+.contact-row span {
+    font-size: 14px;
+    color: #333;
+}
+
+.social-media {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 6px;
+}
+
+.social-icon img {
+    width: 30px;
+    height: 30px;
+}
+
+.social-icon img:hover {
+    opacity: 0.8;
+}
