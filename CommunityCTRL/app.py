@@ -12,13 +12,14 @@ def get_db():
     return db
 
 
-# Route to display user data on the homepage
 @app.route('/')
 def home():
-    db = get_db()
-    cur = db.execute('SELECT * FROM user')
-    users = cur.fetchall()
-    return render_template('index.html', users=users)
+    return render_template('index.html')
+
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 
 if __name__ == '__main__':
