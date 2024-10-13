@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CommunityCtrl</title>
+    <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
 </head>
 <body>
@@ -21,20 +21,20 @@
         </div>
     </header>
     <div class="content-wrapper">
-        <div class="login-container">
+        <div class="form-container">
             <h2>Sign in</h2>
             <form>
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="example@gmail.com" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
                 <label for="password">Password</label>
                 <div class="password-input-container">
                     <input type="password" id="password" name="password" required>
                     <img src="{{ url_for('static', filename='asset/eye_show_light.png') }}" id="toggle-password" class="toggle-icon" alt="Show Password">
                 </div>
-                <a href="#" class="forgot-password">Forgot password?</a>
+                <a href="{{ url_for('forgot_password') }}" class="forgot-password">Forgot password?</a>
                 <div class="button-container">
-                    <button type="button" class="back-button">Back</button>
-                    <button type="submit" class="sign-in-button">Sign In</button>
+                    <button type="button" class="white-button" onclick="window.location.href='/'">Back</button>
+                    <button type="submit" class="blue-button">Sign In</button>
                 </div>
             </form>
         </div>
@@ -45,9 +45,9 @@
                 &copy; 2024 CommunityCtrl. All rights reserved.
             </div>
             <div class="footer-hyperlinks">
-                <a href="#" class="footer-hyperlink">Privacy Policy</a>
+                <a href="{{ url_for('privacy_policy') }}" class="footer-hyperlink">Privacy Policy</a>
                 <span class="divider">|</span>
-                <a href="#" class="footer-hyperlink">Terms of Service</a>
+                <a href="{{ url_for('terms_of_service') }}" class="footer-hyperlink">Terms of Service</a>
             </div>
         </div>
     </footer>
