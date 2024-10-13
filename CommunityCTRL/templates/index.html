@@ -16,13 +16,13 @@
                     <div class="toggle-circle"></div>
                 </div>
             </div>
-            <button class="login-button">Login</button>
+            <button class="login-button" onclick="window.location.href='/login'">Login</button>
         </div>
     </nav>
     <div class="content">
         <div class="image-container">
             <img src="{{ url_for('static', filename='asset/welcome.png') }}" alt="Welcome to the CommunityCTRL" class="welcome-image">
-            <button class="on-image-button">Get Started</button>
+            <button class="on-image-button" onclick="window.location.href='/login'">Get Started</button>
         </div>
         <h2 class="offer-heading">What We Offer...</h2>
         <div class="feature-boxes">
