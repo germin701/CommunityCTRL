@@ -17,9 +17,24 @@ def home():
     return render_template('index.html')
 
 
+@app.route('/privacy-policy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
+
+@app.route('/terms-of-service')
+def terms_of_service():
+    return render_template('terms_of_service.html')
+
+
 @app.route('/login')
 def login():
     return render_template('login.html')
+
+
+@app.route('/forgot-password')
+def forgot_password():
+    return render_template('forgot_password.html')
 
 
 if __name__ == '__main__':
