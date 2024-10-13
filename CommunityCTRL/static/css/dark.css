@@ -276,7 +276,7 @@ footer a.footer-link:hover {
     align-items: center;
 }
 
-.login-container {
+.form-container {
     width: 390px;
     padding: 24px;
     margin: 0 auto;
@@ -289,21 +289,21 @@ footer a.footer-link:hover {
     transform: translate(-50%, -50%);
 }
 
-.login-container h2 {
+.form-container h2 {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 18px;
     margin-top: 6px;
 }
 
-.login-container label {
+.form-container label {
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 9px;
     display: block;
 }
 
-.login-container input[type="text"], input[type="password"] {
+.form-container input[type="email"], input[type="password"] {
     width: 100%;
     padding: 15px;
     margin-bottom: 15px;
@@ -315,7 +315,7 @@ footer a.footer-link:hover {
     box-sizing: border-box;
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
+input[type="email"]:focus, input[type="password"]:focus {
     outline: none;
 }
 
@@ -359,7 +359,7 @@ input::placeholder {
     gap: 9px;
 }
 
-.back-button {
+.white-button {
     background-color: #E8EAED;
     border: none;
     padding: 10px 16px;
@@ -367,10 +367,15 @@ input::placeholder {
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    width: 84px;
+    min-width: 84px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    text-align: center;
+    justify-content: center;
+    display: flex;
 }
 
-.sign-in-button {
+.blue-button {
     background-color: #1A80E5;
     color: white;
     border: none;
@@ -379,14 +384,19 @@ input::placeholder {
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    width: 84px;
+    min-width: 84px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    text-align: center;
+    justify-content: center;
+    display: flex;
 }
 
-.sign-in-button:hover {
+.blue-button:hover {
     background-color: #1569C7;
 }
 
-.back-button:hover {
+.white-button:hover {
     background-color: #D0D2D5;
 }
 
