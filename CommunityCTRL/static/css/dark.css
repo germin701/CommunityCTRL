@@ -4,8 +4,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #333; /* Dark mode background */
-    color: white; /* Dark mode text color */
+    background-color: #333;
+    color: white;
 }
 
 nav {
@@ -15,7 +15,7 @@ nav {
     padding: 1em;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Space between logo and buttons */
+    justify-content: space-between;
     border-bottom: 2px #777 solid;
     position: sticky;
     top: 0;
@@ -54,12 +54,11 @@ nav .logo {
     margin-left: auto;
 }
 
-/* Text styling above toggle */
 .mode-text {
     color: white;
     font-size: 14px;
     font-weight: 500;
-    margin-bottom: 5px; /* Space between text and toggle button */
+    margin-bottom: 5px;
 }
 
 .toggle-container {
@@ -84,7 +83,7 @@ nav .logo {
 }
 
 .toggle-container.dark .toggle-circle {
-    left: 24px; /* Move to the right */
+    left: 24px;
 }
 
 .content {
@@ -92,7 +91,7 @@ nav .logo {
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align items to start to position correctly below nav */
+    align-items: flex-start;
     margin-top: 10px;
     flex-direction: column;
     align-items: center;
@@ -101,23 +100,23 @@ nav .logo {
 
 .image-container {
     position: relative;
-    width: 100%; /* Full width */
-    max-width: 960px; /* Optional: Set a max width */
-    margin: 0 auto; /* Center the image container */
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
 }
 
 .welcome-image {
-    width: 100%; /* Make the image responsive */
-    height: auto; /* Maintain aspect ratio */
-    max-height: 600px; /* Set max height */
-    display: block; /* Ensure it's a block element */
+    width: 100%;
+    height: auto;
+    max-height: 600px;
+    display: block;
     opacity: 60%;
 }
 
 .on-image-button {
     position: absolute;
-    bottom: 12%; /* Adjust button position from the bottom */
-    left: 6%; /* Center horizontally */
+    bottom: 12%;
+    left: 6%;
     background-color: #1A80E5;
     color: white;
     border: none;
@@ -133,42 +132,42 @@ nav .logo {
 }
 
 .offer-heading {
-    text-align: center; /* Center the text */
-    font-size: 30px; /* Adjust the font size as needed */
-    color: white; /* Change color according to your design */
+    text-align: center;
+    font-size: 30px;
+    color: white;
     margin-top: 36px;
     margin-bottom: -3px;
 }
 
 .feature-boxes {
-    display: grid; /* Use CSS Grid to create a layout */
-    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
-    gap: 20px; /* Space between boxes */
-    margin: 20px auto; /* Center the grid and add vertical margin */
-    max-width: 1200px; /* Optional: Limit the maximum width */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 20px auto;
+    max-width: 1200px;
 }
 
 .feature-box {
-    background-color: #3c3c3c; /* Light background color for boxes */
-    border: 1px solid #ddd; /* Border around boxes */
-    border-radius: 12px; /* Rounded corners */
-    padding: 20px; /* Inner spacing */
-    text-align: center; /* Center-align text */
-    transition: transform 0.3s; /* Smooth scale effect on hover */
+    background-color: #3c3c3c;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s;
 }
 
 .feature-box:hover {
-    transform: scale(1.05); /* Slightly enlarge on hover */
+    transform: scale(1.05);
 }
 
 .feature-box h4 {
-    margin: 0 0 10px; /* Space below the heading */
-    font-size: 1.2rem; /* Heading size */
+    margin: 0 0 10px;
+    font-size: 1.2rem;
 }
 
 .feature-box p {
-    font-size: 0.9rem; /* Description size */
-    color: #bbb; /* Description text color */
+    font-size: 0.9rem;
+    color: #bbb;
 }
 
 footer {
@@ -176,10 +175,10 @@ footer {
     color: white;
     text-align: center;
     padding: 1em;
-    display: flex; /* Use flexbox to center content */
-    flex-direction: column; /* Stack content vertically */
-    align-items: center; /* Horizontally center content */
-    justify-content: center; /* Vertically center content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .footer-content {
@@ -190,18 +189,18 @@ footer {
 }
 
 .footer-links {
-    margin-left: 24px; /* Adds some space between copyright and the links */
+    margin-left: 24px;
 }
 
 footer a.footer-link {
-    color: white; /* Light blue link color for dark mode */
-    text-decoration: none; /* Remove underline */
+    color: white;
+    text-decoration: none;
 }
 
 footer .divider {
     margin-left: 2px;
     margin-right: 2px;
-    color: white; /* Divider color */
+    color: white;
 }
 
 footer a.footer-link:hover {
@@ -209,15 +208,15 @@ footer a.footer-link:hover {
 }
 
 .contact-info {
-    margin-top: 15px; /* Space between social media icons and contact info */
-    text-align: center; /* Center the contact info */
+    margin-top: 15px;
+    text-align: center;
 }
 
 .contact-row {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 6px; /* Space between rows */
+    margin-bottom: 6px;
 }
 
 .contact-icon {
@@ -226,14 +225,13 @@ footer a.footer-link:hover {
 }
 
 #email-icon {
-    width: 24px; /* Adjust size as needed */
+    width: 24px;
     height: 18px;
     margin-right: 6px;
 }
 
-/* Specific size for phone icon */
 #phone-icon {
-    width: 27px; /* Adjust size as needed */
+    width: 27px;
     height: 27px;
 }
 
@@ -256,4 +254,165 @@ footer a.footer-link:hover {
 
 .social-icon img:hover {
     opacity: 0.8;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 45px;
+    background-color: #333;
+    height: auto;
+}
+
+.logo img {
+    height: 48px;
+}
+
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    width: 390px;
+    padding: 24px;
+    margin: 0 auto;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.login-container h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    margin-top: 6px;
+}
+
+.login-container label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 9px;
+    display: block;
+}
+
+.login-container input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 12px;
+    background-color: #E8EDF5;
+    color: #4A709C;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    outline: none;
+}
+
+input::placeholder {
+    color: #4A709C;
+}
+
+.password-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-container input {
+    width: 100%;
+    padding-right: 40px;
+    box-sizing: border-box;
+}
+
+.password-input-container img.toggle-icon {
+    position: absolute;
+    right: 10px;
+    top: 39%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+}
+
+.forgot-password {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1A80E5;
+    text-decoration: none;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+}
+
+.back-button {
+    background-color: #E8EAED;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    width: 84px;
+}
+
+.sign-in-button {
+    background-color: #1A80E5;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    width: 84px;
+}
+
+.sign-in-button:hover {
+    background-color: #1569C7;
+}
+
+.back-button:hover {
+    background-color: #D0D2D5;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+    border-top: 2px solid #E5E8EB;
+    margin-top: auto;
+    margin-bottom: -15px;
+    position: relative;
+    width: 100%;
+    font-size: 14px;
+}
+
+.footer-hyperlinks {
+    display: flex;
+    gap: 10px;
+}
+
+.footer-hyperlink {
+    text-decoration: none;
+    color: white;
+}
+
+.footer-hyperlink:hover {
+    text-decoration: underline;
 }
