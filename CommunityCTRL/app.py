@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g, request, redirect, url_for, flash
+from flask import Flask, render_template, g, request, redirect, url_for, flash, session
 import sqlite3
 
 app = Flask(__name__)
@@ -14,7 +14,7 @@ def get_db():
 
 
 @app.route('/')
-def home():
+def landing():
     return render_template('index.html')
 
 
@@ -28,8 +28,24 @@ def terms_of_service():
     return render_template('terms_of_service.html')
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        cursor = get_db().cursor()
+        cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+        user = cursor.fetchone()
+        if user and user[5] == password:
+            session['user_id'] = user[0]
+            session['role'] = user[7]
+            if user[7] == 1:
+                return redirect(url_for('admin_home'))
+            else:
+                return redirect(url_for('home'))
+        else:
+            flash('Invalid email or password.', 'error')
+            return redirect(url_for('login'))
     return render_template('login.html')
 
 
@@ -52,6 +68,22 @@ def forgot_password():
 @app.route('/verification')
 def verification_reset_password():
     return render_template('verification_reset_password.html')
+
+
+@app.route('/home')
+def home():
+    cursor = get_db().cursor()
+    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?", (session['user_id'],))
+    user = cursor.fetchone()
+    return render_template('home.html', user=user)
+
+
+@app.route('/admin_home')
+def admin_home():
+    cursor = get_db().cursor()
+    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?", (session['user_id'],))
+    user = cursor.fetchone()
+    return render_template('admin_home.html', user=user)
 
 
 if __name__ == '__main__':
