@@ -82,7 +82,6 @@ nav .logo {
     transition: left 0.3s;
 }
 
-/* When dark mode is active */
 .dark-mode .toggle-circle {
     left: 20px;
 }
@@ -176,6 +175,7 @@ footer {
     color: #333;
     text-align: center;
     padding: 1em;
+    padding-top: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -406,9 +406,9 @@ input::placeholder {
     justify-content: space-between;
     align-items: center;
     padding: 1em;
+    padding-bottom: 0;
     border-top: 2px solid #E5E8EB;
     margin-top: auto;
-    margin-bottom: -15px;
     position: relative;
     width: 100%;
     font-size: 14px;
@@ -483,3 +483,218 @@ input::placeholder {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.no-scroll {
+    overflow-y: hidden;
+}
+
+.screen-container {
+    display: flex;
+    height: calc(100vh - 45px);
+}
+
+.sidebar {
+    width: 201px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    justify-content: space-between;
+}
+
+.logo-section {
+    padding-bottom: 30px;
+}
+
+.menu-logo {
+    width: 100%;
+}
+
+.badge {
+    margin-top: 9px;
+    margin-bottom: -18px;
+    display: flex;
+    align-items: center;
+}
+
+.badge-background {
+    width: 54px;
+    height: 27px;
+    background: #4A709C;
+    border-radius: 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: 300;
+    display: flex;
+    justify-content: center; /* Center the text horizontally */
+    align-items: center;
+}
+
+/* Sidebar Menu */
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 9px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease,
+    transform 0.3s ease;
+}
+
+.menu-item.active {
+    background-color: #D0D9E8;
+}
+
+.menu-item:hover {
+    background-color: #D9E9FF;
+    transform: scale(1.05); /* Slightly enlarges the button on hover */
+}
+
+.menu-icon {
+    width: 45px;
+    height: auto;
+}
+
+.menu-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0D141C;
+    transition: color 0.3s ease; /* Adds smooth color transition */
+}
+
+.menu-item:hover .menu-text {
+    color: #1E73B9; /* Changes the text color on hover */
+}
+
+.theme-toggle-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.switch-container {
+    width: 40px;
+    height: 18px;
+    padding: 2px;
+    background-color: #ddd;
+    border-radius: 25px;
+    position: relative;
+    cursor: pointer;
+    margin-left: 10px; /* Space between toggle and text */
+}
+
+.switch-circle {
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s ease;
+}
+
+.switch-container.dark .switch-circle {
+    left: 20px; /* Move circle to the right for dark mode */
+}
+
+.theme-text {
+    font-size: 16px;
+    color: #333;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 12px;
+    padding-right: 24px;
+}
+
+.header h1 {
+    font-size: 30px;
+    color: #333;
+}
+
+.header-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.icon {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;
+}
+
+.header-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.icon {
+    width: 40px;
+    height: 40px;
+    background-color: #ddd;
+    border-radius: 50%;
+}
+
+.icon:hover {
+    background-color: #bbb;
+}
+
+.plain-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.plain-icon img {
+    width: 39px;
+    height: 39px;
+}
+
+.announcement-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: scroll;
+    padding-right: 9px;
+}
+
+.announcement-card {
+    padding: 6px 18px;
+    border-radius: 18px;
+    border: 2px solid #DBE0E5;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.announcement-card h3 {
+    font-size: 18px;
+    margin-bottom: 3px;
+    margin-top: 12px;
+}
+
+.announcement-card p {
+    font-size: 15px;
+    color: #4A709C;
+    margin-bottom: 12px;
+    text-align: justify;
+}
+
+.announcement-card img {
+    width: 300px;
+    height: auto;
+    border-radius: 6px;
+    margin-bottom: 9px;
+}
