@@ -528,11 +528,10 @@ input::placeholder {
     font-size: 12px;
     font-weight: 300;
     display: flex;
-    justify-content: center; /* Center the text horizontally */
+    justify-content: center;
     align-items: center;
 }
 
-/* Sidebar Menu */
 .menu-item {
     display: flex;
     align-items: center;
@@ -550,7 +549,7 @@ input::placeholder {
 
 .menu-item:hover {
     background-color: #555E68;
-    transform: scale(1.05); /* Slightly enlarges the button on hover */
+    transform: scale(1.05);
 }
 
 .menu-icon {
@@ -564,11 +563,11 @@ input::placeholder {
     font-size: 15px;
     font-weight: 600;
     color: white;
-    transition: color 0.3s ease; /* Adds smooth color transition */
+    transition: color 0.3s ease;
 }
 
 .menu-item:hover .menu-text {
-    color: #66CCFF; /* Changes the text color on hover */
+    color: #66CCFF;
 }
 
 .theme-toggle-section {
@@ -586,7 +585,7 @@ input::placeholder {
     border-radius: 25px;
     position: relative;
     cursor: pointer;
-    margin-left: 10px; /* Space between toggle and text */
+    margin-left: 10px;
 }
 
 .switch-circle {
@@ -601,11 +600,11 @@ input::placeholder {
 }
 
 .switch-container.active .switch-circle {
-    left: 25px; /* Move circle to the right for dark mode */
+    left: 25px;
 }
 
 .switch-container.active {
-    background-color: #4A709C; /* Background color for dark mode */
+    background-color: #4A709C;
 }
 
 .theme-text {
@@ -615,7 +614,6 @@ input::placeholder {
 
 .main-content {
     flex-grow: 1;
-    padding-top: 20px 0px;
     display: flex;
     flex-direction: column;
 }
@@ -640,7 +638,7 @@ input::placeholder {
 
 .icon {
     display: flex;
-    justify-content: center; /* Center horizontally */
+    justify-content: center;
     align-items: center;
 }
 
