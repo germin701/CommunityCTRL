@@ -141,6 +141,7 @@
             const logo = document.getElementById('logo');
             const menuIcons = document.querySelectorAll('.menu-icon');
             const profileIcon = document.getElementById('profile-icon');
+            const editIcons = document.querySelectorAll('.edit-icon');
 
             // Icon sources for light and dark modes
             const lightIcons = {
@@ -152,7 +153,8 @@
                 facility_icon: "{{ url_for('static', filename='asset/facility_unselect.png') }}",
                 poll_icon: "{{ url_for('static', filename='asset/poll_unselect.png') }}",
                 issue_reporting_icon: "{{ url_for('static', filename='asset/issue_unselect.png') }}",
-                profile_icon: "{{ url_for('static', filename='asset/profile_dark.png') }}"
+                profile_icon: "{{ url_for('static', filename='asset/profile_dark.png') }}",
+                edit: "{{ url_for('static', filename='asset/edit.png') }}"
             };
 
             const darkIcons = {
@@ -164,7 +166,8 @@
                 facility_icon: "{{ url_for('static', filename='asset/facility_dark_unselect.png') }}",
                 poll_icon: "{{ url_for('static', filename='asset/poll_dark_unselect.png') }}",
                 issue_reporting_icon: "{{ url_for('static', filename='asset/issue_dark_unselect.png') }}",
-                profile_icon: "{{ url_for('static', filename='asset/profile_light.png') }}"
+                profile_icon: "{{ url_for('static', filename='asset/profile_light.png') }}",
+                edit: "{{ url_for('static', filename='asset/edit_light.png') }}"
             };
 
             function updateIcons(theme) {
@@ -181,6 +184,13 @@
                 } else {
                     profileIcon.src = lightIcons.profile_icon;
                 }
+                editIcons.forEach((editIcon) => {
+                    if (theme === 'dark') {
+                        editIcon.src = darkIcons.edit;
+                    } else {
+                        editIcon.src = lightIcons.edit;
+                    }
+                });
             }
 
             // Check for user's theme preference in localStorage
