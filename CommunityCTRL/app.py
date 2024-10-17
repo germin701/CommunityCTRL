@@ -73,7 +73,8 @@ def verification_reset_password():
 @app.route('/home')
 def home():
     cursor = get_db().cursor()
-    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?", (session['user_id'],))
+    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?",
+                   (session['user_id'],))
     user = cursor.fetchone()
     return render_template('home.html', user=user)
 
@@ -81,9 +82,15 @@ def home():
 @app.route('/admin_home')
 def admin_home():
     cursor = get_db().cursor()
-    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?", (session['user_id'],))
+    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?",
+                   (session['user_id'],))
     user = cursor.fetchone()
     return render_template('admin_home.html', user=user)
+
+
+@app.route('/create_announcement')
+def create_announcement():
+    return render_template('create_announcement.html')
 
 
 if __name__ == '__main__':
