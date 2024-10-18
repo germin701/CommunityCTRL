@@ -883,6 +883,18 @@ textarea::placeholder {
     margin-bottom: 18px;
 }
 
+.admin-visitor-card {
+    padding-left: 9px;
+    border-radius: 18px;
+    border: 2px #DBE0E5 solid;
+    justify-content: flex-start;
+    align-items: center;
+    display: inline-flex;
+    margin-left: 12px;
+    margin-right: 9px;
+    margin-bottom: 18px;
+}
+
 .avatar {
     width: 72px;
     height: 72px;
@@ -918,4 +930,9 @@ textarea::placeholder {
 .visitor-card .button-container {
     margin-left: 639px;
     margin-top: 54px;
+}
+
+.admin-visitor-card .button-container {
+    margin-left: 639px;
+    margin-top: 105px;
 }
