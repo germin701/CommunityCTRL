@@ -103,5 +103,10 @@ def admin_visitor():
     return render_template('admin_visitor.html')
 
 
+@app.route('/visitor_detail')
+def visitor_detail():
+    return render_template('visitor_detail.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
