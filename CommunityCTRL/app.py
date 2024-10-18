@@ -93,5 +93,10 @@ def create_announcement():
     return render_template('create_announcement.html')
 
 
+@app.route('/visitor')
+def visitor():
+    return render_template('visitor.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
