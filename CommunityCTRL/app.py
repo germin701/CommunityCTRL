@@ -98,5 +98,10 @@ def visitor():
     return render_template('visitor.html')
 
 
+@app.route('/admin_visitor')
+def admin_visitor():
+    return render_template('admin_visitor.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
