@@ -60,7 +60,7 @@
                     <div class="icon bell">
                         <img class="header-icon" src="{{ url_for('static', filename='asset/notification.png') }}">
                     </div>
-                    <div class="icon logout">
+                    <div class="icon logout" onclick="window.location.href='/login'">
                         <img class="header-icon" src="{{ url_for('static', filename='asset/logout.png') }}">
                     </div>
                     <div class="plain-icon">
@@ -150,8 +150,8 @@
 
             // Icon sources for light and dark modes
             const lightIcons = {
-                dashboard_icon: "{{ url_for('static', filename='asset/home_select.png') }}",
-                visitors_icon: "{{ url_for('static', filename='asset/visitor_unselect.png') }}",
+                dashboard_icon: "{{ url_for('static', filename='asset/home_unselect.png') }}",
+                visitors_icon: "{{ url_for('static', filename='asset/visitor_select.png') }}",
                 security_footage_icon: "{{ url_for('static', filename='asset/cctv_unselect.png') }}",
                 staff_icon: "{{ url_for('static', filename='asset/staff_unselect.png') }}",
                 unit_icon: "{{ url_for('static', filename='asset/unit_unselect.png') }}",
@@ -162,8 +162,8 @@
             };
 
             const darkIcons = {
-                dashboard_icon: "{{ url_for('static', filename='asset/home_dark_select.png') }}",
-                visitors_icon: "{{ url_for('static', filename='asset/visitor_dark_unselect.png') }}",
+                dashboard_icon: "{{ url_for('static', filename='asset/home_dark_unselect.png') }}",
+                visitors_icon: "{{ url_for('static', filename='asset/visitor_dark_select.png') }}",
                 security_footage_icon: "{{ url_for('static', filename='asset/cctv_dark_unselect.png') }}",
                 staff_icon: "{{ url_for('static', filename='asset/staff_dark_unselect.png') }}",
                 unit_icon: "{{ url_for('static', filename='asset/unit_dark_unselect.png') }}",
