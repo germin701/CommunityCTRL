@@ -108,5 +108,16 @@ def visitor_detail():
     return render_template('visitor_detail.html')
 
 
+@app.route('/edit_visitor')
+def edit_visitor():
+    # Example list of existing vehicles fetched from the database
+    vehicles = [
+        {"type": "Car", "number": "XYZ 1234"},
+        {"type": "Motorcycle", "number": "ABC 5678"}
+    ]
+
+    return render_template('edit_visitor.html', vehicles=vehicles)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
