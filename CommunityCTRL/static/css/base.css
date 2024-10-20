@@ -326,7 +326,7 @@ input::placeholder {
     color: #4A709C;
 }
 
-input[type="email"] {
+.email {
     width: 100%;
     margin-left: 0;
     margin-bottom: 15px;
@@ -941,6 +941,8 @@ textarea::placeholder {
     display: flex;
     flex-direction: column;
     padding-left: 12px;
+    flex: 1;
+    overflow-y: scroll;
 }
 
 .profile {
@@ -950,10 +952,10 @@ textarea::placeholder {
 }
 
 .profile-pic {
-    width: 99px;
-    height: 99px;
+    width: 120px;
+    height: 120px;
     background: #D9D9D9;
-    border-radius: 60px;
+    border-radius: 50%;
 }
 
 .profile label {
@@ -986,7 +988,7 @@ textarea::placeholder {
 }
 
 .visited-history h3 {
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
 .custom-table {
@@ -1006,4 +1008,108 @@ textarea::placeholder {
 .custom-table td {
     padding: 6px 0;
     color: #4A709C;
+}
+
+.profile .upload-area {
+    width: 120px;
+    height: 120px;
+    min-height: 120px;
+    border-radius: 50%;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.input-field .phone {
+    width: 126px;
+}
+
+.input-field .email-field {
+    width: 300px;
+}
+
+.input-field .type {
+    width: 186px;
+}
+
+.input-field .number {
+    width: 177px;
+}
+
+.row .input-field {
+    margin-top: -15px;
+}
+
+form h3 {
+    margin-left: 12px;
+    margin-top: 30px;
+    margin-bottom: -15px;
+}
+
+.select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.select-wrapper::after {
+    content: '▼';
+    font-size: 12px;
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #4A709C;
+}
+
+.select-wrapper select {
+    margin-left: 12px;
+    padding: 15px;
+    padding-right: 24px;
+    border: none;
+    border-radius: 12px;
+    background-color: #E8EDF5;
+    color: #4A709C;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    letter-spacing: 0.03rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+}
+
+.select-wrapper select:focus {
+    outline: none;
+}
+
+.new-number {
+    margin-left: 24px;
+    width: 177px;
+}
+
+.add-vehicle {
+    background: #4A709C;
+    color: white;
+    border-radius: 9px;
+    border: none;
+    padding: 6px 15px;
+    margin-left: 12px;
+    margin-top: 12px;
+    font-weight: 600;
+}
+
+.details-section .button-container {
+    margin-bottom: 9px;
 }
