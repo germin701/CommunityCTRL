@@ -1017,7 +1017,7 @@ textarea::placeholder {
     color: #4A709C;
 }
 
-.profile .upload-area {
+.details-section .upload-area {
     width: 120px;
     height: 120px;
     min-height: 120px;
@@ -1031,6 +1031,13 @@ textarea::placeholder {
     margin-top: 30px;
 }
 
+.row-label {
+    display: flex;
+    align-items: center;
+    gap: 102px;
+    margin-top: 30px;
+}
+
 .input-field {
     display: flex;
     flex-direction: column;
@@ -1041,7 +1048,7 @@ textarea::placeholder {
     width: 126px;
 }
 
-.input-field .email-field {
+.input-field .email-field, .input-field .name {
     width: 300px;
 }
 
@@ -1051,6 +1058,10 @@ textarea::placeholder {
 
 .input-field .number {
     width: 177px;
+}
+
+.input-field .ic {
+    width: 132px;
 }
 
 .row .input-field {
@@ -1119,4 +1130,9 @@ form h3 {
 
 .details-section .button-container {
     margin-bottom: 9px;
+    margin-right: 9px;
+}
+
+#ic-field {
+    margin-left: 12px;
 }
