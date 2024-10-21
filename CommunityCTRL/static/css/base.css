@@ -626,6 +626,7 @@ input::placeholder {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: nowrap;
     padding-left: 12px;
     padding-right: 24px;
 }
@@ -633,6 +634,7 @@ input::placeholder {
 .header h1 {
     font-size: 30px;
     color: #333;
+    white-space: nowrap;
 }
 
 .header-icons {
@@ -864,14 +866,14 @@ textarea::placeholder {
     flex: 1;
 }
 
-.visitor-section {
+.visitor-section, .invitation-section {
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
     flex: 1;
 }
 
-.visitor-card {
+.visitor-card, .invitation-card {
     padding-left: 9px;
     border-radius: 18px;
     border: 2px #DBE0E5 solid;
@@ -903,7 +905,7 @@ textarea::placeholder {
     margin-left: 16px;
 }
 
-.visitor-info {
+.visitor-info, .invitation-info {
     padding: 6px 24px;
     flex-direction: column;
     justify-content: center;
@@ -919,7 +921,7 @@ textarea::placeholder {
     word-wrap: break-word;
 }
 
-.visitor-details {
+.visitor-details, .invitation-details {
     color: #4A709C;
     font-size: 15px;
     font-weight: 400;
@@ -927,7 +929,7 @@ textarea::placeholder {
     word-wrap: break-word;
 }
 
-.visitor-card .button-container {
+.visitor-card .button-container, .invitation-card .button-container {
     margin-left: 639px;
     margin-top: 54px;
 }
