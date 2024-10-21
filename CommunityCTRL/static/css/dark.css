@@ -1133,6 +1133,6 @@ form h3 {
     margin-right: 9px;
 }
 
-#ic-field {
+#ic-field, #unit-field {
     margin-left: 12px;
 }
