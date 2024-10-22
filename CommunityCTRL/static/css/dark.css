@@ -1143,3 +1143,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(30%) sepia(90%) saturate(200%) hue-rotate(180deg);
     cursor: pointer;
 }
+
+#first-row, #first-row-label {
+    margin-top: 15px;
+}
+
+.new-visitor-fields, .new-vehicle-fields {
+    display: none;
+    margin-top: 10px;
+}
+
+textarea#reason {
+    width: 300px;
+    margin-bottom: 15px;
+}
