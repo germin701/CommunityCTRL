@@ -1137,7 +1137,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
 }
 
-#first-row, #first-row-label {
+#first-row {
+    margin-top: 15px;
+    gap: 24px;
+}
+
+#first-row-label {
     margin-top: 15px;
 }
 
