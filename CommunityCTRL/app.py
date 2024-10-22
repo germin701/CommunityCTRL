@@ -1,5 +1,6 @@
 from flask import Flask, render_template, g, request, redirect, url_for, flash, session
 import sqlite3
+from datetime import date
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
@@ -147,6 +148,16 @@ def invitation_detail():
 @app.route('/admin_invitation_detail')
 def admin_invitation_detail():
     return render_template('admin_invitation_detail.html')
+
+
+@app.route('/edit_invitation')
+def edit_invitation():
+    current_date = date.today().isoformat()
+    original_date = '2024-11-15'
+    vehicle = 'Motorcycle PPP 1234'
+    reason = 'renovation'
+    return render_template('edit_invitation.html', current_date=current_date, original_date=original_date,
+                           vehicle=vehicle, reason=reason)
 
 
 if __name__ == '__main__':
