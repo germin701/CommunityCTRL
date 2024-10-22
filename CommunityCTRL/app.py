@@ -170,5 +170,11 @@ def admin_edit_invitation():
                            vehicle=vehicle, reason=reason)
 
 
+@app.route('/new_invite')
+def new_invite():
+    current_date = date.today().isoformat()
+    return render_template('new_invite.html', current_date=current_date)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
