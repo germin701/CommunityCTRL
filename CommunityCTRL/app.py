@@ -160,5 +160,15 @@ def edit_invitation():
                            vehicle=vehicle, reason=reason)
 
 
+@app.route('/admin_edit_invitation')
+def admin_edit_invitation():
+    current_date = date.today().isoformat()
+    original_date = '2024-11-15'
+    vehicle = 'Motorcycle PPP 1234'
+    reason = 'renovation'
+    return render_template('admin_edit_invitation.html', current_date=current_date, original_date=original_date,
+                           vehicle=vehicle, reason=reason)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
