@@ -1135,6 +1135,11 @@ form h3 {
     margin-right: 9px;
 }
 
-#ic-field, #unit-field {
+#ic-field, #unit-field, #date-field {
     margin-left: 12px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(30%) sepia(90%) saturate(200%) hue-rotate(180deg);
+    cursor: pointer;
 }
