@@ -139,5 +139,10 @@ def admin_invitation_list():
     return render_template('admin_invitation_list.html')
 
 
+@app.route('/invitation_detail')
+def invitation_detail():
+    return render_template('invitation_detail.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
