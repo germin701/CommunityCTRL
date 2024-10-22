@@ -144,5 +144,10 @@ def invitation_detail():
     return render_template('invitation_detail.html')
 
 
+@app.route('/admin_invitation_detail')
+def admin_invitation_detail():
+    return render_template('admin_invitation_detail.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
