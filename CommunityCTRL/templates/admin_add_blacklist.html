@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CommunityCTRL</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
+</head>
+<body class="no-scroll">
+    <div class="screen-container">
+        <div class="sidebar">
+            <div class="logo-section">
+                <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
+                <div class="badge">
+                    <div class="badge-background">Admin</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/home'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/home_unselect.png') }}" alt="dashboard_icon">
+                <div class="menu-text">Dashboard</div>
+            </div>
+            <div class="menu-item active" onclick="window.location.href='/visitor'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/visitor_select.png') }}" alt="visitors_icon">
+                <div class="menu-text">Visitors</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/cctv_unselect.png') }}" alt="security_footage_icon">
+                <div class="menu-text">Security Footage</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/staff_unselect.png') }}" alt="staff_icon">
+                <div class="menu-text">Staff</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/unit_unselect.png') }}" alt="unit_icon">
+                <div class="menu-text">Unit</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/facility_unselect.png') }}" alt="facility_icon">
+                <div class="menu-text">Facilities</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/poll_unselect.png') }}" alt="poll_icon">
+                <div class="menu-text">Poll</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/issue_unselect.png') }}" alt="issue_reporting_icon">
+                <div class="menu-text">Issue Reporting</div>
+            </div>
+            <div class="theme-toggle-section">
+                <span class="theme-text">Dark Mode</span>
+                <div id="theme-toggle" class="switch-container">
+                    <div class="switch-circle"></div>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Add Blacklistee</h1>
+                <div class="header-icons">
+                    <div class="icon bell">
+                        <img class="header-icon" src="{{ url_for('static', filename='asset/notification.png') }}">
+                    </div>
+                    <div class="icon logout" onclick="window.location.href='/login'">
+                        <img class="header-icon" src="{{ url_for('static', filename='asset/logout.png') }}">
+                    </div>
+                    <div class="plain-icon">
+                        <img src="{{ url_for('static', filename='asset/profile_dark.png') }}" alt="Profile_Icon" id="profile-icon">
+                    </div>
+                </div>
+            </div>
+            <div class="details-section">
+                <form>
+                    <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
+                        <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
+                        <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
+                        <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" class="name" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <label for="gender">Gender</label>
+                            <div class="select-wrapper">
+                                <select id="gender" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-field" id="ic-field">
+                            <label for="ic">IC Number</label>
+                            <input type="text" id="ic" name="ic" class="ic" required>
+                        </div>
+                        <div class="input-field">
+                            <label for="unit">Unit</label>
+                            <div class="select-wrapper">
+                                <select id="unit" name="unit" required>
+                                    <option value="">Select Unit</option>
+                                    <option value="1001">1001</option>
+                                    <option value="1002">1002</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="button-container">
+                        <button type="submit" class="blue-button">Save</button>
+                        <button type="button" class="blue-button" onclick="window.location.href='/admin_blacklist'">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="footer-container">
+            <div class="copyright">
+                &copy; 2024 CommunityCtrl. All rights reserved.
+            </div>
+            <div class="footer-hyperlinks">
+                <a href="{{ url_for('privacy_policy') }}" class="footer-hyperlink">Privacy Policy</a>
+                <span class="divider">|</span>
+                <a href="{{ url_for('terms_of_service') }}" class="footer-hyperlink">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script for toggling between Light Mode and Dark Mode -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeStyle = document.getElementById('theme-style');
+            const logo = document.getElementById('logo');
+            const menuIcons = document.querySelectorAll('.menu-icon');
+            const profileIcon = document.getElementById('profile-icon');
+
+            // Icon sources for light and dark modes
+            const lightIcons = {
+                dashboard_icon: "{{ url_for('static', filename='asset/home_unselect.png') }}",
+                visitors_icon: "{{ url_for('static', filename='asset/visitor_select.png') }}",
+                security_footage_icon: "{{ url_for('static', filename='asset/cctv_unselect.png') }}",
+                staff_icon: "{{ url_for('static', filename='asset/staff_unselect.png') }}",
+                unit_icon: "{{ url_for('static', filename='asset/unit_unselect.png') }}",
+                facility_icon: "{{ url_for('static', filename='asset/facility_unselect.png') }}",
+                poll_icon: "{{ url_for('static', filename='asset/poll_unselect.png') }}",
+                issue_reporting_icon: "{{ url_for('static', filename='asset/issue_unselect.png') }}",
+                profile_icon: "{{ url_for('static', filename='asset/profile_dark.png') }}"
+            };
+
+            const darkIcons = {
+                dashboard_icon: "{{ url_for('static', filename='asset/home_dark_unselect.png') }}",
+                visitors_icon: "{{ url_for('static', filename='asset/visitor_dark_select.png') }}",
+                security_footage_icon: "{{ url_for('static', filename='asset/cctv_dark_unselect.png') }}",
+                staff_icon: "{{ url_for('static', filename='asset/staff_dark_unselect.png') }}",
+                unit_icon: "{{ url_for('static', filename='asset/unit_dark_unselect.png') }}",
+                facility_icon: "{{ url_for('static', filename='asset/facility_dark_unselect.png') }}",
+                poll_icon: "{{ url_for('static', filename='asset/poll_dark_unselect.png') }}",
+                issue_reporting_icon: "{{ url_for('static', filename='asset/issue_dark_unselect.png') }}",
+                profile_icon: "{{ url_for('static', filename='asset/profile_light.png') }}"
+            };
+
+            function updateIcons(theme) {
+                menuIcons.forEach((icon, index) => {
+                    const platform = icon.alt.toLowerCase();
+                    if (theme === 'dark') {
+                        icon.src = darkIcons[platform];
+                    } else {
+                        icon.src = lightIcons[platform];
+                    }
+                });
+                if (theme === 'dark') {
+                    profileIcon.src = darkIcons.profile_icon;
+                } else {
+                    profileIcon.src = lightIcons.profile_icon;
+                }
+            }
+
+            // Check for user's theme preference in localStorage
+            const currentTheme = localStorage.getItem('theme') || 'light';
+
+            // Set the theme based on stored preference
+            if (currentTheme === 'dark') {
+                themeStyle.href = "{{ url_for('static', filename='css/dark.css') }}";
+                themeToggle.classList.add('active');
+                logo.src = "{{ url_for('static', filename='asset/logo_light.png') }}";
+                updateIcons('dark');
+            }
+
+            // Add click event listener to the toggle button
+            themeToggle.addEventListener('click', () => {
+                // Switch between Light Mode and Dark Mode
+                if (themeStyle.href.includes('base.css')) {
+                    themeStyle.href = "{{ url_for('static', filename='css/dark.css') }}";
+                    themeToggle.classList.add('active');
+                    logo.src = "{{ url_for('static', filename='asset/logo_light.png') }}";
+                    localStorage.setItem('theme', 'dark');
+                    updateIcons('dark');
+                } else {
+                    themeStyle.href = "{{ url_for('static', filename='css/base.css') }}";
+                    themeToggle.classList.remove('dark');
+                    logo.src = "{{ url_for('static', filename='asset/logo.png') }}";
+                    localStorage.setItem('theme', 'light');
+                    updateIcons('light');
+                }
+            });
+        });
+
+        // Function to trigger the image upload input
+        function triggerImageUpload() {
+            const imageUploadInput = document.getElementById('imageUpload');
+            imageUploadInput.click();
+        }
+
+        // Function to display the uploaded image
+        function displayImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.style.display = 'block';
+                    placeholderText.style.display = 'none';  // Hide the placeholder text
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUploadInput = document.getElementById('imageUpload');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const placeholderText = document.getElementById('placeholderText');
+
+            // If no image is present (i.e., the src is empty), display the placeholder text
+            if (!uploadedImage.src) {
+                uploadedImage.style.display = 'none';
+                placeholderText.style.display = 'block';
+            }
+
+            // Attach the displayImage function to the input's onchange event
+            imageUploadInput.addEventListener('change', function() {
+                displayImage(this);
+            });
+        });
+    </script>
+</body>
+</html>
