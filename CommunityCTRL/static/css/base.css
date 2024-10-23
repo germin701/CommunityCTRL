@@ -936,12 +936,16 @@ textarea::placeholder {
 
 .blacklist-card .button-container {
     margin-left: 876px;
-    margin-top: 39px;
+    margin-top: 60px;
 }
 
 .admin-visitor-card .button-container {
     margin-left: 639px;
     margin-top: 105px;
+}
+
+.invitation-card .admin-invite-button-container {
+    margin-top: 84px;
 }
 
 .details-section {
