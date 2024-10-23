@@ -192,5 +192,10 @@ def admin_blacklist():
     return render_template('admin_blacklist.html')
 
 
+@app.route('/add_blacklist')
+def add_blacklist():
+    return render_template('add_blacklist.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
