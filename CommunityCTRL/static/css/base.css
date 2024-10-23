@@ -936,7 +936,7 @@ textarea::placeholder {
 
 .blacklist-card .button-container {
     margin-left: 876px;
-    margin-top: 60px;
+    margin-top: 39px;
 }
 
 .admin-visitor-card .button-container {
@@ -946,6 +946,10 @@ textarea::placeholder {
 
 .invitation-card .admin-invite-button-container {
     margin-top: 84px;
+}
+
+.blacklist-card .admin-blacklist-button-container {
+    margin-top: 60px;
 }
 
 .details-section {
