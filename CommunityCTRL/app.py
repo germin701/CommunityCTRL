@@ -182,5 +182,10 @@ def admin_new_invite():
     return render_template('admin_new_invite.html', current_date=current_date)
 
 
+@app.route('/blacklist')
+def blacklist():
+    return render_template('blacklist.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
