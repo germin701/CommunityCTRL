@@ -873,14 +873,14 @@ textarea::placeholder {
     flex: 1;
 }
 
-.visitor-section, .invitation-section {
+.visitor-section, .invitation-section, .blacklist-section {
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
     flex: 1;
 }
 
-.visitor-card, .invitation-card {
+.visitor-card, .invitation-card, .blacklist-card {
     padding-left: 9px;
     border-radius: 18px;
     border: 2px #DBE0E5 solid;
@@ -912,7 +912,7 @@ textarea::placeholder {
     margin-left: 16px;
 }
 
-.visitor-info, .invitation-info {
+.visitor-info, .invitation-info, .blacklist-info {
     padding: 6px 24px;
     flex-direction: column;
     justify-content: center;
@@ -920,7 +920,7 @@ textarea::placeholder {
     display: inline-flex;
 }
 
-.visitor-name {
+.visitor-name, .blacklist-name {
     color: white;
     font-size: 15px;
     font-weight: 700;
@@ -928,7 +928,7 @@ textarea::placeholder {
     word-wrap: break-word;
 }
 
-.visitor-details, .invitation-details {
+.visitor-details, .invitation-details, .blacklist-details {
     color: #4A709C;
     font-size: 15px;
     font-weight: 400;
@@ -939,6 +939,11 @@ textarea::placeholder {
 .visitor-card .button-container, .invitation-card .button-container {
     margin-left: 639px;
     margin-top: 54px;
+}
+
+.blacklist-card .button-container {
+    margin-left: 876px;
+    margin-top: 39px;
 }
 
 .admin-visitor-card .button-container {
