@@ -217,5 +217,10 @@ def new_staff():
     return render_template('new_staff.html')
 
 
+@app.route('/edit_staff')
+def edit_staff():
+    return render_template('edit_staff.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
