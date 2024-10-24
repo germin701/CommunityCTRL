@@ -404,8 +404,30 @@ input::placeholder {
     white-space: nowrap;
 }
 
+.blues-button {
+    background-color: #4DA9F2;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 84px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    white-space: nowrap;
+}
+
 .blue-button:hover {
     background-color: #1569C7;
+}
+
+.blues-button:hover {
+    background-color: #3D91D9;
 }
 
 .white-button:hover {
@@ -873,7 +895,7 @@ textarea::placeholder {
     flex: 1;
 }
 
-.visitor-section, .invitation-section, .blacklist-section, .staff-section {
+.visitor-section, .invitation-section, .blacklist-section, .staff-section, .admin-staff-section {
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
@@ -888,7 +910,7 @@ textarea::placeholder {
     justify-content: flex-start;
 }
 
-.visitor-card, .invitation-card, .blacklist-card {
+.visitor-card, .invitation-card, .blacklist-card, .admin-staff-card {
     padding-left: 9px;
     border-radius: 18px;
     border: 2px #DBE0E5 solid;
@@ -969,6 +991,11 @@ textarea::placeholder {
 .admin-visitor-card .button-container {
     margin-left: 639px;
     margin-top: 105px;
+}
+
+.admin-staff-card .button-container {
+    margin-left: 720px;
+    margin-top: 57px;
 }
 
 .invitation-card .admin-invite-button-container {
