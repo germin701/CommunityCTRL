@@ -212,5 +212,10 @@ def admin_staff():
     return render_template('admin_staff.html')
 
 
+@app.route('/new_staff')
+def new_staff():
+    return render_template('new_staff.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
