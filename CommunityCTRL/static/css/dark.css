@@ -1110,7 +1110,7 @@ textarea::placeholder {
     width: 126px;
 }
 
-.input-field .email-field, .input-field .name {
+.input-field .email-field, .input-field .name, .input-field .position {
     width: 300px;
 }
 
