@@ -202,5 +202,10 @@ def admin_add_blacklist():
     return render_template('admin_add_blacklist.html')
 
 
+@app.route('/staff')
+def staff():
+    return render_template('staff.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
