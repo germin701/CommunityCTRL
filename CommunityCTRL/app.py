@@ -222,5 +222,16 @@ def edit_staff():
     return render_template('edit_staff.html')
 
 
+@app.route('/resignee')
+def resignee():
+    # Example list of existing vehicles fetched from the database
+    vehicles = [
+        {"type": "Car", "number": "XYZ 1234"},
+        {"type": "Motorcycle", "number": "ABC 5678"}
+    ]
+
+    return render_template('resignee.html', vehicles=vehicles)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
