@@ -1217,3 +1217,8 @@ textarea#reason {
     width: 300px;
     margin-bottom: 15px;
 }
+
+.resigned-button-container {
+    margin-left: 812px;
+    margin-top: 57px;
+}
