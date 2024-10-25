@@ -1,12 +1,23 @@
 from flask import Flask, render_template, g, request, redirect, url_for, flash, session
 import sqlite3
 from datetime import date
+from flask_mail import Mail, Message
+import random
+import re
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'communityctrl.service@gmail.com'
+app.config['MAIL_PASSWORD'] = 'wdgy mzsq imhp nyea'
+app.config['MAIL_DEFAULT_SENDER'] = 'communityctrl.service@gmail.com'
+mail = Mail(app)
+otp_store = {}
 
-# Helper function to get a database connection
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -66,17 +77,92 @@ def forgot_password():
         cursor.execute("SELECT * FROM users WHERE email=?", (email,))
         result = cursor.fetchone()
         if result:
-            return redirect(url_for('verification_reset_password'))
+            otp = random.randint(100000, 999999)
+            otp_store[email] = otp
+            session['email'] = email
+
+            # Send OTP email
+            msg = Message('OTP for password reset', recipients=[email])
+            msg.body = f'Hello, \n\nYour OTP code is {otp}. \nPlease enter it to reset your password.\n\nThanks!'
+            mail.send(msg)
+            return redirect(url_for('verification'))  # Redirect to OTP verification
         else:
             flash('Please enter a valid email address.', 'error')
             return redirect(url_for('forgot_password'))
+
     flash('Please enter your email address to reset password.', 'info')
     return render_template('forgot_password.html')
 
 
-@app.route('/verification')
-def verification_reset_password():
-    return render_template('verification_reset_password.html')
+@app.route('/verification', methods=['GET', 'POST'])
+def verification():
+    email = session.get('email')
+    if not session.get('otp_sent'):
+        flash('An OTP has been sent to your email address.', 'info')
+        session['otp_sent'] = True
+    if request.method == 'POST':
+        otp = request.form.get('otp')
+
+        # Verify OTP
+        if otp_store.get(email) == int(otp):
+            return redirect(url_for('reset_password'))
+        else:
+            flash('Invalid OTP. Please try again.', 'error')
+            return redirect(url_for('verification'))
+    return render_template('verification.html')
+
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('email')
+    if session.get('otp_sent'):
+        flash('OTP verified! You can now reset your password.', 'info')
+        session.pop('otp_sent', None)
+
+    if not email:
+        flash('Session expired or email not found. Please try again.', 'error')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('password')
+        confirm_password = request.form.get('confirm-password')
+        if new_password != confirm_password:
+            print(new_password)
+            print(confirm_password)
+            flash('Passwords do not match. Please try again.', 'error')
+            return redirect(url_for('reset_password'))
+
+        # Define password policy
+        password_policy = {
+            'min_length': 8,
+            'digit': r'[0-9]',
+            'special_char': r'[!@#$%^&*(),.?":{}|<>]'
+        }
+
+        # Check if password meets policy
+        if len(new_password) < password_policy['min_length']:
+            flash('Password must be at least 8 characters long.', 'error')
+            return redirect(url_for('reset_password'))
+        if not re.search(password_policy['digit'], new_password):
+            flash('Password must contain at least one digit.', 'error')
+            return redirect(url_for('reset_password'))
+        if not re.search(password_policy['special_char'], new_password):
+            flash('Password must contain at least one special character.', 'error')
+            return redirect(url_for('reset_password'))
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET password=? WHERE email=?", (new_password, email))
+        conn.commit()
+        session.clear()
+        return '''
+            <script>
+                alert("Password has been reset successfully!");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('login'))
+
+    return render_template('reset_password.html')
 
 
 @app.route('/home')
