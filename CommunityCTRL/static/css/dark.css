@@ -326,7 +326,7 @@ input::placeholder {
     color: #4A709C;
 }
 
-.email {
+.email, .otp, .password, .confirm-password {
     width: 100%;
     margin-left: 0;
     margin-bottom: 15px;
@@ -1031,12 +1031,12 @@ textarea::placeholder {
     padding-bottom: 6px;
 }
 
-.info {
+.infos {
     display: flex;
     flex-direction: column;
 }
 
-.info .visitor-details {
+.infos .visitor-details {
     padding-left: 12px;
 }
 
@@ -1136,6 +1136,16 @@ form h3 {
     margin-bottom: -15px;
 }
 
+.first-row-title {
+    margin-top: -6px;
+    margin-bottom: 9px;
+}
+
+.tenant-title {
+    margin-top: 30px;
+    margin-bottom: 9px;
+}
+
 .select-wrapper {
     position: relative;
     display: inline-block;
@@ -1226,4 +1236,14 @@ textarea#reason {
 .resigned-button-container {
     margin-left: 812px;
     margin-top: 57px;
+}
+
+.profile i {
+    font-size: 24px;
+    color: #ff4d4d;
+    cursor: pointer;
+}
+
+.profile i:hover {
+    color: #cc0000;
 }
