@@ -12,7 +12,7 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Admin</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
             <div class="menu-item active" onclick="window.location.href='/admin_home'">
@@ -62,7 +62,7 @@
                     <div class="icon bell">
                         <img class="header-icon" src="{{ url_for('static', filename='asset/notification.png') }}">
                     </div>
-                    <div class="icon logout" onclick="window.location.href='/login'">
+                    <div class="icon logout" onclick="window.location.href='/logout'">
                         <img class="header-icon" src="{{ url_for('static', filename='asset/logout.png') }}">
                     </div>
                     <div class="plain-icon">
