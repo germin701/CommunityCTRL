@@ -39,10 +39,18 @@ def login():
         user = cursor.fetchone()
         if user and user[5] == password:
             session['user_id'] = user[0]
-            session['role'] = user[7]
             if user[7] == 1:
+                session['role'] = 'Admin'
                 return redirect(url_for('admin_home'))
             else:
+                if user[7] == 2:
+                    session['role'] = 'Owner'
+                    cursor.execute("SELECT unit_id FROM units WHERE user_id=?", (session['user_id'],))
+                    session['unit'] = cursor.fetchone()[0]
+                else:
+                    session['role'] = 'Tenant'
+                    cursor.execute("SELECT unit_id FROM unit_tenants WHERE user_id=?", (session['user_id'],))
+                    session['unit'] = cursor.fetchone()[0]
                 return redirect(url_for('home'))
         else:
             flash('Invalid email or password.', 'error')
@@ -73,20 +81,18 @@ def verification_reset_password():
 
 @app.route('/home')
 def home():
-    cursor = get_db().cursor()
-    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?",
-                   (session['user_id'],))
-    user = cursor.fetchone()
-    return render_template('home.html', user=user)
+    return render_template('home.html', role=session['role'])
 
 
 @app.route('/admin_home')
 def admin_home():
-    cursor = get_db().cursor()
-    cursor.execute("SELECT u.*, r.role FROM users u, roles r WHERE u.role_id=r.role_id AND user_id=?",
-                   (session['user_id'],))
-    user = cursor.fetchone()
-    return render_template('admin_home.html', user=user)
+    return render_template('admin_home.html', role=session['role'])
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 
 @app.route('/create_announcement')
@@ -231,6 +237,17 @@ def resignee():
     ]
 
     return render_template('resignee.html', vehicles=vehicles)
+
+
+@app.route('/unit')
+def unit():
+    # Example list of existing vehicles fetched from the database
+    vehicles = [
+        {"type": "Car", "number": "XYZ 1234"},
+        {"type": "Motorcycle", "number": "ABC 5678"}
+    ]
+
+    return render_template('unit.html', vehicles=vehicles)
 
 
 if __name__ == '__main__':
