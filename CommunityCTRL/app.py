@@ -1,13 +1,13 @@
 from flask import Flask, render_template, g, request, redirect, url_for, flash, session
 import sqlite3
-from datetime import date
+from datetime import date, datetime, timedelta
 from flask_mail import Mail, Message
-import random
+import secrets
 import re
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
-
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -15,7 +15,6 @@ app.config['MAIL_USERNAME'] = 'communityctrl.service@gmail.com'
 app.config['MAIL_PASSWORD'] = 'wdgy mzsq imhp nyea'
 app.config['MAIL_DEFAULT_SENDER'] = 'communityctrl.service@gmail.com'
 mail = Mail(app)
-otp_store = {}
 
 
 def get_db():
@@ -23,6 +22,24 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect('instance/database.db')
     return db
+
+
+@app.before_request
+def check_session_expiration():
+    # Skip static files and public pages
+    if request.endpoint in ['static'] + ['landing', 'login', 'forgot_password', 'privacy_policy', 'terms_of_service']:
+        return
+
+    # Validation for password reset pages (email session)
+    if request.endpoint in ['verification', 'reset_password']:
+        if 'email' not in session:
+            flash('Session expired. Please try again.', 'error')
+            return redirect(url_for('login'))
+
+    # Validation for all other authenticated pages (user_id session)
+    elif 'user_id' not in session:
+        flash('Session expired. Please try again.', 'error')
+        return redirect(url_for('login'))
 
 
 @app.route('/')
@@ -71,14 +88,20 @@ def login():
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
+    if not session.get('initial'):
+        flash('Please enter your email address to reset password.', 'info')
+        session['initial'] = True
     if request.method == 'POST':
         email = request.form['email']
         cursor = get_db().cursor()
         cursor.execute("SELECT * FROM users WHERE email=?", (email,))
         result = cursor.fetchone()
         if result:
-            otp = random.randint(100000, 999999)
-            otp_store[email] = otp
+            # Generate a secure OTP and set expiration time (2 minutes)
+            otp = secrets.randbelow(900000) + 100000
+            otp_expiration = datetime.now() + timedelta(minutes=2)
+            session['otp'] = str(otp)
+            session['otp_expiration'] = otp_expiration.strftime('%Y-%m-%d %H:%M:%S')
             session['email'] = email
 
             # Send OTP email
@@ -90,25 +113,35 @@ def forgot_password():
             flash('Please enter a valid email address.', 'error')
             return redirect(url_for('forgot_password'))
 
-    flash('Please enter your email address to reset password.', 'info')
     return render_template('forgot_password.html')
 
 
 @app.route('/verification', methods=['GET', 'POST'])
 def verification():
-    email = session.get('email')
     if not session.get('otp_sent'):
         flash('An OTP has been sent to your email address.', 'info')
         session['otp_sent'] = True
     if request.method == 'POST':
-        otp = request.form.get('otp')
+        user_otp = request.form.get('otp')
+        otp = session.get('otp')
+        otp_expiration = session.get('otp_expiration')
 
-        # Verify OTP
-        if otp_store.get(email) == int(otp):
-            return redirect(url_for('reset_password'))
-        else:
-            flash('Invalid OTP. Please try again.', 'error')
-            return redirect(url_for('verification'))
+        # Verify if OTP exists and is still valid
+        if otp and otp_expiration:
+            otp_expiration_time = datetime.strptime(otp_expiration, '%Y-%m-%d %H:%M:%S')
+            if datetime.now() > otp_expiration_time:
+                session.clear()
+                session['initial'] = True
+                flash('OTP has expired. Please request a new one.', 'error')
+                return redirect(url_for('forgot_password'))
+
+            # Verify OTP
+            if user_otp == otp:
+                return redirect(url_for('reset_password'))
+            else:
+                flash('Invalid OTP. Please try again.', 'error')
+                return redirect(url_for('verification'))
+
     return render_template('verification.html')
 
 
@@ -119,16 +152,10 @@ def reset_password():
         flash('OTP verified! You can now reset your password.', 'info')
         session.pop('otp_sent', None)
 
-    if not email:
-        flash('Session expired or email not found. Please try again.', 'error')
-        return redirect(url_for('forgot_password'))
-
     if request.method == 'POST':
         new_password = request.form.get('password')
         confirm_password = request.form.get('confirm-password')
         if new_password != confirm_password:
-            print(new_password)
-            print(confirm_password)
             flash('Passwords do not match. Please try again.', 'error')
             return redirect(url_for('reset_password'))
 
