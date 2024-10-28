@@ -64,18 +64,20 @@
                     <div class="icon logout" onclick="window.location.href='/login'">
                         <img class="header-icon" src="{{ url_for('static', filename='asset/logout.png') }}">
                     </div>
-                    <div class="plain-icon">
+                    <div class="plain-icon" onclick="window.location.href='/profile'">
                         <img src="{{ url_for('static', filename='asset/profile_dark.png') }}" alt="Profile_Icon" id="profile-icon">
                     </div>
                 </div>
             </div>
             <div class="details-section">
                 <div class="profile" id="profile">
-                    <div class="upload-area profile-pic" id="uploadArea" onclick="triggerImageUpload()">
-                        <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
-                        <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
-                        <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
-                    </div>
+                    <form id="uploadForm" method="POST" action="/upload_profile_pic" enctype="multipart/form-data">
+                        <div class="upload-area profile-pic" id="uploadArea" onclick="triggerImageUpload()">
+                            <input type="file" id="imageUpload" name="profile_pic" accept="image/*" onchange="displayImageAndSubmit(this)" style="display: none;" />
+                            <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
+                            <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
+                        </div>
+                    </form>
                     <div class="infos">
                         <label>{{ user[1] }}</label>
                         <div class="visitor-details">{{ user[2] }}</div>
@@ -286,17 +288,23 @@
         }
 
         // Function to display the uploaded image
-        function displayImage(input) {
+        function displayImageAndSubmit(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
 
                 reader.onload = function (e) {
+                    // Display the image preview
+                    const uploadedImage = document.getElementById('uploadedImage');
                     uploadedImage.src = e.target.result;
                     uploadedImage.style.display = 'block';
-                    placeholderText.style.display = 'none';  // Hide the placeholder text
+                    const placeholderText = document.getElementById('placeholderText');
+                    placeholderText.style.display = 'none';
                 };
 
                 reader.readAsDataURL(input.files[0]);
+
+                // Automatically submit the form after image selection
+                document.getElementById('uploadForm').submit();
             }
         }
 
@@ -305,7 +313,7 @@
             const uploadedImage = document.getElementById('uploadedImage');
             const placeholderText = document.getElementById('placeholderText');
 
-            // If no image is present (i.e., the src is empty), display the placeholder text
+            // If no image is present, display the placeholder text
             if (!uploadedImage.src) {
                 uploadedImage.style.display = 'none';
                 placeholderText.style.display = 'block';
