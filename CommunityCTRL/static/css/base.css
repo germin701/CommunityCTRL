@@ -355,6 +355,16 @@ input::placeholder {
     height: 24px;
 }
 
+.password-input-container img.profile-toggle-icon {
+    position: absolute;
+    right: 24px;
+    top: 39%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+}
+
 .forgot-password {
     display: block;
     margin-bottom: 15px;
@@ -1105,7 +1115,7 @@ textarea::placeholder {
     width: 126px;
 }
 
-.input-field .email-field, .input-field .name, .input-field .position {
+.input-field .email-field, .input-field .name, .input-field .position, .input-field .profile-password {
     width: 300px;
 }
 
@@ -1195,6 +1205,16 @@ form h3 {
     font-weight: 600;
 }
 
+.send-otp {
+    background: #4A709C;
+    color: white;
+    border-radius: 9px;
+    border: none;
+    padding: 6px 15px;
+    margin-top: 12px;
+    font-weight: 600;
+}
+
 .details-section .button-container {
     margin-bottom: 9px;
     margin-right: 9px;
@@ -1241,4 +1261,33 @@ textarea#reason {
 
 .profile i:hover {
     color: #cc0000;
+}
+
+#profile {
+    margin-top: -54px;
+}
+
+.profile-pic {
+    margin-top: 57px;
+    background-color: #E8EDF5;
+}
+
+#action-buttons {
+    justify-content: flex-start;
+    margin-left: 162px;
+    margin-top: -45px;
+}
+
+.hidden {
+    display: none;
+}
+
+.profile-button {
+    justify-content: flex-start;
+    margin-left: 12px;
+    margin-top: 12px;
+}
+
+#profile-password {
+    margin-left: 12px;
 }
