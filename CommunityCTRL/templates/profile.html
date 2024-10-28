@@ -119,9 +119,9 @@
                         <div class="row">
                             <div class="input-field">
                                 <label for="new-email">Email</label>
-                                <input type="text" id="new-email" name="new-email" class="email-field" value="{{ user[4] }}" required>
+                                <input type="email" id="new-email" name="new-email" class="email-field" value="{{ user[4] }}" required>
                             </div>
-                            <button type="button" class="send-otp">Send OTP</button>
+                            <button type="button" class="send-otp" onclick="sendOTP()">Send OTP</button>
                         </div>
                         <div class="row">
                             <div class="input-field">
@@ -188,6 +188,10 @@
             const logo = document.getElementById('logo');
             const menuIcons = document.querySelectorAll('.menu-icon');
             const profileIcon = document.getElementById('profile-icon');
+            const passwordInput = document.getElementById('current-password');
+            const newPasswordInput = document.getElementById('new-password');
+            const confirmPasswordInput = document.getElementById('confirm-new-password');
+            const togglePassword = document.getElementById('toggle-password');
 
             // Icon sources for light and dark modes
             const lightIcons = {
@@ -257,6 +261,21 @@
                     localStorage.setItem('theme', 'light');
                     updateIcons('light');
                 }
+            });
+
+            // Add click event listener to toggle password visibility
+            togglePassword.addEventListener('click', () => {
+            const isPasswordVisible = passwordInput.type === 'text';
+
+            // Toggle visibility for passwordInput, newPasswordInput and confirmPasswordInput
+            passwordInput.type = isPasswordVisible ? 'password' : 'text';
+            newPasswordInput.type = isPasswordVisible ? 'password' : 'text';
+            confirmPasswordInput.type = isPasswordVisible ? 'password' : 'text';
+
+            // Change the icon based on the visibility state
+            togglePassword.src = isPasswordVisible
+                ? "{{ url_for('static', filename='asset/eye_hide_light.png') }}"
+                : "{{ url_for('static', filename='asset/eye_show_light.png') }}";
             });
         });
 
@@ -345,6 +364,26 @@
         function cancelEdit() {
             hideAllForms();
             actionElement.classList.remove('hidden');
+        }
+
+        // Function to send OTP
+        function sendOTP() {
+            // Get the new email value
+            var newEmail = document.getElementById('new-email');
+
+            // Check if the email field is empty or invalid
+            if (!newEmail.checkValidity()) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            window.location.href = '/send_otp?email=' + encodeURIComponent(newEmail.value);
+        }
+
+        var alertMessage = "{{ alert_message }}";
+
+        if (alertMessage) {
+            alert(alertMessage);
         }
     </script>
 </body>
