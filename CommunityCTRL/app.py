@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 from flask_mail import Mail, Message
 import secrets
 import re
+import base64
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
@@ -213,7 +214,43 @@ def profile():
     cursor = get_db().cursor()
     cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
     user = cursor.fetchone()
-    return render_template('profile.html', user=user, role=session['role'])
+    profile_pic = None
+    if user[8]:
+        profile_pic = 'data:image/jpeg;base64,' + base64.b64encode(user[8]).decode('utf-8')
+    return render_template('profile.html', user=user, role=session['role'], currentProfilePic=profile_pic)
+
+
+@app.route('/upload_profile_pic', methods=['POST'])
+def upload_profile_pic():
+    if 'profile_pic' not in request.files:
+        return '''
+            <script>
+                alert("No file selected!");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('profile'))
+
+    file = request.files['profile_pic']
+    if file.filename == '':
+        return '''
+            <script>
+                alert("No file selected!");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('profile'))
+
+    if file:
+        image_data = file.read()
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET picture = ? WHERE user_id = ?", (image_data, session['user_id']))
+        conn.commit()
+        return '''
+            <script>
+                alert("Profile picture updated successfully!");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('profile'))
 
 
 @app.route('/save_phone', methods=['POST'])
