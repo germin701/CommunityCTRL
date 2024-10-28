@@ -208,6 +208,152 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route('/profile')
+def profile():
+    cursor = get_db().cursor()
+    cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
+    user = cursor.fetchone()
+    return render_template('profile.html', user=user, role=session['role'])
+
+
+@app.route('/save_phone', methods=['POST'])
+def save_phone():
+    new_phone = request.form['new-phone']
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET phone = ? WHERE user_id = ?", (new_phone, session['user_id']))
+    conn.commit()
+    cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
+    user = cursor.fetchone()
+    return render_template('profile.html', user=user, role=session['role'],
+                           alert_message="Phone number updated successfully!")
+
+
+@app.route('/send_otp')
+def send_otp():
+    email = request.args.get('email')
+    # Generate a secure OTP and set expiration time (2 minutes)
+    otp = secrets.randbelow(900000) + 100000
+    otp_expiration = datetime.now() + timedelta(minutes=2)
+    session['otp'] = str(otp)
+    session['otp_expiration'] = otp_expiration.strftime('%Y-%m-%d %H:%M:%S')
+    session['email'] = email
+
+    # Send OTP email
+    msg = Message('OTP for password reset', recipients=[email])
+    msg.body = f'Hello, \n\nYour OTP code is {otp}. \nPlease enter it to reset your password.\n\nThanks!'
+    mail.send(msg)
+    return '''
+        <script>
+            alert("An OTP has been sent to your email address.");
+            window.history.back();
+        </script>
+        '''
+
+
+@app.route('/save_email', methods=['POST'])
+def save_email():
+    conn = get_db()
+    cursor = conn.cursor()
+    user_otp = request.form.get('otp')
+    otp = session.get('otp')
+    otp_expiration = session.get('otp_expiration')
+
+    # Verify if OTP exists and is still valid
+    if otp and otp_expiration:
+        otp_expiration_time = datetime.strptime(otp_expiration, '%Y-%m-%d %H:%M:%S')
+        if datetime.now() > otp_expiration_time:
+            session.pop('otp', None)
+            session.pop('otp_expiration', None)
+            session.pop('email', None)
+            return '''
+                <script>
+                    alert("OTP has expired. Please request a new one.");
+                    window.history.back();
+                </script>
+                '''
+
+        # Verify OTP
+        if user_otp == otp:
+            cursor.execute("UPDATE users SET email = ? WHERE user_id = ?", (session['email'], session['user_id']))
+            conn.commit()
+            session.pop('otp', None)
+            session.pop('otp_expiration', None)
+            session.pop('email', None)
+            cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
+            user = cursor.fetchone()
+            return render_template('profile.html', user=user, role=session['role'],
+                                   alert_message="OTP verified! Email updated successfully!")
+        else:
+            flash('Invalid OTP. Please try again.', 'error')
+            return '''
+                <script>
+                    alert("Invalid OTP. Please try again.");
+                    window.history.back();
+                </script>
+                '''
+
+
+@app.route('/save_password', methods=['POST'])
+def save_password():
+    current_password = request.form['current-password']
+    new_password = request.form['new-password']
+    confirm_password = request.form['confirm-new-password']
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
+    user = cursor.fetchone()
+    if user[5] != current_password:
+        return '''
+            <script>
+                alert("Incorrect current password!");
+                window.history.back();
+            </script>
+            '''
+    elif new_password != confirm_password:
+        return '''
+            <script>
+                alert("New passwords do not match!");
+                window.history.back();
+            </script>
+            '''
+    else:
+        # Define password policy
+        password_policy = {
+            'min_length': 8,
+            'digit': r'[0-9]',
+            'special_char': r'[!@#$%^&*(),.?":{}|<>]'
+        }
+
+        # Check if password meets policy
+        if len(new_password) < password_policy['min_length']:
+            return '''
+                <script>
+                    alert("Password must be at least 8 characters long.");
+                    window.history.back();
+                </script>
+                '''
+        elif not re.search(password_policy['digit'], new_password):
+            return '''
+                <script>
+                    alert("Password must contain at least one digit.");
+                    window.history.back();
+                </script>
+                '''
+        elif not re.search(password_policy['special_char'], new_password):
+            return '''
+                <script>
+                    alert("Password must contain at least one special character.");
+                    window.history.back();
+                </script>
+                '''
+        else:
+            cursor.execute("UPDATE users SET password = ? WHERE user_id = ?", (new_password, session['user_id']))
+            conn.commit()
+            return render_template('profile.html', user=user, role=session['role'],
+                                   alert_message="Password updated successfully!")
+
+
 @app.route('/create_announcement')
 def create_announcement():
     return render_template('create_announcement.html')
