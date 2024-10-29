@@ -290,6 +290,22 @@ footer a.footer-link:hover {
     transform: translate(-50%, -50%);
 }
 
+.register-form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 663px;
+    padding: 24px;
+    margin: 0 auto;
+    border: 2px solid #bbb;
+    border-radius: 12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+}
+
 .form-container h2 {
     font-size: 1.5rem;
     font-weight: 700;
@@ -297,7 +313,22 @@ footer a.footer-link:hover {
     margin-top: 6px;
 }
 
+.register-form-container h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    margin-top: 6px;
+}
+
 .form-container label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 9px;
+    display: block;
+    padding-left: 0;
+}
+
+.register-form-container label {
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 9px;
@@ -330,6 +361,17 @@ input::placeholder {
     width: 100%;
     margin-left: 0;
     margin-bottom: 15px;
+}
+
+.register-name, .register-email, .register-password {
+    width: 100%;
+    margin-left: 0;
+    margin-bottom: 15px;
+    width: 300px;
+}
+
+#register-confirm-password {
+    width: 300px;
 }
 
 .password-input-container {
@@ -975,7 +1017,7 @@ textarea::placeholder {
     word-wrap: break-word;
 }
 
-.visitor-details, .invitation-details, .blacklist-details, .staff-details {
+.visitor-details, .invitation-details, .blacklist-details, .staff-, .owner-details, .tenant-details {
     color: #4A709C;
     font-size: 15px;
     font-weight: 400;
@@ -1025,7 +1067,7 @@ textarea::placeholder {
     gap: 20px;
 }
 
-.profile-pic {
+.profile-picture {
     width: 120px;
     height: 120px;
     background: #D9D9D9;
@@ -1041,7 +1083,7 @@ textarea::placeholder {
     flex-direction: column;
 }
 
-.infos .visitor-details {
+.infos .visitor-details, .infos .owner-details, .infos .tenant-details {
     padding-left: 12px;
 }
 
@@ -1103,6 +1145,13 @@ textarea::placeholder {
     align-items: center;
     gap: 102px;
     margin-top: 30px;
+}
+
+.link-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 9px;
 }
 
 .input-field {
@@ -1189,6 +1238,18 @@ form h3 {
     outline: none;
 }
 
+#wrapper-register-gender {
+    padding-right: 12px;
+}
+
+#wrapper-register-gender::after {
+    right: 27px;
+}
+
+#register-gender {
+    margin-left: 0;
+}
+
 .new-number {
     margin-left: 24px;
     width: 177px;
@@ -1222,6 +1283,19 @@ form h3 {
 
 #ic-field, #unit-field, #date-field {
     margin-left: 12px;
+}
+
+#ic {
+    margin-left: 0;
+}
+
+#phone {
+    margin-left: 0;
+}
+
+#unit {
+    margin-left: 0;
+    width: 63px;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -1290,4 +1364,26 @@ textarea#reason {
 
 #profile-password {
     margin-left: 12px;
+}
+
+.link-container {
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+
+.link {
+    color: #268AF5;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 6px;
+}
+
+.link i {
+    margin-right: 6px;
+    color: #268AF5;
+}
+
+.link:hover {
+    text-decoration: underline;
 }
