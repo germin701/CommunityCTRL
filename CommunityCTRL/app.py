@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g, request, redirect, url_for, flash, session
+from flask import Flask, render_template, g, request, redirect, url_for, flash, session, jsonify, abort
 import sqlite3
 from datetime import date, datetime, timedelta
 from flask_mail import Mail, Message
@@ -28,7 +28,8 @@ def get_db():
 @app.before_request
 def check_session_expiration():
     # Skip static files and public pages
-    if request.endpoint in ['static'] + ['landing', 'login', 'forgot_password', 'privacy_policy', 'terms_of_service']:
+    if request.endpoint in ['static'] + ['landing', 'login', 'forgot_password', 'privacy_policy', 'terms_of_service',
+                                         'register']:
         return
 
     # Validation for password reset pages (email session)
@@ -64,7 +65,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         cursor = get_db().cursor()
-        cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+        cursor.execute("SELECT * FROM users WHERE email=? AND status=1", (email,))
         user = cursor.fetchone()
         if user and user[5] == password:
             session['user_id'] = user[0]
@@ -95,7 +96,7 @@ def forgot_password():
     if request.method == 'POST':
         email = request.form['email']
         cursor = get_db().cursor()
-        cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+        cursor.execute("SELECT * FROM users WHERE email=? AND status=1", (email,))
         result = cursor.fetchone()
         if result:
             # Generate a secure OTP and set expiration time (2 minutes)
@@ -109,7 +110,7 @@ def forgot_password():
             msg = Message('OTP for password reset', recipients=[email])
             msg.body = f'Hello, \n\nYour OTP code is {otp}. \nPlease enter it to reset your password.\n\nThanks!'
             mail.send(msg)
-            return redirect(url_for('verification'))  # Redirect to OTP verification
+            return redirect(url_for('verification'))
         else:
             flash('Please enter a valid email address.', 'error')
             return redirect(url_for('forgot_password'))
@@ -535,15 +536,136 @@ def resignee():
     return render_template('resignee.html', vehicles=vehicles)
 
 
-@app.route('/unit')
+@app.route('/unit', methods=['GET', 'POST'])
 def unit():
-    # Example list of existing vehicles fetched from the database
-    vehicles = [
-        {"type": "Car", "number": "XYZ 1234"},
-        {"type": "Motorcycle", "number": "ABC 5678"}
-    ]
+    conn = get_db()
+    cursor = conn.cursor()
+    if session['role'] == 'Owner':
+        if request.method == 'POST':
+            new_vehicle_types = request.form.getlist('newVehicleType[]')
+            new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
 
-    return render_template('unit.html', vehicles=vehicles)
+            # Insert new vehicles into the database
+            for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                if vehicle_type and vehicle_number:
+                    if vehicle_type == 'Car':
+                        vehicle_id = 1
+                    else:
+                        vehicle_id = 2
+                    cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id) VALUES (?, ?, ?)",
+                                   (vehicle_id, vehicle_number, session['user_id']))
+                    conn.commit()
+            return '''
+                <script>
+                    alert("Vehicle added successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('unit'))
+
+        # Get unit id
+        cursor.execute("SELECT unit_id FROM units WHERE user_id=?", (session['user_id'],))
+        unit_num = cursor.fetchone()[0]
+
+        # Get owner details
+        cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
+        user = cursor.fetchone()
+        print(user)
+
+        # Get owner's vehicles
+        cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
+                       "v.type_id AND v.user_id=?", (session['user_id'],))
+        vehicles = cursor.fetchall()
+        print(vehicles)
+
+        # Get unit tenant ids
+        cursor.execute("SELECT t.user_id FROM unit_tenants t, users u WHERE t.user_id=u.user_id AND u.status=1 AND"
+                       " t.unit_id=?", (unit_num,))
+        tenant_user_ids = cursor.fetchall()
+
+        tenants = []
+        tenant_vehicles = {}
+        for tenant_user_id in tenant_user_ids:
+            # Fetch tenant details
+            cursor.execute("SELECT * FROM users WHERE user_id=?", (tenant_user_id[0],))
+            tenant = cursor.fetchone()
+            tenants.append(tenant)
+
+            # Fetch tenant's vehicles
+            cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id "
+                           "= v.type_id AND v.user_id=?", (tenant_user_id[0],))
+            tenant_s_vehicle = cursor.fetchall()
+            tenant_vehicles[tenant_user_id[0]] = tenant_s_vehicle
+
+        print(tenant_vehicles)
+        return render_template('unit.html', unit=unit_num, user=user, role=session['role'],
+                               vehicles=vehicles, tenants=tenants, tenant_vehicles=tenant_vehicles)
+
+
+@app.route('/remove-tenant/<tenant_id>/<unit_id>', methods=['POST'])
+def remove_tenant(tenant_id, unit_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM requests WHERE type='remove tenant' AND unit_id=? AND user_id=? AND status=1",
+                   (unit_id, tenant_id))
+    request_exist = cursor.fetchone()
+    if request_exist:
+        return jsonify({"success": False, "message": "Request already sent. Please wait for admin approval."})
+    else:
+        cursor.execute("INSERT INTO requests (type, unit_id, user_id, status) VALUES ('remove tenant', ?, ?, 1)",
+                       (unit_id, tenant_id))
+        conn.commit()
+        return jsonify({"success": True, "message": "Request sent to Admin. Please wait for their approval."})
+
+
+@app.route('/generate-register-link/<unit_id>/<role>', methods=['POST'])
+def generate_register_link(unit_id, role):
+    token = secrets.token_urlsafe(16)
+    if role == 'Tenant':
+        role_id = 3
+    else:
+        role_id = 2
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO tokens (unit_id, role_id, token, status) VALUES (?, ?, ?, ?)",
+                   (unit_id, role_id, token, 1))
+    conn.commit()
+
+    # Generate the registration link with the token
+    register_link = f"http://localhost:5000/register?token={token}"
+    return jsonify({'register_link': register_link})
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    token = request.args.get('token')
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Check if token is valid and not used
+    cursor.execute("SELECT * FROM tokens WHERE token = ? AND status = 1", (token,))
+    token_data = cursor.fetchone()
+    if not token_data:
+        return abort(404, description="Invalid or expired registration link.")
+
+    unit_num = token_data[1]
+    role = token_data[2]
+
+    # if request.method == 'POST':
+    #     # Get tenant/owner registration details
+    #     name = request.form['name']
+    #     email = request.form['email']
+    #
+    #     # Save tenant/owner registration details
+    #     conn.execute("INSERT INTO registrations (unit_id, name, email, role) VALUES (?, ?, ?, ?)",
+    #                  (unit_id, name, email, role))
+    #     conn.execute("UPDATE registration_tokens SET used = 1 WHERE token = ?", (token,))
+    #     conn.commit()
+    #     conn.close()
+    #
+    #     flash(f'{role.capitalize()} registered successfully! Awaiting admin approval.')
+    #     return redirect('/registration-success')
+
+    return render_template('register.html', unit_num=unit_num)
 
 
 if __name__ == '__main__':
