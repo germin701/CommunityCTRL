@@ -850,5 +850,10 @@ def register():
     return render_template('register.html', token=token, unit_num=unit_num)
 
 
+@app.route('/unit_list')
+def unit_list():
+    return render_template('unit_list.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
