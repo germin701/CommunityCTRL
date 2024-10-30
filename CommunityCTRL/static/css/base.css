@@ -563,6 +563,11 @@ input::placeholder {
     animation: fadeIn 0.3s forwards ease-out;
 }
 
+#register-flash {
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
 @keyframes fadeIn {
     to {
         opacity: 1;
