@@ -1072,6 +1072,17 @@ textarea::placeholder {
     height: 120px;
     background: #D9D9D9;
     border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .profile label {
