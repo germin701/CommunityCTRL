@@ -77,7 +77,7 @@
                     <div class="profile">
                         <div class="profile-picture">
                             {% if profile_picture %}
-                            <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-img">
+                            <img src="{{ profile_picture }}" alt="Profile Picture">
                             {% endif %}
                         </div>
                         <div class="infos">
@@ -120,22 +120,26 @@
                     {% if tenants %}
                         {% for tenant in tenants %}
                         <div class="profile">
-                            <div class="profile-picture"></div>
+                            <div class="profile-picture">
+                                {% if tenant.profile_picture %}
+                                <img src="{{ tenant.profile_picture }}" alt="Tenant Profile Picture">
+                                {% endif %}
+                            </div>
                             <div class="infos">
-                                <label>{{ tenant[1] }}</label>
-                                <div class="tenant-details">{{ tenant[2] }}</div>
-                                <div class="tenant-details">{{ tenant[3] }}</div>
+                                <label>{{ tenant.details[1] }}</label>
+                                <div class="tenant-details">{{ tenant.details[2] }}</div>
+                                <div class="tenant-details">{{ tenant.details[3] }}</div>
                             </div>
                             <div class="contact-container">
                                 <label>Contact Details</label>
                                 <div class="contact-infos">
                                     <div class="contact">
                                         Phone Number
-                                        <div class="visitor-details">{{ tenant[6] }}</div>
+                                        <div class="visitor-details">{{ tenant.details[6] }}</div>
                                     </div>
                                     <div class="contact">
                                         Email
-                                        <div class="visitor-details">{{ tenant[4] }}</div>
+                                        <div class="visitor-details">{{ tenant.details[4] }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -146,7 +150,7 @@
                             <label>Vehicle Type </label>
                             <label>Vehicle Number</label>
                         </div>
-                        {% for tenant_vehicle in tenant_vehicles[tenant[0]] %}
+                        {% for tenant_vehicle in tenant_vehicles[tenant.details[0]] %}
                         <div class="row">
                             <div class="input-field">
                                 <input type="text" id="tenant-vehicle-type{{ loop.index }}" name="tenant-vehicle-type[]" class="type" value="{{ tenant_vehicle[0] }}" readonly> <!-- vehicle[0] is the type -->
