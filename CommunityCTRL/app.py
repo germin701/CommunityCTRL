@@ -646,6 +646,27 @@ def unit():
                                tenant_vehicles=tenant_vehicles)
 
     elif session['role'] == 'Tenant':
+        if request.method == 'POST':
+            new_vehicle_types = request.form.getlist('newVehicleType[]')
+            new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
+
+            # Insert new vehicles into the database
+            for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                if vehicle_type and vehicle_number:
+                    if vehicle_type == 'Car':
+                        vehicle_id = 1
+                    else:
+                        vehicle_id = 2
+                    cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id) VALUES (?, ?, ?)",
+                                   (vehicle_id, vehicle_number, session['user_id']))
+                    conn.commit()
+            return '''
+                <script>
+                    alert("Vehicle added successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('unit'))
+
         # Get unit id
         cursor.execute("SELECT unit_id FROM unit_tenants WHERE user_id=?", (session['user_id'],))
         unit_num = cursor.fetchone()[0]
