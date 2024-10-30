@@ -316,7 +316,7 @@ footer a.footer-link:hover {
 .register-form-container h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 18px;
+    margin-bottom: 0;
     margin-top: 6px;
 }
 
@@ -1197,6 +1197,14 @@ textarea::placeholder {
 
 .row .input-field {
     margin-top: -15px;
+}
+
+.register-form-container .input-field {
+    gap: 0;
+}
+
+#register-submit {
+    margin-top: 12px;
 }
 
 form h3 {
