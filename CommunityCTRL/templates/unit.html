@@ -75,7 +75,11 @@
                 <form action="{{ url_for('unit') }}" method="POST">
                     <h2 class="first-row-title">Owner Detail</h2>
                     <div class="profile">
-                        <div class="profile-picture"></div>
+                        <div class="profile-picture">
+                            {% if profile_picture %}
+                            <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-img">
+                            {% endif %}
+                        </div>
                         <div class="infos">
                             <label>{{ user[1] }}</label>
                             <div class="owner-details">{{ user[2] }}</div>
