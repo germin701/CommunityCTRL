@@ -945,7 +945,7 @@ textarea::placeholder {
     flex: 1;
 }
 
-.visitor-section, .invitation-section, .blacklist-section, .staff-section, .admin-staff-section {
+.visitor-section, .invitation-section, .blacklist-section, .staff-section, .admin-staff-section, .unit-section {
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
@@ -960,7 +960,7 @@ textarea::placeholder {
     justify-content: flex-start;
 }
 
-.visitor-card, .invitation-card, .blacklist-card, .admin-staff-card {
+.visitor-card, .invitation-card, .blacklist-card, .admin-staff-card, .unit-card {
     padding-left: 9px;
     border-radius: 18px;
     border: 2px #DBE0E5 solid;
@@ -1006,7 +1006,7 @@ textarea::placeholder {
     margin-left: 16px;
 }
 
-.visitor-info, .invitation-info, .blacklist-info, .staff-info {
+.visitor-info, .invitation-info, .blacklist-info, .staff-info, .unit-info {
     padding: 6px 24px;
     flex-direction: column;
     justify-content: center;
@@ -1014,7 +1014,7 @@ textarea::placeholder {
     display: inline-flex;
 }
 
-.visitor-name, .blacklist-name, .staff-name {
+.visitor-name, .blacklist-name, .staff-name, .unit-name {
     color: #0D141C;
     font-size: 15px;
     font-weight: 700;
@@ -1022,7 +1022,7 @@ textarea::placeholder {
     word-wrap: break-word;
 }
 
-.visitor-details, .invitation-details, .blacklist-details, .staff-, .owner-details, .tenant-details {
+.visitor-details, .invitation-details, .blacklist-details, .staff-details, .owner-details, .tenant-details, .unit-details {
     color: #4A709C;
     font-size: 15px;
     font-weight: 400;
@@ -1047,6 +1047,11 @@ textarea::placeholder {
 
 .admin-staff-card .button-container {
     margin-left: 720px;
+    margin-top: 57px;
+}
+
+.unit-card .button-container {
+    margin-left: 780px;
     margin-top: 57px;
 }
 
