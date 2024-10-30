@@ -726,6 +726,9 @@ def unit():
                                profile_picture=profile_picture, vehicles=vehicles, tenant=tenant,
                                tenant_profile_picture=tenant_profile_picture, tenant_vehicles=tenant_vehicles)
 
+    else:
+        pass
+
 
 @app.route('/remove-tenant/<tenant_id>/<unit_id>', methods=['POST'])
 def remove_tenant(tenant_id, unit_id):
@@ -848,11 +851,6 @@ def register():
                 '''.format(url_for('landing'))
 
     return render_template('register.html', token=token, unit_num=unit_num)
-
-
-@app.route('/unit_list')
-def unit_list():
-    return render_template('unit_list.html')
 
 
 if __name__ == '__main__':
