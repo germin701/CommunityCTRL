@@ -623,7 +623,19 @@ def unit():
             # Fetch tenant details
             cursor.execute("SELECT * FROM users WHERE user_id=?", (tenant_user_id[0],))
             tenant = cursor.fetchone()
-            tenants.append(tenant)
+
+            # Convert BLOB to Base64 for the tenant's profile picture
+            tenant_profile_picture = None
+            if tenant[8]:
+                # Detect image type
+                image_type = imghdr.what(None, h=tenant[8])
+
+                # Check if image type is valid
+                if image_type in ['jpg', 'jpeg', 'png']:
+                    tenant_profile_picture = (f"data:image/{image_type};base64," + base64.b64encode(tenant[8])
+                                              .decode('utf-8'))
+
+            tenants.append({'details': tenant, 'profile_picture': tenant_profile_picture})
 
             # Fetch tenant's vehicles
             cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id "
