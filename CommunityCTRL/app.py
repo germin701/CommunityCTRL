@@ -5,6 +5,7 @@ from flask_mail import Mail, Message
 import secrets
 import re
 import base64
+import imghdr
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
@@ -215,14 +216,22 @@ def profile():
     cursor = get_db().cursor()
     cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
     user = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the profile picture
     profile_pic = None
     if user[8]:
-        profile_pic = 'data:image/jpeg;base64,' + base64.b64encode(user[8]).decode('utf-8')
+        # Detect image type
+        image_type = imghdr.what(None, h=user[8])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            profile_pic = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
     return render_template('profile.html', user=user, role=session['role'], currentProfilePic=profile_pic)
 
 
 @app.route('/upload_profile_pic', methods=['POST'])
 def upload_profile_pic():
+    allowed_extensions = {'jpg', 'jpeg', 'png'}
     if 'profile_pic' not in request.files:
         return '''
             <script>
@@ -236,6 +245,22 @@ def upload_profile_pic():
         return '''
             <script>
                 alert("No file selected!");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('profile'))
+
+    if file.filename.split('.')[-1].lower() not in allowed_extensions:
+        return '''
+            <script>
+                alert("Invalid file type! Please upload jpg, jpeg, or png.");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('profile'))
+
+    if file.mimetype not in ['image/jpeg', 'image/png']:
+        return '''
+            <script>
+                alert("Invalid file type! Please upload a valid image.");
                 window.location.href = "{}";
             </script>
             '''.format(url_for('profile'))
@@ -571,6 +596,16 @@ def unit():
         user = cursor.fetchone()
         print(user)
 
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if user[8]:
+            # Detect image type
+            image_type = imghdr.what(None, h=user[8])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
+
         # Get owner's vehicles
         cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
                        "v.type_id AND v.user_id=?", (session['user_id'],))
@@ -598,7 +633,8 @@ def unit():
 
         print(tenant_vehicles)
         return render_template('unit.html', unit=unit_num, user=user, role=session['role'],
-                               vehicles=vehicles, tenants=tenants, tenant_vehicles=tenant_vehicles)
+                               profile_picture=profile_picture, vehicles=vehicles, tenants=tenants,
+                               tenant_vehicles=tenant_vehicles)
 
 
 @app.route('/remove-tenant/<tenant_id>/<unit_id>', methods=['POST'])
