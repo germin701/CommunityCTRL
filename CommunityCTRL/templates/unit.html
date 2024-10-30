@@ -153,10 +153,10 @@
                         {% for tenant_vehicle in tenant_vehicles[tenant.details[0]] %}
                         <div class="row">
                             <div class="input-field">
-                                <input type="text" id="tenant-vehicle-type{{ loop.index }}" name="tenant-vehicle-type[]" class="type" value="{{ tenant_vehicle[0] }}" readonly> <!-- vehicle[0] is the type -->
+                                <input type="text" id="tenant-vehicle-type{{ loop.index }}" name="tenant-vehicle-type[]" class="type" value="{{ tenant_vehicle[0] }}" readonly>
                             </div>
                             <div class="input-field">
-                                <input type="text" id="tenant-vehicle-number{{ loop.index }}" name="tenant-vehicle-number[]" class="number" value="{{ tenant_vehicle[1] }}" readonly> <!-- vehicle[1] is the number -->
+                                <input type="text" id="tenant-vehicle-number{{ loop.index }}" name="tenant-vehicle-number[]" class="number" value="{{ tenant_vehicle[1] }}" readonly>
                             </div>
                         </div>
                         {% endfor %}
