@@ -594,7 +594,6 @@ def unit():
         # Get owner details
         cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
         user = cursor.fetchone()
-        print(user)
 
         # Convert BLOB to Base64 for the profile picture
         profile_picture = None
@@ -610,7 +609,6 @@ def unit():
         cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
                        "v.type_id AND v.user_id=?", (session['user_id'],))
         vehicles = cursor.fetchall()
-        print(vehicles)
 
         # Get unit tenant ids
         cursor.execute("SELECT t.user_id FROM unit_tenants t, users u WHERE t.user_id=u.user_id AND u.status=1 AND"
@@ -643,8 +641,7 @@ def unit():
             tenant_s_vehicle = cursor.fetchall()
             tenant_vehicles[tenant_user_id[0]] = tenant_s_vehicle
 
-        print(tenant_vehicles)
-        return render_template('unit.html', unit=unit_num, user=user, role=session['role'],
+        return render_template('unit.html', unit=unit_num, role=session['role'], user=user,
                                profile_picture=profile_picture, vehicles=vehicles, tenants=tenants,
                                tenant_vehicles=tenant_vehicles)
 
