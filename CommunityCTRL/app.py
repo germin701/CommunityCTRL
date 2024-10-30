@@ -645,6 +645,58 @@ def unit():
                                profile_picture=profile_picture, vehicles=vehicles, tenants=tenants,
                                tenant_vehicles=tenant_vehicles)
 
+    elif session['role'] == 'Tenant':
+        # Get unit id
+        cursor.execute("SELECT unit_id FROM unit_tenants WHERE user_id=?", (session['user_id'],))
+        unit_num = cursor.fetchone()[0]
+
+        # Get tenant details
+        cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
+        tenant = cursor.fetchone()
+
+        # Convert BLOB to Base64 for the profile picture
+        tenant_profile_picture = None
+        if tenant[8]:
+            # Detect image type
+            image_type = imghdr.what(None, h=tenant[8])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                tenant_profile_picture = (f"data:image/{image_type};base64," + base64.b64encode(tenant[8])
+                                          .decode('utf-8'))
+
+        # Get tenant's vehicles
+        cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
+                       "v.type_id AND v.user_id=?", (session['user_id'],))
+        tenant_vehicles = cursor.fetchall()
+
+        # Get unit owner id
+        cursor.execute("SELECT user_id FROM units WHERE unit_id=?", (unit_num,))
+        owner_id = cursor.fetchone()[0]
+
+        # Get unit owner details
+        cursor.execute("SELECT * FROM users WHERE user_id=?", (owner_id,))
+        user = cursor.fetchone()
+
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if user[8]:
+            # Detect image type
+            image_type = imghdr.what(None, h=user[8])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
+
+        # Get owner's vehicles
+        cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
+                       "v.type_id AND v.user_id=?", (user[0],))
+        vehicles = cursor.fetchall()
+
+        return render_template('tenant_unit.html', unit=unit_num, role=session['role'], user=user,
+                               profile_picture=profile_picture, vehicles=vehicles, tenant=tenant,
+                               tenant_profile_picture=tenant_profile_picture, tenant_vehicles=tenant_vehicles)
+
 
 @app.route('/remove-tenant/<tenant_id>/<unit_id>', methods=['POST'])
 def remove_tenant(tenant_id, unit_id):
