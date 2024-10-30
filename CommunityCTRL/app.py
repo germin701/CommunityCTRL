@@ -282,14 +282,23 @@ def upload_profile_pic():
 @app.route('/save_phone', methods=['POST'])
 def save_phone():
     new_phone = request.form['new-phone']
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE users SET phone = ? WHERE user_id = ?", (new_phone, session['user_id']))
-    conn.commit()
-    cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
-    user = cursor.fetchone()
-    return render_template('profile.html', user=user, role=session['role'],
-                           alert_message="Phone number updated successfully!")
+    # Validate contains only digits and length is 10/11
+    if not re.match(r'^\d{10,11}$', new_phone):
+        return '''
+            <script>
+                alert("Please enter a valid phone and only digits are allowed.");
+                window.history.back();
+            </script>
+            '''
+    else:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET phone = ? WHERE user_id = ?", (new_phone, session['user_id']))
+        conn.commit()
+        cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
+        user = cursor.fetchone()
+        return render_template('profile.html', user=user, role=session['role'],
+                               alert_message="Phone number updated successfully!")
 
 
 @app.route('/send_otp')
@@ -348,7 +357,6 @@ def save_email():
             return render_template('profile.html', user=user, role=session['role'],
                                    alert_message="OTP verified! Email updated successfully!")
         else:
-            flash('Invalid OTP. Please try again.', 'error')
             return '''
                 <script>
                     alert("Invalid OTP. Please try again.");
@@ -756,6 +764,8 @@ def generate_register_link(unit_id, role):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     token = request.args.get('token')
+    if not token:
+        return abort(404, description="Registration link is missing.")
     conn = get_db()
     cursor = conn.cursor()
 
@@ -765,25 +775,79 @@ def register():
     if not token_data:
         return abort(404, description="Invalid or expired registration link.")
 
+    token_id = token_data[0]
     unit_num = token_data[1]
-    role = token_data[2]
+    if token_data[2] == 2:
+        role_type = 'add owner'
+    else:
+        role_type = 'add tenant'
 
-    # if request.method == 'POST':
-    #     # Get tenant/owner registration details
-    #     name = request.form['name']
-    #     email = request.form['email']
-    #
-    #     # Save tenant/owner registration details
-    #     conn.execute("INSERT INTO registrations (unit_id, name, email, role) VALUES (?, ?, ?, ?)",
-    #                  (unit_id, name, email, role))
-    #     conn.execute("UPDATE registration_tokens SET used = 1 WHERE token = ?", (token,))
-    #     conn.commit()
-    #     conn.close()
-    #
-    #     flash(f'{role.capitalize()} registered successfully! Awaiting admin approval.')
-    #     return redirect('/registration-success')
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm-password']
+        gender = request.form['gender']
+        ic = request.form['ic']
+        phone = request.form['phone']
 
-    return render_template('register.html', unit_num=unit_num)
+        # Define password policy
+        password_policy = {
+            'min_length': 8,
+            'digit': r'[0-9]',
+            'special_char': r'[!@#$%^&*(),.?":{}|<>]'
+        }
+
+        if password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'error')
+            return redirect(url_for('register', token=token))
+
+        # Check if password meets policy
+        elif len(password) < password_policy['min_length']:
+            flash('Password must be at least 8 characters long.', 'error')
+            return redirect(url_for('register', token=token))
+        elif not re.search(password_policy['digit'], password):
+            flash('Password must contain at least one digit.', 'error')
+            return redirect(url_for('register', token=token))
+        elif not re.search(password_policy['special_char'], password):
+            flash('Password must contain at least one special character.', 'error')
+            return redirect(url_for('register', token=token))
+
+        # Validate contains only digits and length is 12
+        elif not re.match(r'^\d{12}$', ic):
+            flash('Please enter a valid ic and only digits are allowed.', 'error')
+            return redirect(url_for('register', token=token))
+
+        # Validate contains only digits and length is 10/11
+        elif not re.match(r'^\d{10,11}$', phone):
+            flash('Please enter a valid phone and only digits are allowed.', 'error')
+            return redirect(url_for('register', token=token))
+
+        else:
+            # Update register info and close token
+            cursor.execute("INSERT INTO registers (name, gender, ic, email, password, phone, token_id) VALUES "
+                           "(?, ?, ?, ?, ?, ?, ?)", (name, gender, ic, email, password, phone, token_id))
+            cursor.execute("UPDATE tokens SET status=0 WHERE token_id=?", (token_id,))
+            conn.commit()
+
+            # Get register_id
+            cursor.execute("SELECT register_id FROM registers WHERE token_id=?", (token_id,))
+            register_id = cursor.fetchone()[0]
+
+            # Update request list
+            cursor.execute("INSERT INTO requests (type, register_id, unit_id, status) VALUES (?, ?, ?, 1)",
+                           (role_type, register_id, unit_num))
+            conn.commit()
+
+            return '''
+                <script>
+                    alert("Registration completed! Please wait for admin approval. You will be able to log in once " +
+                        "your registration is approved.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('landing'))
+
+    return render_template('register.html', token=token, unit_num=unit_num)
 
 
 if __name__ == '__main__':
