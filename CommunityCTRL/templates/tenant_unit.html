@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommunityCTRL</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body class="no-scroll">
     <div class="screen-container">
@@ -151,6 +152,7 @@
                         <div class="input-field">
                             <input type="text" id="tenant-vehicle-number{{ loop.index }}" name="tenant-vehicle-number[]" class="number" value="{{ tenant_vehicle.1 }}" readonly>
                         </div>
+                        <i class="fa fa-minus-circle" onclick="removeVehicle('{{ tenant_vehicle.0 }}', '{{ tenant_vehicle.1 }}', {{ tenant[0] }})"></i>
                     </div>
                     {% endfor %}
                     <div id="new-vehicle-list"></div>
@@ -284,6 +286,28 @@
             // Append the new vehicle row to the list
             newVehicleList.appendChild(newVehicleRow);
         });
+
+        function removeVehicle(vehicleType, vehicleNum, user_id) {
+            const unitId = {{ unit }};
+
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to remove this vehicle?");
+
+            if (userConfirmed) {
+                fetch(`/remove-vehicle/${vehicleType}/${vehicleNum}/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = '/unit';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to remove vehicle. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
