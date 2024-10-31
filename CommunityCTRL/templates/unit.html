@@ -112,6 +112,7 @@
                         <div class="input-field">
                             <input type="text" id="owner-vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ owner_vehicle.1 }}" readonly>
                         </div>
+                        <i class="fa fa-minus-circle" onclick="removeVehicle('{{ owner_vehicle.0 }}', '{{ owner_vehicle.1 }}', {{ user[0] }})"></i>
                     </div>
                     {% endfor %}
                     <div id="new-vehicle-list"></div>
@@ -119,7 +120,7 @@
                     <h2 class="tenant-title">Tenant Detail</h2>
                     {% if tenants %}
                         {% for tenant in tenants %}
-                        <div class="profile">
+                        <div class="profile" id="tenant-profile">
                             <div class="profile-picture">
                                 {% if tenant.profile_picture %}
                                 <img src="{{ tenant.profile_picture }}" alt="Tenant Profile Picture">
@@ -143,7 +144,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <i class="fa fa-minus-circle" onclick="confirmRemoval({{ tenant[0] }}, {{ unit }})"></i>
+                            <i class="fa fa-minus-circle" onclick="confirmRemoval('{{ role }}', {{ tenant.details[0] }}, {{ unit }})"></i>
                         </div>
                         <h3>Vehicle Detail</h3>
                         <div class="row-label">
@@ -301,25 +302,44 @@
             newVehicleList.appendChild(newVehicleRow);
         });
 
-        function confirmRemoval(tenantId, unitId) {
+        function confirmRemoval(role, tenantId, unitId) {
             // Show a confirmation dialog
             const userConfirmed = confirm("Are you sure you want to remove this tenant?");
 
             if (userConfirmed) {
-                fetch(`/remove-tenant/${tenantId}/${unitId}`, {
+                fetch(`/remove-tenant/${role}/${tenantId}/${unitId}`, {
                     method: 'POST',
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                    } else {
-                        alert(data.message);
-                    }
+                    alert(data.message);
+                    window.location.href = '/unit';
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert("Failed to send the request. Please try again.");
+                });
+            }
+        }
+
+        function removeVehicle(vehicleType, vehicleNum, user_id) {
+            const unitId = {{ unit }};
+
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to remove this vehicle?");
+
+            if (userConfirmed) {
+                fetch(`/remove-vehicle/${vehicleType}/${vehicleNum}/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = '/unit';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to remove vehicle. Please try again.");
                 });
             }
         }
