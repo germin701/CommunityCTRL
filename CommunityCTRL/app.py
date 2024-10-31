@@ -1100,5 +1100,10 @@ def register():
     return render_template('register.html', token=token, unit_num=unit_num)
 
 
+@app.route('/request_list')
+def request_list():
+    return render_template('request_list.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
