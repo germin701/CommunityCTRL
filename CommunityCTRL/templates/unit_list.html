@@ -59,7 +59,7 @@
                 <h1>Unit</h1>
                 <div class="search-container">
                     <img src="{{ url_for('static', filename='asset/magnifier.png') }}" alt="Magnifier" class="magnifier-icon">
-                    <input type="text" class="search-input" placeholder="Search Unit">
+                    <input type="text" id="unitSearch" class="search-input" placeholder="Search Unit">
                 </div>
                 <div class="button-container">
                     <button class="blue-button">Request List</button>
@@ -78,7 +78,7 @@
             </div>
             <div class="unit-section">
                 {% for unit in units %}
-                <div class="unit-card">
+                <div class="unit-card" data-unit="{{ unit[0] }}">
                     <div class="avatar"></div>
                     <div class="unit-info">
                         <div class="unit-name">{{ unit[0] }}</div>
@@ -183,6 +183,20 @@
                     logo.src = "{{ url_for('static', filename='asset/logo.png') }}";
                     localStorage.setItem('theme', 'light');
                     updateIcons('light');
+                }
+            });
+        });
+
+        document.getElementById('unitSearch').addEventListener('input', function() {
+            const searchTerm = this.value;
+            const units = document.querySelectorAll('.unit-card');
+
+            units.forEach(unit => {
+                const unitId = unit.getAttribute('data-unit');
+                if (unitId.includes(searchTerm)) {
+                    unit.style.display = 'inline-flex';
+                } else {
+                    unit.style.display = 'none';
                 }
             });
         });
