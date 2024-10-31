@@ -71,42 +71,17 @@
             </div>
             <div class="request-list-section">
                 <div class="request-list-card-container">
+                    {% for request in requests %}
                     <div class="request-list-card">
                         <div class="request-list-info">
-                            <div class="request-list-title">Remove Tenant</div>
-                            <div class="request-list-details">Unit: 1001</div>
+                            <div class="request-list-title">{{ request[1] }}</div>
+                            <div class="request-list-details">Unit: {{ request[3] }}</div>
                         </div>
                         <div class="button-container">
                             <button class="blue-button">View Details</button>
                         </div>
                     </div>
-                    <div class="request-list-card">
-                        <div class="request-list-info">
-                            <div class="request-list-title">Add Tenant</div>
-                            <div class="request-list-details">Unit: 1001</div>
-                        </div>
-                        <div class="button-container">
-                            <button class="blue-button">View Details</button>
-                        </div>
-                    </div>
-                    <div class="request-list-card">
-                        <div class="request-list-info">
-                            <div class="request-list-title">New Owner</div>
-                            <div class="request-list-details">Unit: 1003</div>
-                        </div>
-                        <div class="button-container">
-                            <button class="blue-button">View Details</button>
-                        </div>
-                    </div>
-                    <div class="request-list-card">
-                        <div class="request-list-info">
-                            <div class="request-list-title">Remove Tenant</div>
-                            <div class="request-list-details">Unit: 1001</div>
-                        </div>
-                        <div class="button-container">
-                            <button class="blue-button">View Details</button>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
