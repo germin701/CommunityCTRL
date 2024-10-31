@@ -269,7 +269,7 @@ def upload_profile_pic():
         image_data = file.read()
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("UPDATE users SET picture = ? WHERE user_id = ?", (image_data, session['user_id']))
+        cursor.execute("UPDATE users SET picture=? WHERE user_id=?", (image_data, session['user_id']))
         conn.commit()
         return '''
             <script>
@@ -293,7 +293,7 @@ def save_phone():
     else:
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("UPDATE users SET phone = ? WHERE user_id = ?", (new_phone, session['user_id']))
+        cursor.execute("UPDATE users SET phone=? WHERE user_id=?", (new_phone, session['user_id']))
         conn.commit()
         cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
         user = cursor.fetchone()
@@ -347,7 +347,7 @@ def save_email():
 
         # Verify OTP
         if user_otp == otp:
-            cursor.execute("UPDATE users SET email = ? WHERE user_id = ?", (session['email'], session['user_id']))
+            cursor.execute("UPDATE users SET email=? WHERE user_id=?", (session['email'], session['user_id']))
             conn.commit()
             session.pop('otp', None)
             session.pop('otp_expiration', None)
@@ -419,7 +419,7 @@ def save_password():
                 </script>
                 '''
         else:
-            cursor.execute("UPDATE users SET password = ? WHERE user_id = ?", (new_password, session['user_id']))
+            cursor.execute("UPDATE users SET password=? WHERE user_id=?", (new_password, session['user_id']))
             conn.commit()
             return render_template('profile.html', user=user, role=session['role'],
                                    alert_message="Password updated successfully!")
@@ -577,23 +577,37 @@ def unit():
         if request.method == 'POST':
             new_vehicle_types = request.form.getlist('newVehicleType[]')
             new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
+            if not new_vehicle_types:
+                pass
+            else:
+                # Insert new vehicles into the database
+                for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                    if vehicle_type and vehicle_number:
+                        if vehicle_type == 'Car':
+                            vehicle_id = 1
+                        else:
+                            vehicle_id = 2
 
-            # Insert new vehicles into the database
-            for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
-                if vehicle_type and vehicle_number:
-                    if vehicle_type == 'Car':
-                        vehicle_id = 1
-                    else:
-                        vehicle_id = 2
-                    cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id) VALUES (?, ?, ?)",
-                                   (vehicle_id, vehicle_number, session['user_id']))
-                    conn.commit()
-            return '''
-                <script>
-                    alert("Vehicle added successfully!");
-                    window.location.href = "{}";
-                </script>
-                '''.format(url_for('unit'))
+                        # Check if the vehicle already exists for the current user
+                        cursor.execute("SELECT user_vehicle_id FROM user_vehicles WHERE type_id=? AND "
+                                       "vehicle_number=? AND user_id=?", (vehicle_id, vehicle_number,
+                                                                          session['user_id']))
+                        existing_vehicle = cursor.fetchone()
+                        if existing_vehicle is not None:
+                            existing_vehicle_id = existing_vehicle[0]
+                            cursor.execute("UPDATE user_vehicles SET status=1 WHERE user_vehicle_id=?",
+                                           (existing_vehicle_id,))
+                        else:
+                            cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id) VALUES "
+                                           "(?, ?, ?)", (vehicle_id, vehicle_number, session['user_id']))
+                        conn.commit()
+
+                return '''
+                    <script>
+                        alert("Vehicle added successfully!");
+                        window.location.href = "{}";
+                    </script>
+                    '''.format(url_for('unit'))
 
         # Get unit id
         cursor.execute("SELECT unit_id FROM units WHERE user_id=?", (session['user_id'],))
@@ -615,7 +629,7 @@ def unit():
 
         # Get owner's vehicles
         cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
-                       "v.type_id AND v.user_id=?", (session['user_id'],))
+                       "v.type_id AND v.status=1 AND v.user_id=?", (session['user_id'],))
         vehicles = cursor.fetchall()
 
         # Get unit tenant ids
@@ -645,7 +659,7 @@ def unit():
 
             # Fetch tenant's vehicles
             cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id "
-                           "= v.type_id AND v.user_id=?", (tenant_user_id[0],))
+                           "= v.type_id AND v.status=1 AND v.user_id=?", (tenant_user_id[0],))
             tenant_s_vehicle = cursor.fetchall()
             tenant_vehicles[tenant_user_id[0]] = tenant_s_vehicle
 
@@ -657,23 +671,37 @@ def unit():
         if request.method == 'POST':
             new_vehicle_types = request.form.getlist('newVehicleType[]')
             new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
+            if not new_vehicle_types:
+                pass
+            else:
+                # Insert new vehicles into the database
+                for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                    if vehicle_type and vehicle_number:
+                        if vehicle_type == 'Car':
+                            vehicle_id = 1
+                        else:
+                            vehicle_id = 2
 
-            # Insert new vehicles into the database
-            for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
-                if vehicle_type and vehicle_number:
-                    if vehicle_type == 'Car':
-                        vehicle_id = 1
-                    else:
-                        vehicle_id = 2
-                    cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id) VALUES (?, ?, ?)",
-                                   (vehicle_id, vehicle_number, session['user_id']))
-                    conn.commit()
-            return '''
-                <script>
-                    alert("Vehicle added successfully!");
-                    window.location.href = "{}";
-                </script>
-                '''.format(url_for('unit'))
+                        # Check if the vehicle already exists for the current user
+                        cursor.execute("SELECT user_vehicle_id FROM user_vehicles WHERE type_id=? AND "
+                                       "vehicle_number=? AND user_id=?", (vehicle_id, vehicle_number,
+                                                                          session['user_id']))
+                        existing_vehicle = cursor.fetchone()
+                        if existing_vehicle is not None:
+                            existing_vehicle_id = existing_vehicle[0]
+                            cursor.execute("UPDATE user_vehicles SET status=1 WHERE user_vehicle_id=?",
+                                           (existing_vehicle_id,))
+                        else:
+                            cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id, status) "
+                                           "VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, session['user_id']))
+                        conn.commit()
+
+                return '''
+                    <script>
+                        alert("Vehicle added successfully!");
+                        window.location.href = "{}";
+                    </script>
+                    '''.format(url_for('unit'))
 
         # Get unit id
         cursor.execute("SELECT unit_id FROM unit_tenants WHERE user_id=?", (session['user_id'],))
@@ -696,7 +724,7 @@ def unit():
 
         # Get tenant's vehicles
         cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
-                       "v.type_id AND v.user_id=?", (session['user_id'],))
+                       "v.type_id AND v.status=1 AND v.user_id=?", (session['user_id'],))
         tenant_vehicles = cursor.fetchall()
 
         # Get unit owner id
@@ -719,7 +747,7 @@ def unit():
 
         # Get owner's vehicles
         cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
-                       "v.type_id AND v.user_id=?", (user[0],))
+                       "v.type_id AND v.status=1 AND v.user_id=?", (user[0],))
         vehicles = cursor.fetchall()
 
         return render_template('tenant_unit.html', unit=unit_num, role=session['role'], user=user,
@@ -727,23 +755,242 @@ def unit():
                                tenant_profile_picture=tenant_profile_picture, tenant_vehicles=tenant_vehicles)
 
     else:
-        pass
+        # Get unit list with owner details
+        cursor.execute("SELECT units.unit_id, units.user_id, u.name, u.phone, u.email FROM units LEFT JOIN users u ON "
+                       "units.user_id = u.user_id")
+        units = cursor.fetchall()
+
+        return render_template('unit_list.html', units=units)
 
 
-@app.route('/remove-tenant/<tenant_id>/<unit_id>', methods=['POST'])
-def remove_tenant(tenant_id, unit_id):
+@app.route('/admin_unit', methods=['GET', 'POST'])
+def admin_unit():
+    unit_num = request.args.get('unit_id')
+    if not unit_num:
+        return abort(404, description="Invalid unit.")
     conn = get_db()
     cursor = conn.cursor()
+    if request.method == 'POST':
+        # Dictionary to store vehicles for each owner and tenant
+        owner_vehicles = {}
+        tenant_vehicles = {}
+        vehicle_entry = {}
+
+        # Combined loop to process both owner and tenant vehicle data
+        for field_name, vehicle_data in request.form.items():
+            # Check if the field is related to owner or tenant vehicles
+            if field_name.startswith("ownerVehicles"):
+                # Extract owner_id
+                entity_id = field_name.split('[')[1].split(']')[0]
+
+                # Initialize the list for the owner if not already present
+                if entity_id not in owner_vehicles:
+                    owner_vehicles[entity_id] = []
+                current_dict = owner_vehicles[entity_id]
+
+            elif field_name.startswith("tenantVehicles"):
+                # Extract tenant_id
+                entity_id = field_name.split('[')[1].split(']')[0]
+
+                # Initialize the list for the tenant if not already present
+                if entity_id not in tenant_vehicles:
+                    tenant_vehicles[entity_id] = []
+                current_dict = tenant_vehicles[entity_id]
+
+            # Skip if the field is neither owner nor tenant vehicle
+            else:
+                continue
+
+            # Store vehicle type or number in a temporary dictionary
+            if 'type' in field_name:
+                vehicle_entry = {'type': vehicle_data}
+            elif 'number' in field_name:
+                vehicle_entry['number'] = vehicle_data
+
+                # Once both type and number are added, append to the appropriate list
+                current_dict.append(vehicle_entry)
+
+                # Reset for the next vehicle
+                vehicle_entry = {}
+
+        # Check if there are any vehicles to update or insert
+        if not owner_vehicles and not tenant_vehicles:
+            pass
+
+        else:
+            for owner_id, vehicles in owner_vehicles.items():
+                for vehicle in vehicles:
+                    vehicle_type = vehicle.get('type')
+                    vehicle_number = vehicle.get('number')
+                    if vehicle_type == 'Car':
+                        vehicle_id = 1
+                    else:
+                        vehicle_id = 2
+
+                    # Check if the vehicle already exists for the current user
+                    cursor.execute("SELECT user_vehicle_id FROM user_vehicles WHERE type_id=? AND vehicle_number=?"
+                                   " AND user_id=?", (vehicle_id, vehicle_number, owner_id))
+                    existing_vehicle = cursor.fetchone()
+                    if existing_vehicle is not None:
+                        existing_vehicle_id = existing_vehicle[0]
+                        cursor.execute("UPDATE user_vehicles SET status=1 WHERE user_vehicle_id=?",
+                                       (existing_vehicle_id,))
+                    else:
+                        cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id, status) "
+                                       "VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, owner_id))
+                    conn.commit()
+
+            for tenant_id, vehicles in tenant_vehicles.items():
+                for vehicle in vehicles:
+                    vehicle_type = vehicle.get('type')
+                    vehicle_number = vehicle.get('number')
+                    if vehicle_type == 'Car':
+                        vehicle_id = 1
+                    else:
+                        vehicle_id = 2
+
+                    # Check if the vehicle already exists for the current user
+                    cursor.execute("SELECT user_vehicle_id FROM user_vehicles WHERE type_id=? AND vehicle_number=?"
+                                   " AND user_id=?", (vehicle_id, vehicle_number, tenant_id))
+                    existing_vehicle = cursor.fetchone()
+                    if existing_vehicle is not None:
+                        existing_vehicle_id = existing_vehicle[0]
+                        cursor.execute("UPDATE user_vehicles SET status=1 WHERE user_vehicle_id=?",
+                                       (existing_vehicle_id,))
+                    else:
+                        cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id, status) "
+                                       "VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, tenant_id))
+                    conn.commit()
+
+            return '''
+                <script>
+                    alert("Vehicle added successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_unit', unit_id=unit_num))
+
+    # Get owner user id
+    cursor.execute("SELECT units.user_id FROM units, users u WHERE units.user_id=u.user_id AND u.status=1 AND "
+                   "units.unit_id=?", (unit_num,))
+    result = cursor.fetchone()
+    user_id = result[0] if result else None
+
+    if not user_id:
+        return render_template('admin_unit.html', unit=unit_num, role=session['role'], user=None,
+                               profile_picture=None, vehicles=[], tenants=[], tenant_vehicles={})
+
+    # Get owner details
+    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
+    user = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the profile picture
+    profile_picture = None
+    if user[8]:
+        # Detect image type
+        image_type = imghdr.what(None, h=user[8])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            profile_picture = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
+
+    # Get owner's vehicles
+    cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
+                   "v.type_id AND v.status=1 AND v.user_id=?", (user_id,))
+    vehicles = cursor.fetchall()
+
+    # Get unit tenant ids
+    cursor.execute("SELECT t.user_id FROM unit_tenants t, users u WHERE t.user_id=u.user_id AND u.status=1 AND"
+                   " t.unit_id=?", (unit_num,))
+    tenant_user_ids = cursor.fetchall()
+
+    tenants = []
+    tenant_vehicles = {}
+    for tenant_user_id in tenant_user_ids:
+        # Fetch tenant details
+        cursor.execute("SELECT * FROM users WHERE user_id=?", (tenant_user_id[0],))
+        tenant = cursor.fetchone()
+
+        # Convert BLOB to Base64 for the tenant's profile picture
+        tenant_profile_picture = None
+        if tenant[8]:
+            # Detect image type
+            image_type = imghdr.what(None, h=tenant[8])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                tenant_profile_picture = (f"data:image/{image_type};base64," + base64.b64encode(tenant[8])
+                                          .decode('utf-8'))
+
+        tenants.append({'details': tenant, 'profile_picture': tenant_profile_picture})
+
+        # Fetch tenant's vehicles
+        cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id "
+                       "= v.type_id AND v.status=1 AND v.user_id=?", (tenant_user_id[0],))
+        tenant_s_vehicle = cursor.fetchall()
+        tenant_vehicles[tenant_user_id[0]] = tenant_s_vehicle
+
+    return render_template('admin_unit.html', unit=unit_num, role=session['role'], user=user,
+                           profile_picture=profile_picture, vehicles=vehicles, tenants=tenants,
+                           tenant_vehicles=tenant_vehicles)
+
+
+@app.route('/remove-owner/<owner_id>/<unit_id>', methods=['POST'])
+def remove_owner(owner_id, unit_id):
+    # Get current date
+    current_date = datetime.now().strftime("%d-%m-%Y")
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE units SET user_id=NULL WHERE unit_id=?", (unit_id,))
+    cursor.execute("UPDATE users SET status=0 WHERE user_id=?", (owner_id,))
+    cursor.execute("INSERT INTO unit_history (unit_id, user_id, date) VALUES (?, ?, ?)",
+                   (unit_id, owner_id, current_date))
+    conn.commit()
+    return jsonify({"message": "Owner remove successfully."})
+
+
+@app.route('/remove-tenant/<role>/<tenant_id>/<unit_id>', methods=['POST'])
+def remove_tenant(role, tenant_id, unit_id):
+    # Get current date
+    current_date = datetime.now().strftime("%d-%m-%Y")
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Check request exist or not
     cursor.execute("SELECT * FROM requests WHERE type='remove tenant' AND unit_id=? AND user_id=? AND status=1",
                    (unit_id, tenant_id))
     request_exist = cursor.fetchone()
-    if request_exist:
-        return jsonify({"success": False, "message": "Request already sent. Please wait for admin approval."})
-    else:
-        cursor.execute("INSERT INTO requests (type, unit_id, user_id, status) VALUES ('remove tenant', ?, ?, 1)",
-                       (unit_id, tenant_id))
+
+    if role == 'Admin':
+        if request_exist:
+            cursor.execute("UPDATE requests SET status=0 WHERE request_id=?", (request_exist[0],))
+        cursor.execute("DELETE FROM unit_tenants WHERE user_id=?", (tenant_id,))
+        cursor.execute("UPDATE users SET status=0 WHERE user_id=?", (tenant_id,))
+        cursor.execute("INSERT INTO unit_history (unit_id, user_id, date) VALUES (?, ?, ?)",
+                       (unit_id, tenant_id, current_date))
         conn.commit()
-        return jsonify({"success": True, "message": "Request sent to Admin. Please wait for their approval."})
+        return jsonify({"message": "Tenant remove successfully."})
+    else:
+        if request_exist:
+            return jsonify({"message": "Request already sent. Please wait for admin approval."})
+        else:
+            cursor.execute("INSERT INTO requests (type, unit_id, user_id, status) VALUES ('remove tenant', ?, ?, "
+                           "1)", (unit_id, tenant_id))
+            conn.commit()
+            return jsonify({"message": "Request sent to Admin. Please wait for their approval."})
+
+
+@app.route('/remove-vehicle/<vehicle_type>/<vehicle_num>/<user_id>', methods=['POST'])
+def remove_vehicle(vehicle_type, vehicle_num, user_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    if vehicle_type == 'Car':
+        type_id = 1
+    else:
+        type_id = 2
+    cursor.execute("UPDATE user_vehicles SET status=0 WHERE type_id=? AND vehicle_number=? AND user_id=?",
+                   (type_id, vehicle_num, user_id))
+    conn.commit()
+    return jsonify({"message": "Vehicle removed successfully."})
 
 
 @app.route('/generate-register-link/<unit_id>/<role>', methods=['POST'])
@@ -773,7 +1020,7 @@ def register():
     cursor = conn.cursor()
 
     # Check if token is valid and not used
-    cursor.execute("SELECT * FROM tokens WHERE token = ? AND status = 1", (token,))
+    cursor.execute("SELECT * FROM tokens WHERE token=? AND status=1", (token,))
     token_data = cursor.fetchone()
     if not token_data:
         return abort(404, description="Invalid or expired registration link.")
