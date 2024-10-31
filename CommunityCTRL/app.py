@@ -1102,7 +1102,14 @@ def register():
 
 @app.route('/request_list')
 def request_list():
-    return render_template('request_list.html')
+    cursor = get_db().cursor()
+    cursor.execute("SELECT * FROM requests WHERE status=1")
+    requests = cursor.fetchall()
+
+    # Convert the second element of each tuple to title case
+    requests = [(item[0], item[1].title(), *item[2:]) for item in requests]
+    print(requests)
+    return render_template('request_list.html', requests=requests)
 
 
 if __name__ == '__main__':
