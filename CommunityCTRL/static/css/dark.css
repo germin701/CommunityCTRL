@@ -976,6 +976,7 @@ textarea::placeholder {
     margin-left: 12px;
     margin-right: 9px;
     margin-bottom: 18px;
+    position: relative;
 }
 
 .admin-visitor-card {
@@ -1055,8 +1056,10 @@ textarea::placeholder {
 }
 
 .unit-card .button-container {
-    margin-left: 780px;
-    margin-top: 57px;
+    position: absolute;
+    right: 20px;
+    top: 75%;
+    transform: translateY(-50%);
 }
 
 .invitation-card .admin-invite-button-container {
@@ -1163,6 +1166,13 @@ textarea::placeholder {
     align-items: center;
     gap: 12px;
     margin-top: 30px;
+}
+
+.row i {
+    font-size: 24px;
+    cursor: pointer;
+    margin-bottom: 9px;
+    color: #4A709C;
 }
 
 .row-label {
@@ -1374,6 +1384,10 @@ textarea#reason {
     margin-top: -54px;
 }
 
+#tenant-profile {
+    margin-top: 15px;
+}
+
 .profile-pic {
     margin-top: 57px;
     background-color: #E8EDF5;
@@ -1410,6 +1424,7 @@ textarea#reason {
     font-weight: 600;
     text-decoration: none;
     margin-top: 6px;
+    margin-right: 24px;
 }
 
 .link i {
