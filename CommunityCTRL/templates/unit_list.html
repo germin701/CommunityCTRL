@@ -77,90 +77,20 @@
                 </div>
             </div>
             <div class="unit-section">
+                {% for unit in units %}
                 <div class="unit-card">
                     <div class="avatar"></div>
                     <div class="unit-info">
-                        <div class="unit-name">Samantha Joe</div>
-                        <div class="unit-details">Position: Manager</div>
-                        <div class="unit-details">Phone: 041232569</div>
-                        <div class="unit-details">Email: samantha@gmail.com</div>
+                        <div class="unit-name">{{ unit[0] }}</div>
+                        <div class="unit-details">Owner: {{ unit[2] }}</div>
+                        <div class="unit-details">Phone: {{ unit[3] }}</div>
+                        <div class="unit-details">Email: {{ unit[4] }}</div>
                     </div>
                     <div class="button-container">
-                        <button class="blues-button">View Details</button>
+                        <button class="blues-button" onclick="window.location.href='/admin_unit?unit_id={{ unit[0] }}'">View Details</button>
                     </div>
                 </div>
-                <div class="unit-card">
-                    <div class="avatar"></div>
-                    <div class="unit-info">
-                        <div class="unit-name">Samantha Joe</div>
-                        <div class="unit-details">Position: Manager</div>
-                        <div class="unit-details">Phone: 041232569</div>
-                        <div class="unit-details">Email: samantha@gmail.com</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">View Details</button>
-                    </div>
-                </div>
-                <div class="unit-card">
-                    <div class="avatar"></div>
-                    <div class="unit-info">
-                        <div class="unit-name">Samantha Joe</div>
-                        <div class="unit-details">Position: Manager</div>
-                        <div class="unit-details">Phone: 041232569</div>
-                        <div class="unit-details">Email: samantha@gmail.com</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">View Details</button>
-                    </div>
-                </div>
-                <div class="unit-card">
-                    <div class="avatar"></div>
-                    <div class="unit-info">
-                        <div class="unit-name">Samantha Joe</div>
-                        <div class="unit-details">Position: Manager</div>
-                        <div class="unit-details">Phone: 041232569</div>
-                        <div class="unit-details">Email: samantha@gmail.com</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">View Details</button>
-                    </div>
-                </div>
-                <div class="unit-card">
-                    <div class="avatar"></div>
-                    <div class="unit-info">
-                        <div class="unit-name">Samantha Joe</div>
-                        <div class="unit-details">Position: Manager</div>
-                        <div class="unit-details">Phone: 041232569</div>
-                        <div class="unit-details">Email: samantha@gmail.com</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">View Details</button>
-                    </div>
-                </div>
-                <div class="unit-card">
-                    <div class="avatar"></div>
-                    <div class="unit-info">
-                        <div class="unit-name">Samantha Joe</div>
-                        <div class="unit-details">Position: Manager</div>
-                        <div class="unit-details">Phone: 041232569</div>
-                        <div class="unit-details">Email: samantha@gmail.com</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">View Details</button>
-                    </div>
-                </div>
-                <div class="unit-card">
-                    <div class="avatar"></div>
-                    <div class="unit-info">
-                        <div class="unit-name">Samantha Joe</div>
-                        <div class="unit-details">Position: Manager</div>
-                        <div class="unit-details">Phone: 041232569</div>
-                        <div class="unit-details">Email: samantha@gmail.com</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">View Details</button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
