@@ -1202,6 +1202,7 @@ def request_tenant_details(request_id):
                 </script>
                 '''.format(url_for('request_list'))
 
+    # Get request details
     cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
     request_details = cursor.fetchone()
 
@@ -1238,10 +1239,24 @@ def request_tenant_details(request_id):
 def request_owner_details(request_id):
     conn = get_db()
     cursor = conn.cursor()
+
+    # Get request details
     cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
     request_details = cursor.fetchone()
 
-    return render_template('request_owner_details.html', request_details=request_details)
+    # Unpack and modify the second element
+    request_details = (request_details[0], request_details[1].title(), *request_details[2:])
+
+    # Get unit_id
+    unit_num = request_details[3]
+
+    # Get registration details
+    cursor.execute("SELECT registers.* FROM registers, requests r WHERE registers.register_id=r.register_id AND "
+                   "r.register_id=?", (request_details[2],))
+    register_details = cursor.fetchone()
+
+    return render_template('request_owner_details.html', unit=unit_num, request_details=request_details,
+                           register_details=register_details)
 
 
 if __name__ == '__main__':
