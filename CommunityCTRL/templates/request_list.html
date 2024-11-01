@@ -78,7 +78,11 @@
                             <div class="request-list-details">Unit: {{ request[3] }}</div>
                         </div>
                         <div class="button-container">
-                            <button class="blue-button">View Details</button>
+                            <button
+                                class="blue-button"
+                                onclick="window.location.href='{% if request[1] in ['Add Tenant', 'Remove Tenant'] %}{{ url_for('request_tenant_details', request_id=request[0]) }}{% else %}{{ url_for('request_owner_details', request_id=request[0]) }}{% endif %}'">
+                                View Details
+                            </button>
                         </div>
                     </div>
                     {% endfor %}
