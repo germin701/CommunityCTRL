@@ -197,7 +197,35 @@ def reset_password():
 
 @app.route('/home')
 def home():
-    return render_template('home.html', role=session['role'])
+    cursor = get_db().cursor()
+
+    # Get announcement list
+    cursor.execute("SELECT * FROM announcement WHERE status=1")
+    announcements_data = cursor.fetchall()
+
+    # Convert the fetched data to a list of dictionaries with Base64 encoding for images
+    announcements_list = []
+    for row in announcements_data:
+        picture_data = None
+        if row[3]:
+            # Detect image type
+            image_type = imghdr.what(None, h=row[3])
+
+            # Check if image type is valid and encode it to Base64
+            if image_type in ['jpg', 'jpeg', 'png']:
+                picture_data = f"data:image/{image_type};base64," + base64.b64encode(row[3]).decode('utf-8')
+
+        # Append announcement dictionary to the list
+        announcements_list.append({
+            'announcement_id': row[0],
+            'title': row[1],
+            'detail': row[2],
+            'picture': picture_data,
+            'status': row[4],
+            'date': row[5]
+        })
+
+    return render_template('home.html', announcements=announcements_list, role=session['role'])
 
 
 @app.route('/admin_home')
