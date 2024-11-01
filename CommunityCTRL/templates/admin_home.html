@@ -71,52 +71,26 @@
                 </div>
             </div>
             <div class="announcement-section">
+                {% for announcement in announcements %}
                 <div class="announcement-card">
                     <div class="card-header">
-                        <h3>Announcing the new guest check-in app</h3>
-                        <button class="edit-button" >
-                            <img src="{{ url_for('static', filename='asset/edit.png') }}" alt="Edit" class="edit-icon">
-                        </button>
+                        <h3>{{ announcement.title }}</h3>
+                        <div class="dropdown">
+                            <button class="edit-button" onclick="toggleDropdown({{ announcement.announcement_id }})">
+                                <img src="{{ url_for('static', filename='asset/edit.png') }}" alt="Edit" class="edit-icon">
+                            </button>
+                            <div id="dropdown-{{ announcement.announcement_id }}" class="dropdown-content">
+                                <a>Edit</a>
+                                <a>Delete</a>
+                            </div>
+                        </div>
                     </div>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
+                    <p>{{ announcement.detail }}</p>
+                    {% if announcement.picture %}
+                        <img src="{{ announcement.picture }}" alt="Image">
+                    {% endif %}
                 </div>
-                <div class="announcement-card">
-                    <div class="card-header">
-                        <h3>Announcing the new guest check-in app</h3>
-                        <button class="edit-button" >
-                            <img src="{{ url_for('static', filename='asset/edit.png') }}" alt="Edit" class="edit-icon">
-                        </button>
-                    </div>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
-                    <img src="https://via.placeholder.com/100x100" alt="Image">
-                </div>
-                <div class="announcement-card">
-                    <div class="card-header">
-                        <h3>Announcing the new guest check-in app</h3>
-                        <button class="edit-button" >
-                            <img src="{{ url_for('static', filename='asset/edit.png') }}" alt="Edit" class="edit-icon">
-                        </button>
-                    </div>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
-                </div>
-                <div class="announcement-card">
-                    <div class="card-header">
-                        <h3>Announcing the new guest check-in app</h3>
-                        <button class="edit-button" >
-                            <img src="{{ url_for('static', filename='asset/edit.png') }}" alt="Edit" class="edit-icon">
-                        </button>
-                    </div>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
-                    <img src="https://via.placeholder.com/100x100" alt="Image">
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -222,6 +196,11 @@
                 }
             });
         });
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById('dropdown-' + id);
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
     </script>
 </body>
 </html>
