@@ -1108,7 +1108,6 @@ def request_list():
 
     # Convert the second element of each tuple to title case
     requests = [(item[0], item[1].title(), *item[2:]) for item in requests]
-    print(requests)
     return render_template('request_list.html', requests=requests)
 
 
@@ -1147,8 +1146,7 @@ def request_tenant_details(request_id):
                 cursor.execute("SELECT user_id FROM users WHERE ic=? AND role_id=3 AND status=1",
                                (register_details[3],))
                 new_tenant_user_id = cursor.fetchone()[0]
-                cursor.execute("SELECT unit_id FROM requests WHERE request_id=?", (request_id,))
-                unit_num = cursor.fetchone()[0]
+                unit_num = request_details[3]
 
                 # Add tenant to unit
                 cursor.execute("INSERT INTO unit_tenants (user_id, unit_id) VALUES (?, ?)",
@@ -1235,10 +1233,65 @@ def request_tenant_details(request_id):
                                tenant_details=tenant_details)
 
 
-@app.route('/request_owner_details/<request_id>')
+@app.route('/request_owner_details/<request_id>', methods=['GET', 'POST'])
 def request_owner_details(request_id):
     conn = get_db()
     cursor = conn.cursor()
+
+    if request.method == 'POST':
+        # Get request details
+        cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
+        request_details = cursor.fetchone()
+
+        # Update request
+        cursor.execute("UPDATE requests SET status=0 WHERE request_id=?", (request_id,))
+        conn.commit()
+
+        # Check which button was pressed
+        action = request.form.get('action')
+        if action == 'approve':
+            # Get registration details
+            cursor.execute("SELECT registers.* FROM registers, requests r WHERE "
+                           "registers.register_id=r.register_id AND r.request_id=?", (request_id,))
+            register_details = cursor.fetchone()
+
+            # Add new owner account
+            cursor.execute("INSERT INTO users (name, gender, ic, email, password, phone, role_id, status) "
+                           "VALUES (?, ?, ?, ?, ?, ?, 2, 1)", (register_details[1], register_details[2],
+                                                               register_details[3], register_details[4],
+                                                               register_details[5], register_details[6]))
+            conn.commit()
+
+            # Get the new owner's user_id and unit
+            cursor.execute("SELECT user_id FROM users WHERE ic=? AND role_id=2 AND status=1",
+                           (register_details[3],))
+            new_owner_user_id = cursor.fetchone()[0]
+            unit_num = request_details[3]
+
+            # Update owner to unit
+            cursor.execute("UPDATE units SET user_id=? WHERE unit_id=?", (new_owner_user_id, unit_num))
+            conn.commit()
+
+            # Send email to new tenant
+            msg = Message('Registration Approved: Welcome to Your New Home!', recipients=[register_details[4]])
+            msg.body = (f"Hello {register_details[1]},\n\nCongratulations! Your registration has been approved by "
+                        f"the admin. We are thrilled to welcome you as a part of our community.\n\nBest regards,\n"
+                        f"CommunityCTRL")
+            mail.send(msg)
+
+            return '''
+                <script>
+                    alert("New owner added.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('request_list'))
+
+        return '''
+            <script>
+                alert("Request declined successfully.");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('request_list'))
 
     # Get request details
     cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
