@@ -100,6 +100,7 @@
                     <h2 class="tenant-title">Tenant Detail</h2>
                     <div class="request-form-container">
                         <div class="profile">
+                            {% if request_details[1] == 'Add Tenant' %}
                             <div class="infos">
                                 <label>{{ register_details[1] }}</label>
                                 <div class="tenant-details">{{ register_details[2] }}</div>
@@ -118,6 +119,26 @@
                                     </div>
                                 </div>
                             </div>
+                            {% else %}
+                            <div class="infos">
+                                <label>{{ tenant_details[1] }}</label>
+                                <div class="tenant-details">{{ tenant_details[2] }}</div>
+                                <div class="tenant-details">{{ tenant_details[3] }}</div>
+                            </div>
+                            <div class="contact-container">
+                                <label>Contact Details</label>
+                                <div class="contact-infos">
+                                    <div class="contact">
+                                        Phone Number
+                                        <div class="visitor-details">{{ tenant_details[6] }}</div>
+                                    </div>
+                                    <div class="contact">
+                                        Email
+                                        <div class="visitor-details">{{ tenant_details[4] }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
                             <div class="button-container" id="register-submit">
                                 <button type="submit" name="action" value="approve" class="blue-button">Approve</button>
                                 <button type="submit" name="action" value="decline" class="blue-button">Decline</button>
