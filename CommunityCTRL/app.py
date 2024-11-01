@@ -312,8 +312,8 @@ def send_otp():
     session['email'] = email
 
     # Send OTP email
-    msg = Message('OTP for password reset', recipients=[email])
-    msg.body = f'Hello, \n\nYour OTP code is {otp}. \nPlease enter it to reset your password.\n\nThanks!'
+    msg = Message('OTP for new email verification', recipients=[email])
+    msg.body = f'Hello, \n\nYour OTP code is {otp}. \nPlease enter it to change your email.\n\nThanks!'
     mail.send(msg)
     return '''
         <script>
