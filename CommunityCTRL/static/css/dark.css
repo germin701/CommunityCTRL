@@ -830,6 +830,34 @@ input::placeholder {
     height: auto !important;
 }
 
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 3px;
+    top: 39px;
+    background-color: #f4f4f4;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #D0D9E8;
+}
+
 .card-header h3 {
     font-size: 18px;
     margin-bottom: 3px;
