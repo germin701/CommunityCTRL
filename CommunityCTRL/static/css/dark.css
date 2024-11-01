@@ -1012,7 +1012,6 @@ textarea::placeholder {
     padding-left: 9px;
     border-radius: 18px;
     border: 2px #DBE0E5 solid;
-    background-color: #f3f3f3;
     margin-bottom: 3px;
     gap: 21px;
 }
