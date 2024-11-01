@@ -322,6 +322,22 @@ footer a.footer-link:hover {
     box-sizing: border-box;
 }
 
+.request-form-owner-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 663px;
+    padding: 24px;
+    margin: 0 auto;
+    border: 2px solid #bbb;
+    border-radius: 12px;
+    position: absolute;
+    top: 24%;
+    left: 38.5%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+}
+
 .form-container h2 {
     font-size: 1.5rem;
     font-weight: 700;
