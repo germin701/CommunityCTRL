@@ -1112,5 +1112,25 @@ def request_list():
     return render_template('request_list.html', requests=requests)
 
 
+@app.route('/request_tenant_details/<request_id>')
+def request_tenant_details(request_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
+    request_details = cursor.fetchone()
+
+    return render_template('request_tenant_details.html', request_details=request_details)
+
+
+@app.route('/request_owner_details/<request_id>')
+def request_owner_details(request_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
+    request_details = cursor.fetchone()
+
+    return render_template('request_owner_details.html', request_details=request_details)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
