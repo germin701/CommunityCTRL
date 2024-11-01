@@ -70,32 +70,15 @@
                 </div>
             </div>
             <div class="announcement-section">
+                {% for announcement in announcements %}
                 <div class="announcement-card">
-                    <h3>Announcing the new guest check-in app</h3>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
+                    <h3>{{ announcement.title }}</h3>
+                    <p>{{ announcement.detail }}</p>
+                    {% if announcement.picture %}
+                        <img src="{{ announcement.picture }}" alt="Image">
+                    {% endif %}
                 </div>
-                <div class="announcement-card">
-                    <h3>Announcing the new guest check-in app</h3>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
-                    <img src="https://via.placeholder.com/100x100" alt="Image">
-                </div>
-                <div class="announcement-card">
-                    <h3>Announcing the new guest check-in app</h3>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
-                </div>
-                <div class="announcement-card">
-                    <h3>Announcing the new guest check-in app</h3>
-                    <p>We’re excited to announce the launch of our new guest check-in app, designed to enhance the
-                        visitor experience and make it easier for you to manage your guests. Here’s what you need to
-                        know about the new app and how it can benefit your business.</p>
-                    <img src="https://via.placeholder.com/100x100" alt="Image">
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
