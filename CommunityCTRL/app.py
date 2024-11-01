@@ -1118,34 +1118,89 @@ def request_tenant_details(request_id):
     cursor = conn.cursor()
 
     if request.method == 'POST':
+        # Get request details
+        cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
+        request_details = cursor.fetchone()
+        request_type = request_details[1]
+
+        # Update request
         cursor.execute("UPDATE requests SET status=0 WHERE request_id=?", (request_id,))
         conn.commit()
 
         # Check which button was pressed
         action = request.form.get('action')
-        if action == 'approve':
-            # Get registration details
-            cursor.execute("SELECT registers.* FROM registers, requests r WHERE "
-                           "registers.register_id=r.register_id AND r.request_id=?", (request_id,))
-            register_details = cursor.fetchone()
+        if request_type == 'add tenant':
+            if action == 'approve':
+                # Get registration details
+                cursor.execute("SELECT registers.* FROM registers, requests r WHERE "
+                               "registers.register_id=r.register_id AND r.request_id=?", (request_id,))
+                register_details = cursor.fetchone()
 
-            # Update the database to approve the request
-            cursor.execute("INSERT INTO users (name, gender, ic, email, password, phone, role_id, status) VALUES "
-                           "(?, ?, ?, ?, ?, ?, 3, 1)", (register_details[1], register_details[2], register_details[3],
-                                                        register_details[4], register_details[5], register_details[6]))
-            conn.commit()
+                # Add new tenant account
+                cursor.execute("INSERT INTO users (name, gender, ic, email, password, phone, role_id, status) "
+                               "VALUES (?, ?, ?, ?, ?, ?, 3, 1)", (register_details[1], register_details[2],
+                                                                   register_details[3], register_details[4],
+                                                                   register_details[5], register_details[6]))
+                conn.commit()
 
-            # Get the new tenant's user_id and unit
-            cursor.execute("SELECT user_id FROM users WHERE ic=? AND role_id=3 AND status=1", (register_details[3],))
-            new_tenant_user_id = cursor.fetchone()[0]
-            cursor.execute("SELECT unit_id FROM requests WHERE request_id=?", (request_id,))
-            unit_num = cursor.fetchone()[0]
+                # Get the new tenant's user_id and unit
+                cursor.execute("SELECT user_id FROM users WHERE ic=? AND role_id=3 AND status=1",
+                               (register_details[3],))
+                new_tenant_user_id = cursor.fetchone()[0]
+                cursor.execute("SELECT unit_id FROM requests WHERE request_id=?", (request_id,))
+                unit_num = cursor.fetchone()[0]
 
-            cursor.execute("INSERT INTO unit_tenants (user_id, unit_id) VALUES (?, ?)", (new_tenant_user_id, unit_num))
-            conn.commit()
+                # Add tenant to unit
+                cursor.execute("INSERT INTO unit_tenants (user_id, unit_id) VALUES (?, ?)",
+                               (new_tenant_user_id, unit_num))
+                conn.commit()
 
-        # Redirect after processing the form
-        return redirect(url_for('request_list'))
+                # Send email to new tenant
+                msg = Message('Registration Approved: Welcome to Your New Home!', recipients=[register_details[4]])
+                msg.body = (f"Hello {register_details[1]},\n\nCongratulations! Your registration has been approved by "
+                            f"the admin. We are thrilled to welcome you as a part of our community.\n\nBest regards,\n"
+                            f"CommunityCTRL")
+                mail.send(msg)
+
+                return '''
+                    <script>
+                        alert("New tenant added.");
+                        window.location.href = "{}";
+                    </script>
+                    '''.format(url_for('request_list'))
+
+            return '''
+                <script>
+                    alert("Request declined successfully.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('request_list'))
+
+        else:
+            if action == 'approve':
+                # Get current date
+                current_date = datetime.now().strftime("%d-%m-%Y")
+
+                # Remove tenant
+                cursor.execute("UPDATE users SET status=0 WHERE user_id=?", (request_details[4],))
+                cursor.execute("DELETE FROM unit_tenants WHERE user_id=?", (request_details[4],))
+                cursor.execute("INSERT INTO unit_history (unit_id, user_id, date) VALUES (?, ?, ?)",
+                               (request_details[3], request_details[4], current_date))
+                conn.commit()
+
+                return '''
+                    <script>
+                        alert("Tenant removed.");
+                        window.location.href = "{}";
+                    </script>
+                    '''.format(url_for('request_list'))
+
+            return '''
+                <script>
+                    alert("Request declined successfully.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('request_list'))
 
     cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
     request_details = cursor.fetchone()
@@ -1161,13 +1216,22 @@ def request_tenant_details(request_id):
                    "units.unit_id=?", (unit_num,))
     user = cursor.fetchone()
 
-    # Get registration details
-    cursor.execute("SELECT registers.* FROM registers, requests r WHERE registers.register_id=r.register_id AND "
-                   "r.register_id=?", (request_details[2],))
-    register_details = cursor.fetchone()
+    if request_details[1] == 'Add Tenant':
+        # Get registration details
+        cursor.execute("SELECT registers.* FROM registers, requests r WHERE registers.register_id=r.register_id AND "
+                       "r.register_id=?", (request_details[2],))
+        register_details = cursor.fetchone()
 
-    return render_template('request_tenant_details.html', unit=unit_num, user=user, request_details=request_details,
-                           register_details=register_details)
+        return render_template('request_tenant_details.html', unit=unit_num, user=user, request_details=request_details,
+                               register_details=register_details)
+
+    else:
+        # Get tenant details
+        cursor.execute("SELECT * FROM users WHERE user_id=?", (request_details[4],))
+        tenant_details = cursor.fetchone()
+
+        return render_template('request_tenant_details.html', unit=unit_num, user=user, request_details=request_details,
+                               tenant_details=tenant_details)
 
 
 @app.route('/request_owner_details/<request_id>')
