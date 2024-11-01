@@ -1112,14 +1112,62 @@ def request_list():
     return render_template('request_list.html', requests=requests)
 
 
-@app.route('/request_tenant_details/<request_id>')
+@app.route('/request_tenant_details/<request_id>', methods=['GET', 'POST'])
 def request_tenant_details(request_id):
     conn = get_db()
     cursor = conn.cursor()
+
+    if request.method == 'POST':
+        cursor.execute("UPDATE requests SET status=0 WHERE request_id=?", (request_id,))
+        conn.commit()
+
+        # Check which button was pressed
+        action = request.form.get('action')
+        if action == 'approve':
+            # Get registration details
+            cursor.execute("SELECT registers.* FROM registers, requests r WHERE "
+                           "registers.register_id=r.register_id AND r.request_id=?", (request_id,))
+            register_details = cursor.fetchone()
+
+            # Update the database to approve the request
+            cursor.execute("INSERT INTO users (name, gender, ic, email, password, phone, role_id, status) VALUES "
+                           "(?, ?, ?, ?, ?, ?, 3, 1)", (register_details[1], register_details[2], register_details[3],
+                                                        register_details[4], register_details[5], register_details[6]))
+            conn.commit()
+
+            # Get the new tenant's user_id and unit
+            cursor.execute("SELECT user_id FROM users WHERE ic=? AND role_id=3 AND status=1", (register_details[3],))
+            new_tenant_user_id = cursor.fetchone()[0]
+            cursor.execute("SELECT unit_id FROM requests WHERE request_id=?", (request_id,))
+            unit_num = cursor.fetchone()[0]
+
+            cursor.execute("INSERT INTO unit_tenants (user_id, unit_id) VALUES (?, ?)", (new_tenant_user_id, unit_num))
+            conn.commit()
+
+        # Redirect after processing the form
+        return redirect(url_for('request_list'))
+
     cursor.execute("SELECT * FROM requests WHERE request_id=?", (request_id,))
     request_details = cursor.fetchone()
 
-    return render_template('request_tenant_details.html', request_details=request_details)
+    # Unpack and modify the second element
+    request_details = (request_details[0], request_details[1].title(), *request_details[2:])
+
+    # Get unit_id
+    unit_num = request_details[3]
+
+    # Get owner details
+    cursor.execute("SELECT u.* FROM units, users u WHERE u.user_id=units.user_id AND u.status=1 AND "
+                   "units.unit_id=?", (unit_num,))
+    user = cursor.fetchone()
+
+    # Get registration details
+    cursor.execute("SELECT registers.* FROM registers, requests r WHERE registers.register_id=r.register_id AND "
+                   "r.register_id=?", (request_details[2],))
+    register_details = cursor.fetchone()
+
+    return render_template('request_tenant_details.html', unit=unit_num, user=user, request_details=request_details,
+                           register_details=register_details)
 
 
 @app.route('/request_owner_details/<request_id>')
