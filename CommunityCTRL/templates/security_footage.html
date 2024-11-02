@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommunityCTRL</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
+</head>
+<body class="no-scroll">
+    <div class="screen-container">
+        <div class="sidebar">
+            <div class="logo-section">
+                <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
+                <div class="badge">
+                    <div class="badge-background">Admin</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/admin_home'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/home_unselect.png') }}" alt="dashboard_icon">
+                <div class="menu-text">Dashboard</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/admin_visitor'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/visitor_unselect.png') }}" alt="visitors_icon">
+                <div class="menu-text">Visitors</div>
+            </div>
+            <div class="menu-item active">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/cctv_select.png') }}" alt="security_footage_icon">
+                <div class="menu-text">Security Footage</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/admin_staff'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/staff_unselect.png') }}" alt="staff_icon">
+                <div class="menu-text">Staff</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/unit'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/unit_unselect.png') }}" alt="unit_icon">
+                <div class="menu-text">Unit</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/facility_unselect.png') }}" alt="facility_icon">
+                <div class="menu-text">Facilities</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/poll_unselect.png') }}" alt="poll_icon">
+                <div class="menu-text">Poll</div>
+            </div>
+            <div class="menu-item">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/issue_unselect.png') }}" alt="issue_reporting_icon">
+                <div class="menu-text">Issue Reporting</div>
+            </div>
+            <div class="theme-toggle-section">
+                <span class="theme-text">Dark Mode</span>
+                <div id="theme-toggle" class="switch-container">
+                    <div class="switch-circle"></div>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Security Footage</h1>
+                <div class="header-icons">
+                    <div class="icon bell">
+                        <img class="header-icon" src="{{ url_for('static', filename='asset/notification.png') }}">
+                    </div>
+                    <div class="icon logout" onclick="window.location.href='/logout'">
+                        <img class="header-icon" src="{{ url_for('static', filename='asset/logout.png') }}">
+                    </div>
+                    <div class="plain-icon" onclick="window.location.href='/profile'">
+                        <img src="{{ url_for('static', filename='asset/profile_dark.png') }}" alt="Profile_Icon" id="profile-icon">
+                    </div>
+                </div>
+            </div>
+            <div class="security-footage-section">
+                <div class="tabs">
+                    <button class="tab-link active" onclick="openTab(event, 'live')">Live</button>
+                    <button class="tab-link" onclick="openTab(event, 'past')">Past</button>
+                </div>
+                <div id="live" class="tab-content active">
+                    <!-- Entry gate video thumbnail -->
+                    <div class="video-thumbnail-container">
+                        <video class="video-thumbnail" onclick="openModal('entryVideo')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
+                        <h4>Entry Gate</h4>
+                    </div>
+
+                    <!-- Exit gate video thumbnail -->
+                    <div class="video-thumbnail-container">
+                        <video class="video-thumbnail" onclick="openModal('exitVideo')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
+                        <h4>Exit Gate</h4>
+                    </div>
+                </div>
+                <div id="past" class="tab-content">
+                    <div class="video-thumbnail-container">
+                        <video class="video-thumbnail" src="{{ url_for('static', filename='asset/video3.mov') }}" controls muted></video>
+                    </div>
+                    <div class="video-thumbnail-container">
+                        <video class="video-thumbnail" src="{{ url_for('static', filename='asset/video5.mov') }}" controls muted></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <!-- Video element -->
+            <video id="enlargedVideo" controls></video>
+
+            <!-- Container for recognized car plates -->
+            <div class="plate-recognition">
+                <h3>Car Plate Recognition</h3>
+                <ul id="plateList">
+                    <!-- Car plate numbers with datetime will be dynamically inserted here -->
+                </ul>
+            </div>
+
+            <!-- Close button -->
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+    </div>
+    <footer>
+        <div class="footer-container">
+            <div class="copyright">
+                &copy; 2024 CommunityCtrl. All rights reserved.
+            </div>
+            <div class="footer-hyperlinks">
+                <a href="{{ url_for('privacy_policy') }}" class="footer-hyperlink">Privacy Policy</a>
+                <span class="divider">|</span>
+                <a href="{{ url_for('terms_of_service') }}" class="footer-hyperlink">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script for toggling between Light Mode and Dark Mode -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeStyle = document.getElementById('theme-style');
+            const logo = document.getElementById('logo');
+            const menuIcons = document.querySelectorAll('.menu-icon');
+            const profileIcon = document.getElementById('profile-icon');
+            const editIcons = document.querySelectorAll('.edit-icon');
+
+            // Icon sources for light and dark modes
+            const lightIcons = {
+                dashboard_icon: "{{ url_for('static', filename='asset/home_unselect.png') }}",
+                visitors_icon: "{{ url_for('static', filename='asset/visitor_unselect.png') }}",
+                security_footage_icon: "{{ url_for('static', filename='asset/cctv_select.png') }}",
+                staff_icon: "{{ url_for('static', filename='asset/staff_unselect.png') }}",
+                unit_icon: "{{ url_for('static', filename='asset/unit_unselect.png') }}",
+                facility_icon: "{{ url_for('static', filename='asset/facility_unselect.png') }}",
+                poll_icon: "{{ url_for('static', filename='asset/poll_unselect.png') }}",
+                issue_reporting_icon: "{{ url_for('static', filename='asset/issue_unselect.png') }}",
+                profile_icon: "{{ url_for('static', filename='asset/profile_dark.png') }}",
+                edit: "{{ url_for('static', filename='asset/edit.png') }}"
+            };
+
+            const darkIcons = {
+                dashboard_icon: "{{ url_for('static', filename='asset/home_dark_unselect.png') }}",
+                visitors_icon: "{{ url_for('static', filename='asset/visitor_dark_unselect.png') }}",
+                security_footage_icon: "{{ url_for('static', filename='asset/cctv_dark_select.png') }}",
+                staff_icon: "{{ url_for('static', filename='asset/staff_dark_unselect.png') }}",
+                unit_icon: "{{ url_for('static', filename='asset/unit_dark_unselect.png') }}",
+                facility_icon: "{{ url_for('static', filename='asset/facility_dark_unselect.png') }}",
+                poll_icon: "{{ url_for('static', filename='asset/poll_dark_unselect.png') }}",
+                issue_reporting_icon: "{{ url_for('static', filename='asset/issue_dark_unselect.png') }}",
+                profile_icon: "{{ url_for('static', filename='asset/profile_light.png') }}",
+                edit: "{{ url_for('static', filename='asset/edit_light.png') }}"
+            };
+
+            function updateIcons(theme) {
+                menuIcons.forEach((icon, index) => {
+                    const platform = icon.alt.toLowerCase();
+                    if (theme === 'dark') {
+                        icon.src = darkIcons[platform];
+                    } else {
+                        icon.src = lightIcons[platform];
+                    }
+                });
+                if (theme === 'dark') {
+                    profileIcon.src = darkIcons.profile_icon;
+                } else {
+                    profileIcon.src = lightIcons.profile_icon;
+                }
+                editIcons.forEach((editIcon) => {
+                    if (theme === 'dark') {
+                        editIcon.src = darkIcons.edit;
+                    } else {
+                        editIcon.src = lightIcons.edit;
+                    }
+                });
+            }
+
+            // Check for user's theme preference in localStorage
+            const currentTheme = localStorage.getItem('theme') || 'light';
+
+            // Set the theme based on stored preference
+            if (currentTheme === 'dark') {
+                themeStyle.href = "{{ url_for('static', filename='css/dark.css') }}";
+                themeToggle.classList.add('active');
+                logo.src = "{{ url_for('static', filename='asset/logo_light.png') }}";
+                updateIcons('dark');
+            }
+
+            // Add click event listener to the toggle button
+            themeToggle.addEventListener('click', () => {
+                // Switch between Light Mode and Dark Mode
+                if (themeStyle.href.includes('base.css')) {
+                    themeStyle.href = "{{ url_for('static', filename='css/dark.css') }}";
+                    themeToggle.classList.add('active');
+                    logo.src = "{{ url_for('static', filename='asset/logo_light.png') }}";
+                    localStorage.setItem('theme', 'dark');
+                    updateIcons('dark');
+                } else {
+                    themeStyle.href = "{{ url_for('static', filename='css/base.css') }}";
+                    themeToggle.classList.remove('dark');
+                    logo.src = "{{ url_for('static', filename='asset/logo.png') }}";
+                    localStorage.setItem('theme', 'light');
+                    updateIcons('light');
+                }
+            });
+        });
+
+        function openTab(evt, tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let content of tabContents) {
+                content.classList.remove('active');
+            }
+
+            // Remove 'active' class from all tab links
+            const tabLinks = document.getElementsByClassName('tab-link');
+            for (let link of tabLinks) {
+                link.classList.remove('active');
+            }
+
+            // Show the current tab and add 'active' class to the clicked tab link
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        function openModal(videoType) {
+            const videoModal = document.getElementById("videoModal");
+            const enlargedVideo = document.getElementById("enlargedVideo");
+
+            // Set the video source based on the videoType argument
+            if (videoType === 'entryVideo') {
+                enlargedVideo.src = '{{ url_for('static', filename='asset/video4.mov') }}';
+            } else if (videoType === 'exitVideo') {
+                enlargedVideo.src = '{{ url_for('static', filename='asset/video4.mov') }}';
+            }
+
+            // Show the modal, and play it
+            videoModal.style.display = "flex";
+            enlargedVideo.currentTime = 0;
+            enlargedVideo.play();
+        }
+
+        function closeModal() {
+            const videoModal = document.getElementById("videoModal");
+            const enlargedVideo = document.getElementById("enlargedVideo");
+
+            // Hide the modal and pause the video
+            videoModal.style.display = "none";
+            enlargedVideo.pause();
+            enlargedVideo.currentTime = 0;
+            enlargedVideo.src = '';  // Clear the source to stop buffering
+        }
+    </script>
+</body>
+</html>
