@@ -796,7 +796,7 @@ input::placeholder {
 .announcement-section {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 6px;
     overflow-y: scroll;
     padding-right: 9px;
 }
@@ -806,6 +806,7 @@ input::placeholder {
     border-radius: 18px;
     border: 2px solid #DBE0E5;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 18px;
 }
 
 .card-header {
