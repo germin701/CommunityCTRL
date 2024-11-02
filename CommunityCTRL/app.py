@@ -544,6 +544,28 @@ def create_announcement():
     return render_template('create_announcement.html')
 
 
+@app.route('/edit_announcement/<announcement_id>', methods=['GET', 'POST'])
+def edit_announcement(announcement_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM announcement WHERE announcement_id=?", (announcement_id,))
+    announcement = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the announcement picture
+    announcement_picture = None
+    if announcement[3]:
+        # Detect image type
+        image_type = imghdr.what(None, h=announcement[3])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            announcement_picture = (f"data:image/{image_type};base64," + base64.b64encode(announcement[3])
+                                    .decode('utf-8'))
+
+    return render_template('edit_announcement.html', announcement=announcement,
+                           announcement_picture=announcement_picture)
+
+
 @app.route('/visitor')
 def visitor():
     return render_template('visitor.html')
