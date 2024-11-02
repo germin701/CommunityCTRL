@@ -80,7 +80,7 @@
                                 <img src="{{ url_for('static', filename='asset/edit.png') }}" alt="Edit" class="edit-icon">
                             </button>
                             <div id="dropdown-{{ announcement.announcement_id }}" class="dropdown-content">
-                                <a>Edit</a>
+                                <a href="{{ url_for('edit_announcement', announcement_id=announcement.announcement_id) }}">Edit</a>
                                 <a>Delete</a>
                             </div>
                         </div>
