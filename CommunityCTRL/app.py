@@ -721,6 +721,11 @@ def admin_add_blacklist():
     return render_template('admin_add_blacklist.html')
 
 
+@app.route('/security_footage')
+def security_footage():
+    return render_template('security_footage.html')
+
+
 @app.route('/staff')
 def staff():
     return render_template('staff.html')
