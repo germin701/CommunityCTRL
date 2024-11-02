@@ -73,7 +73,7 @@
                 {% for announcement in announcements %}
                 <div class="announcement-card">
                     <h3>{{ announcement.title }}</h3>
-                    <p>{{ announcement.detail }}</p>
+                    <p>{{ announcement.detail | nl2br }}</p>
                     {% if announcement.picture %}
                         <img src="{{ announcement.picture }}" alt="Image">
                     {% endif %}
