@@ -548,6 +548,44 @@ def create_announcement():
 def edit_announcement(announcement_id):
     conn = get_db()
     cursor = conn.cursor()
+    if request.method == 'POST':
+        title = request.form['title']
+        detail = request.form['content']
+        picture = request.files.get('announcement_pic')
+        status = 0 if 'hide_from_owner_tenant' in request.form else 1
+
+        # Validate and process picture
+        picture_data = None
+        if picture and picture.filename:
+            error = validate_announcement_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        # Check if a new picture was provided
+        if picture_data:
+            cursor.execute("UPDATE announcement SET title=?, detail=?, picture=?, status=? WHERE announcement_id=?",
+                           (title, detail, picture_data, status, announcement_id))
+
+        else:
+            cursor.execute("UPDATE announcement SET title=?, detail=?, status=? WHERE announcement_id=?",
+                           (title, detail, status, announcement_id))
+        conn.commit()
+
+        return '''
+            <script>
+                alert("Announcement updated successfully!");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('admin_home'))
+
+    # Get announcement details
     cursor.execute("SELECT * FROM announcement WHERE announcement_id=?", (announcement_id,))
     announcement = cursor.fetchone()
 
