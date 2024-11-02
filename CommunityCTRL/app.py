@@ -6,6 +6,7 @@ import secrets
 import re
 import base64
 import imghdr
+from markupsafe import Markup, escape
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
@@ -17,6 +18,16 @@ app.config['MAIL_USERNAME'] = 'communityctrl.service@gmail.com'
 app.config['MAIL_PASSWORD'] = 'wdgy mzsq imhp nyea'
 app.config['MAIL_DEFAULT_SENDER'] = 'communityctrl.service@gmail.com'
 mail = Mail(app)
+
+
+def nl2br(value):
+    # Escape any HTML and replace newlines with <br> tags
+    escaped_value = escape(value).replace('\n', Markup('<br>'))
+    return Markup(escaped_value)
+
+
+# Register the filter
+app.jinja_env.filters['nl2br'] = nl2br
 
 
 def get_db():
@@ -221,8 +232,7 @@ def home():
             'title': row[1],
             'detail': row[2],
             'picture': picture_data,
-            'status': row[4],
-            'date': row[5]
+            'status': row[4]
         })
 
     return render_template('home.html', announcements=announcements_list, role=session['role'])
@@ -254,8 +264,7 @@ def admin_home():
             'title': row[1],
             'detail': row[2],
             'picture': picture_data,
-            'status': row[4],
-            'date': row[5]
+            'status': row[4]
         })
 
     return render_template('admin_home.html', announcements=announcements_list, role=session['role'])
@@ -481,8 +490,57 @@ def save_password():
                                    alert_message="Password updated successfully!")
 
 
-@app.route('/create_announcement')
+def validate_announcement_image(file):
+    allowed_extensions = {'jpg', 'jpeg', 'png'}
+    if file.filename == '':
+        return "No file selected!"
+
+    if file.filename.split('.')[-1].lower() not in allowed_extensions:
+        return "Invalid file type! Please upload jpg, jpeg, or png."
+
+    if file.mimetype not in ['image/jpeg', 'image/png']:
+        return "Invalid file type! Please upload a valid image."
+
+    return None
+
+
+@app.route('/create_announcement', methods=['GET', 'POST'])
 def create_announcement():
+    if request.method == 'POST':
+        title = request.form['title']
+        detail = request.form['content']
+        picture = request.files.get('announcement_pic')
+        status = 0 if 'hide_from_owner_tenant' in request.form else 1
+
+        # Validate and process picture
+        if picture and picture.filename:
+            error = validate_announcement_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        else:
+            picture_data = None
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO announcement (title, detail, picture, status) VALUES (?, ?, ?, ?)",
+                       (title, detail, picture_data, status))
+        conn.commit()
+
+        return '''
+            <script>
+                alert("Announcement created successfully!");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('admin_home'))
+
     return render_template('create_announcement.html')
 
 
