@@ -604,6 +604,15 @@ def edit_announcement(announcement_id):
                            announcement_picture=announcement_picture)
 
 
+@app.route('/delete_announcement/<announcement_id>', methods=['POST'])
+def delete_announcement(announcement_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM announcement WHERE announcement_id=?", (announcement_id,))
+    conn.commit()
+    return jsonify({"message": "Announcement deleted successfully!"})
+
+
 @app.route('/visitor')
 def visitor():
     return render_template('visitor.html')
