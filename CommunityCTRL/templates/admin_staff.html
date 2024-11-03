@@ -47,7 +47,7 @@
                 <h1>Staff</h1>
                 <div class="search-container">
                     <img src="{{ url_for('static', filename='asset/magnifier.png') }}" alt="Magnifier" class="magnifier-icon">
-                    <input type="text" class="search-input" placeholder="Search Staff">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search Staff">
                 </div>
                 <div class="button-container">
                     <button class="blue-button" onclick="window.location.href='/new_staff'">+ Add</button>
@@ -63,7 +63,7 @@
             </div>
             <div class="admin-staff-section">
                 {% for staff in staffs %}
-                <div class="admin-staff-card">
+                <div class="admin-staff-card" data-name="{{ staff.name|lower }}">
                     <div class="avatar">
                         {% if staff.profile_picture %}
                         <img src="{{ staff.profile_picture }}" alt="Profile Picture">
@@ -173,6 +173,20 @@
                     logo.src = "{{ url_for('static', filename='asset/logo.png') }}";
                     localStorage.setItem('theme', 'light');
                     updateIcons('light');
+                }
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            const staffCards = document.querySelectorAll('.admin-staff-card');
+
+            staffCards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(searchValue)) {
+                    card.style.display = 'inline-flex';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         });
