@@ -499,7 +499,7 @@ def save_password():
                                    alert_message="Password updated successfully!")
 
 
-def validate_announcement_image(file):
+def validate_image(file):
     allowed_extensions = {'jpg', 'jpeg', 'png'}
     if file.filename == '':
         return "No file selected!"
@@ -523,7 +523,7 @@ def create_announcement():
 
         # Validate and process picture
         if picture and picture.filename:
-            error = validate_announcement_image(picture)
+            error = validate_image(picture)
             if error:
                 return f'''
                     <script>
@@ -566,7 +566,7 @@ def edit_announcement(announcement_id):
         # Validate and process picture
         picture_data = None
         if picture and picture.filename:
-            error = validate_announcement_image(picture)
+            error = validate_image(picture)
             if error:
                 return f'''
                     <script>
@@ -896,8 +896,143 @@ def admin_staff():
     return render_template('admin_staff.html', staffs=staff_list)
 
 
-@app.route('/new_staff')
+@app.route('/new_staff', methods=['GET', 'POST'])
 def new_staff():
+    if request.method == 'POST':
+        picture = request.files.get('staff-pic')
+        name = request.form['name']
+        position = request.form['position']
+        email = request.form['email']
+        gender = request.form['gender']
+        ic = request.form['ic']
+        office_number = request.form['office-phone']
+        personal_number = request.form['personal-phone']
+        password = request.form['password']
+        confirm_password = request.form['confirm-password']
+        new_vehicle_types = request.form.getlist('newVehicleType[]')
+        new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
+
+        # Validate and process picture
+        if picture and picture.filename:
+            error = validate_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        else:
+            picture_data = None
+
+        # Define password policy
+        password_policy = {
+            'min_length': 8,
+            'digit': r'[0-9]',
+            'special_char': r'[!@#$%^&*(),.?":{}|<>]'
+        }
+
+        if password != confirm_password:
+            return '''
+                <script>
+                    alert("Passwords do not match. Please try again.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('new_staff'))
+
+        # Check if password meets policy
+        elif len(password) < password_policy['min_length']:
+            return '''
+                <script>
+                    alert("Password must be at least 8 characters long.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('new_staff'))
+        elif not re.search(password_policy['digit'], password):
+            return '''
+                <script>
+                    alert("Password must contain at least one digit.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('new_staff'))
+        elif not re.search(password_policy['special_char'], password):
+            return '''
+                <script>
+                    alert("Password must contain at least one special character.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('new_staff'))
+
+        # Validate contains only digits and length is 12
+        elif not re.match(r'^\d{12}$', ic):
+            return '''
+                <script>
+                    alert("Please enter a valid ic and only digits are allowed.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('new_staff'))
+
+        # Validate contains only digits and length is 9
+        elif not re.match(r'^\d{9}$', office_number):
+            return '''
+                <script>
+                    alert("Please enter a valid office phone and only digits are allowed.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('new_staff'))
+
+        # Validate contains only digits and length is 10/11
+        elif not re.match(r'^\d{10,11}$', personal_number):
+            return '''
+                <script>
+                    alert("Please enter a valid phone and only digits are allowed.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('new_staff'))
+
+        else:
+            conn = get_db()
+            cursor = conn.cursor()
+
+            # Add new staff account
+            cursor.execute("INSERT INTO users (name, gender, ic, email, password, phone, role_id, picture, status)"
+                           " VALUES (?, ?, ?, ?, ?, ?, 1, ?, 1)", (name, gender, ic, email, password, personal_number,
+                                                                   picture_data))
+            conn.commit()
+
+            # Get new staff user_id
+            cursor.execute("SELECT user_id FROM users WHERE ic=? AND role_id=1 AND status=1", (ic,))
+            staff_user_id = cursor.fetchone()[0]
+
+            # Add new staff
+            cursor.execute("INSERT INTO staffs (user_id, phone, position) VALUES (?, ?, ?)", (staff_user_id,
+                                                                                              office_number, position))
+            conn.commit()
+
+            # Add staff vehicle details
+            if not new_vehicle_types:
+                pass
+            else:
+                # Insert new vehicles into the database
+                for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                    if vehicle_type and vehicle_number:
+                        if vehicle_type == 'Car':
+                            vehicle_id = 1
+                        else:
+                            vehicle_id = 2
+                        cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id, status) "
+                                       "VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, staff_user_id))
+                        conn.commit()
+            return '''
+                <script>
+                    alert("New staff account created successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_staff'))
+
     return render_template('new_staff.html')
 
 
@@ -946,8 +1081,8 @@ def unit():
                             cursor.execute("UPDATE user_vehicles SET status=1 WHERE user_vehicle_id=?",
                                            (existing_vehicle_id,))
                         else:
-                            cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id) VALUES "
-                                           "(?, ?, ?)", (vehicle_id, vehicle_number, session['user_id']))
+                            cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id, status) "
+                                           "VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, session['user_id']))
                         conn.commit()
 
                 return '''
@@ -1122,8 +1257,8 @@ def unit():
                     profile_picture = f"data:image/{image_type};base64," + base64.b64encode(units[5]).decode('utf-8')
 
             # Create a dictionary for the unit with the Base64-encoded picture
-            unit_data = {"unit_id": units[0], "user_id": units[1], "name": units[2], "phone": units[3], "email": units[4],
-                         "profile_picture": profile_picture}
+            unit_data = {"unit_id": units[0], "user_id": units[1], "name": units[2], "phone": units[3],
+                         "email": units[4], "profile_picture": profile_picture}
             unit_list.append(unit_data)
 
         return render_template('unit_list.html', units=unit_list)
