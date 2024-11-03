@@ -439,6 +439,14 @@ input::placeholder {
     height: 24px;
 }
 
+#staff-password-container {
+    margin-left: 12px;
+}
+
+.staff-password {
+    width: 240px;
+}
+
 .forgot-password {
     display: block;
     margin-bottom: 15px;
