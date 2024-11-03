@@ -870,7 +870,30 @@ def staff():
 
 @app.route('/admin_staff')
 def admin_staff():
-    return render_template('admin_staff.html')
+    cursor = get_db().cursor()
+    cursor.execute("SELECT u.user_id, u.name, s.position, s.phone, u.email, u.picture, u.status FROM staffs s, users u "
+                   "WHERE u.user_id=s.user_id")
+    staff_lists = cursor.fetchall()
+
+    # Process staffs to convert profile pictures to Base64
+    staff_list = []
+    for staffs in staff_lists:
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if staffs[5]:
+            # Detect image type
+            image_type = imghdr.what(None, h=staffs[5])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(staffs[5]).decode('utf-8')
+
+        # Create a dictionary for the staff with the Base64-encoded picture
+        staff_data = {"user_id": staffs[0], "name": staffs[1], "position": staffs[2], "phone": staffs[3],
+                      "email": staffs[4], "profile_picture": profile_picture, "status": staffs[6]}
+        staff_list.append(staff_data)
+    print(staff_list)
+    return render_template('admin_staff.html', staffs=staff_list)
 
 
 @app.route('/new_staff')
