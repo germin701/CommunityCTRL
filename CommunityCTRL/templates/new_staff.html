@@ -55,9 +55,9 @@
                 </div>
             </div>
             <div class="details-section">
-                <form>
+                <form method="POST" action="{{ url_for('new_staff') }}" enctype="multipart/form-data">
                     <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
-                        <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
+                        <input type="file" id="imageUpload" name="staff-pic" accept="image/*" onchange="displayImage(this)" style="display: none;" />
                         <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
                         <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                     </div>
@@ -75,7 +75,7 @@
                     </div>
                     <div class="row">
                         <div class="input-field">
-                            <label for="email">Email (Optional)</label>
+                            <label for="email">Email</label>
                             <input type="email" id="email" name="email" class="email-field" placeholder="example@gmail.com" required>
                         </div>
                     </div>
@@ -105,24 +105,25 @@
                             <input type="text" id="personal-phone" name="personal-phone" class="phone" required>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <label for="new-password">Password</label>
+                            <input type="password" id="new-password" name="password" class="staff-password" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <label for="confirm-new-password">Confirm Password</label>
+                            <div class="password-input-container" id="staff-password-container">
+                                <input type="password" id="confirm-new-password" name="confirm-password" class="staff-password" required>
+                                <img src="{{ url_for('static', filename='asset/eye_hide_light.png') }}" id="toggle-password" class="toggle-icon" alt="Show Password">
+                            </div>
+                        </div>
+                    </div>
                     <h3>Vehicle Detail</h3>
                     <div class="row-label">
                         <label>Vehicle Type</label>
                         <label>Vehicle Number</label>
-                    </div>
-                    <div class="row">
-                        <div class="input-field">
-                            <div class="select-wrapper">
-                                <select id="vehicle-type" name="vehicle-type" required>
-                                    <option value="">Select Vehicle Type</option>
-                                    <option value="Car">Car</option>
-                                    <option value="Motorcycle">Motorcycle</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-field">
-                            <input type="text" id="vehicle-number" name="vehicle-number" class="new-number" placeholder="Enter vehicle number" required>
-                        </div>
                     </div>
                     <div id="new-vehicle-list"></div>
                     <button id="add-vehicle-btn" class="add-vehicle">+ Add Vehicle</button>
@@ -155,6 +156,9 @@
             const logo = document.getElementById('logo');
             const menuIcons = document.querySelectorAll('.menu-icon');
             const profileIcon = document.getElementById('profile-icon');
+            const passwordInput = document.getElementById('new-password');
+            const confirmPasswordInput = document.getElementById('confirm-new-password');
+            const togglePassword = document.getElementById('toggle-password');
 
             // Icon sources for light and dark modes
             const lightIcons = {
@@ -219,6 +223,20 @@
                     updateIcons('light');
                 }
             });
+
+            // Add click event listener to toggle password visibility
+            togglePassword.addEventListener('click', () => {
+            const isPasswordVisible = passwordInput.type === 'text';
+
+            // Toggle visibility for passwordInput and confirmPasswordInput
+            passwordInput.type = isPasswordVisible ? 'password' : 'text';
+            confirmPasswordInput.type = isPasswordVisible ? 'password' : 'text';
+
+            // Change the icon based on the visibility state
+            togglePassword.src = isPasswordVisible
+                ? "{{ url_for('static', filename='asset/eye_hide_light.png') }}"
+                : "{{ url_for('static', filename='asset/eye_show_light.png') }}";
+            });
         });
 
         // Function to trigger the image upload input
@@ -235,7 +253,7 @@
                 reader.onload = function (e) {
                     uploadedImage.src = e.target.result;
                     uploadedImage.style.display = 'block';
-                    placeholderText.style.display = 'none';  // Hide the placeholder text
+                    placeholderText.style.display = 'none';
                 };
 
                 reader.readAsDataURL(input.files[0]);
