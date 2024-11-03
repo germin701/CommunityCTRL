@@ -63,16 +63,20 @@
             </div>
             <div class="unit-section">
                 {% for unit in units %}
-                <div class="unit-card" data-unit="{{ unit[0] }}">
-                    <div class="avatar"></div>
+                <div class="unit-card" data-unit="{{ unit.unit_id }}">
+                    <div class="avatar">
+                        {% if unit.profile_picture %}
+                        <img src="{{ unit.profile_picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
                     <div class="unit-info">
-                        <div class="unit-name">{{ unit[0] }}</div>
-                        <div class="unit-details">Owner: {{ unit[2] }}</div>
-                        <div class="unit-details">Phone: {{ unit[3] }}</div>
-                        <div class="unit-details">Email: {{ unit[4] }}</div>
+                        <div class="unit-name">{{ unit.unit_id }}</div>
+                        <div class="unit-details">Owner: {{ unit.name }}</div>
+                        <div class="unit-details">Phone: {{ unit.phone }}</div>
+                        <div class="unit-details">Email: {{ unit.email }}</div>
                     </div>
                     <div class="button-container">
-                        <button class="blues-button" onclick="window.location.href='/admin_unit?unit_id={{ unit[0] }}'">View Details</button>
+                        <button class="blues-button" onclick="window.location.href='/admin_unit?unit_id={{ unit.unit_id }}'">View Details</button>
                     </div>
                 </div>
                 {% endfor %}
