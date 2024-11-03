@@ -1082,6 +1082,13 @@ textarea::placeholder {
     margin-left: 16px;
 }
 
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
 .visitor-info, .invitation-info, .blacklist-info, .staff-info, .unit-info, .request-list-info {
     padding: 6px 24px;
     flex-direction: column;
