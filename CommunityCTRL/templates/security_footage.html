@@ -75,13 +75,10 @@
                     <button class="tab-link" onclick="openTab(event, 'past')">Past</button>
                 </div>
                 <div id="live" class="tab-content active">
-                    <!-- Entry gate video thumbnail -->
                     <div class="video-thumbnail-container">
                         <video class="video-thumbnail" onclick="openModal('entryVideo')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
                         <h4>Entry Gate</h4>
                     </div>
-
-                    <!-- Exit gate video thumbnail -->
                     <div class="video-thumbnail-container">
                         <video class="video-thumbnail" onclick="openModal('exitVideo')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
                         <h4>Exit Gate</h4>
@@ -100,19 +97,11 @@
     </div>
     <div id="videoModal" class="modal">
         <div class="modal-content">
-            <!-- Video element -->
-            <video id="enlargedVideo" controls></video>
-
-            <!-- Container for recognized car plates -->
+            <img id="enlargedVideo" src="/lpr_stream" alt="Live Stream">
             <div class="plate-recognition">
                 <h3>Car Plate Recognition</h3>
-                <ul id="plateList">
-                    <!-- Car plate numbers with datetime will be dynamically inserted here -->
-                </ul>
+                <ul id="plateList"></ul>
             </div>
-
-            <!-- Close button -->
-            <span class="close" onclick="closeModal()">&times;</span>
         </div>
     </div>
     <footer>
@@ -236,32 +225,49 @@
             evt.currentTarget.classList.add('active');
         }
 
-        function openModal(videoType) {
-            const videoModal = document.getElementById("videoModal");
-            const enlargedVideo = document.getElementById("enlargedVideo");
-
-            // Set the video source based on the videoType argument
-            if (videoType === 'entryVideo') {
-                enlargedVideo.src = '{{ url_for('static', filename='asset/video4.mov') }}';
-            } else if (videoType === 'exitVideo') {
-                enlargedVideo.src = '{{ url_for('static', filename='asset/video4.mov') }}';
-            }
-
-            // Show the modal, and play it
-            videoModal.style.display = "flex";
-            enlargedVideo.currentTime = 0;
-            enlargedVideo.play();
+        function openModal() {
+            document.getElementById("videoModal").style.display = "flex";
+            startPlateUpdates();
         }
 
         function closeModal() {
-            const videoModal = document.getElementById("videoModal");
-            const enlargedVideo = document.getElementById("enlargedVideo");
+            document.getElementById("videoModal").style.display = "none";
+            stopPlateUpdates();
+        }
 
-            // Hide the modal and pause the video
-            videoModal.style.display = "none";
-            enlargedVideo.pause();
-            enlargedVideo.currentTime = 0;
-            enlargedVideo.src = '';  // Clear the source to stop buffering
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target === document.getElementById("videoModal")) {
+                closeModal();
+            }
+        }
+
+        // Interval ID to control the polling
+        let updateInterval;
+
+        function startPlateUpdates() {
+            // Fetch detected plates every 2 seconds
+            updateInterval = setInterval(fetchDetectedPlates, 2000);
+        }
+
+        function stopPlateUpdates() {
+            clearInterval(updateInterval);
+        }
+
+        function fetchDetectedPlates() {
+            fetch('/get_detected_plates')
+                .then(response => response.json())
+                .then(data => {
+                    const plateList = document.getElementById("plateList");
+                    plateList.innerHTML = "";  // Clear the existing list
+                    const sortedPlates = Object.entries(data).sort((a, b) => new Date(a[1]) - new Date(b[1]));
+                    for (const [plate, timestamp] of Object.entries(data)) {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `Plate: ${plate}, Time: ${timestamp}`;
+                        plateList.appendChild(listItem);
+                    }
+                })
+                .catch(error => console.error('Error fetching detected plates:', error));
         }
     </script>
 </body>
