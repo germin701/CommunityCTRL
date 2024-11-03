@@ -82,7 +82,7 @@
     </div>
     <div id="videoModal" class="modal">
         <div class="modal-content">
-            <img id="enlargedVideo" src="/lpr_stream" alt="Live Stream">
+            <img id="enlargedVideo" src="" alt="Live Stream">
             <div class="plate-recognition">
                 <h3>Car Plate Recognition</h3>
                 <ul id="plateList"></ul>
@@ -204,11 +204,13 @@
 
         function openModal() {
             document.getElementById("videoModal").style.display = "flex";
+            document.getElementById("enlargedVideo").src = "/lpr_stream";
             startPlateUpdates();
         }
 
         function closeModal() {
             document.getElementById("videoModal").style.display = "none";
+            document.getElementById("enlargedVideo").src = "";
             stopPlateUpdates();
         }
 
