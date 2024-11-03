@@ -35,18 +35,6 @@
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/unit_unselect.png') }}" alt="unit_icon">
                 <div class="menu-text">Unit</div>
             </div>
-            <div class="menu-item">
-                <img class="menu-icon" src="{{ url_for('static', filename='asset/facility_unselect.png') }}" alt="facility_icon">
-                <div class="menu-text">Facilities</div>
-            </div>
-            <div class="menu-item">
-                <img class="menu-icon" src="{{ url_for('static', filename='asset/poll_unselect.png') }}" alt="poll_icon">
-                <div class="menu-text">Poll</div>
-            </div>
-            <div class="menu-item">
-                <img class="menu-icon" src="{{ url_for('static', filename='asset/issue_unselect.png') }}" alt="issue_reporting_icon">
-                <div class="menu-text">Issue Reporting</div>
-            </div>
             <div class="theme-toggle-section">
                 <span class="theme-text">Dark Mode</span>
                 <div id="theme-toggle" class="switch-container">
@@ -59,9 +47,6 @@
                 <h1>Announcement</h1>
                 <div class="header-icons">
                     <button class="blue-button" onclick="window.location.href='/create_announcement'">+ Create</button>
-                    <div class="icon bell">
-                        <img class="header-icon" src="{{ url_for('static', filename='asset/notification.png') }}">
-                    </div>
                     <div class="icon logout" onclick="window.location.href='/logout'">
                         <img class="header-icon" src="{{ url_for('static', filename='asset/logout.png') }}">
                     </div>
@@ -137,9 +122,6 @@
                 security_footage_icon: "{{ url_for('static', filename='asset/cctv_dark_unselect.png') }}",
                 staff_icon: "{{ url_for('static', filename='asset/staff_dark_unselect.png') }}",
                 unit_icon: "{{ url_for('static', filename='asset/unit_dark_unselect.png') }}",
-                facility_icon: "{{ url_for('static', filename='asset/facility_dark_unselect.png') }}",
-                poll_icon: "{{ url_for('static', filename='asset/poll_dark_unselect.png') }}",
-                issue_reporting_icon: "{{ url_for('static', filename='asset/issue_dark_unselect.png') }}",
                 profile_icon: "{{ url_for('static', filename='asset/profile_light.png') }}",
                 edit: "{{ url_for('static', filename='asset/edit_light.png') }}"
             };
