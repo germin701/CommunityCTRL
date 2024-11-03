@@ -1059,11 +1059,29 @@ def unit():
 
     else:
         # Get unit list with owner details
-        cursor.execute("SELECT units.unit_id, units.user_id, u.name, u.phone, u.email FROM units LEFT JOIN users u ON "
-                       "units.user_id = u.user_id")
-        units = cursor.fetchall()
+        cursor.execute("SELECT units.unit_id, units.user_id, u.name, u.phone, u.email, u.picture FROM units LEFT JOIN "
+                       "users u ON units.user_id = u.user_id")
+        units_list = cursor.fetchall()
 
-        return render_template('unit_list.html', units=units)
+        # Process units to convert profile pictures to Base64
+        unit_list = []
+        for units in units_list:
+            # Convert BLOB to Base64 for the profile picture
+            profile_picture = None
+            if units[5]:
+                # Detect image type
+                image_type = imghdr.what(None, h=units[5])
+
+                # Check if image type is valid
+                if image_type in ['jpg', 'jpeg', 'png']:
+                    profile_picture = f"data:image/{image_type};base64," + base64.b64encode(units[5]).decode('utf-8')
+
+            # Create a dictionary for the unit with the Base64-encoded picture
+            unit_data = {"unit_id": units[0], "user_id": units[1], "name": units[2], "phone": units[3], "email": units[4],
+                         "profile_picture": profile_picture}
+            unit_list.append(unit_data)
+
+        return render_template('unit_list.html', units=unit_list)
 
 
 @app.route('/admin_unit', methods=['GET', 'POST'])
