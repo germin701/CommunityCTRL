@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g, request, redirect, url_for, flash, session, jsonify, abort
+from flask import Flask, render_template, g, request, redirect, url_for, flash, session, jsonify, abort, Response
 import sqlite3
 from datetime import date, datetime, timedelta
 from flask_mail import Mail, Message
@@ -7,6 +7,9 @@ import re
 import base64
 import imghdr
 from markupsafe import Markup, escape
+import cv2
+import time
+from paddleocr import PaddleOCR
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
@@ -18,6 +21,12 @@ app.config['MAIL_USERNAME'] = 'communityctrl.service@gmail.com'
 app.config['MAIL_PASSWORD'] = 'wdgy mzsq imhp nyea'
 app.config['MAIL_DEFAULT_SENDER'] = 'communityctrl.service@gmail.com'
 mail = Mail(app)
+
+# Threshold and Setting for LPR model
+CONFIDENCE_THRESHOLD = 0.95
+NMS_THRESHOLD = 0.4
+COLORS = [(0, 255, 255), (0, 255, 0), (255, 255, 0), (255, 0, 0)]
+detected_plates = {}
 
 
 def nl2br(value):
@@ -724,6 +733,112 @@ def admin_add_blacklist():
 @app.route('/security_footage')
 def security_footage():
     return render_template('security_footage.html')
+
+
+def generate_video_feed(video_source):
+    # Reset the dictionary
+    detected_plates.clear()
+
+    # Load YOLO model
+    net = cv2.dnn.readNet("darknet/yolov4-obj_best.weights", "darknet/cfg/yolov4-obj.cfg")
+    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
+
+    # Initialize Detection Model
+    model = cv2.dnn.DetectionModel(net)
+    model.setInputParams(size=(416, 416), scale=1 / 255, swapRB=True)
+
+    # Initialize PaddleOCR model
+    ocr_model = PaddleOCR(lang='en')
+
+    # Start video capture
+    cap = cv2.VideoCapture(video_source)
+
+    # Get mask
+    mask = cv2.imread("static/asset/mask.png")
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Apply mask to the frame
+        region = cv2.bitwise_and(frame, mask)
+
+        # Perform detection
+        start = time.time()
+        classes, scores, boxes = model.detect(region, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
+        end = time.time()
+
+        # Get current datetime
+        current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+
+        # Process detections
+        for (classID, score, box) in zip(classes, scores, boxes):
+            color = (0, 255, 255)
+            cv2.rectangle(frame, box, color, 2)
+
+            # Extract the region specified by the bounding box
+            x, y, w, h = box
+            region = frame[y:y + h, x:x + w]
+
+            # Perform OCR on the detected region
+            result = ocr_model.ocr(region)
+
+            # Extract recognized text
+            if result[0] is not None:
+                for line in result:
+                    recognized_text, confidence_text = line[-1][1]
+
+                    # Standardize plate text by removing spaces, commas, hyphens, and dots
+                    standardized_plate = re.sub(r'[\s,-.]', '', recognized_text)
+
+                    label = "%s : %.2f, %.2f" % (standardized_plate, score * 100, confidence_text * 100)
+                    cv2.putText(frame, label, (box[0], box[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+
+                    # Store only if this standardized plate hasn't been detected yet
+                    if standardized_plate not in detected_plates:
+                        detected_plates[standardized_plate] = current_time
+
+        # Calculates and displays the frames per second (FPS)
+        fps_text = "FPS: %.2f " % (1 / (end - start))
+
+        # Define background color and rectangle coordinates
+        background_color = (0, 0, 0)  # Black background
+        fps_rect = (50, 40, 200, 40)  # (x, y, width, height) for FPS
+        time_rect = (50, 80, 390, 40)  # (x, y, width, height) for Time
+
+        # Draw rectangles for FPS and Time background
+        cv2.rectangle(frame, (fps_rect[0], fps_rect[1]), (fps_rect[0] + fps_rect[2], fps_rect[1] + fps_rect[3]),
+                      background_color, -1)
+        cv2.rectangle(frame, (time_rect[0], time_rect[1]), (time_rect[0] + time_rect[2], time_rect[1] + time_rect[3]),
+                      background_color, -1)
+
+        # Overlay the FPS and current time text on top of the rectangles
+        cv2.putText(frame, fps_text, (60, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2)
+        cv2.putText(frame, current_time, (60, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2)
+
+        # Encode the frame for streaming
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+    # Print unique detected plates with their first detection time
+    for plate, timestamp in detected_plates.items():
+        print(f"Plate: {plate}, Time: {timestamp}")
+
+
+@app.route('/lpr_stream')
+def lpr_stream():
+    # Use the same video for demo purpose
+    video_source = 'static/asset/video4.mov'
+    return Response(generate_video_feed(video_source), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/get_detected_plates')
+def get_detected_plates():
+    return jsonify(detected_plates)
 
 
 @app.route('/staff')
