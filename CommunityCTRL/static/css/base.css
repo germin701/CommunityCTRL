@@ -1128,8 +1128,10 @@ textarea::placeholder {
 }
 
 .admin-staff-card .button-container {
-    margin-left: 720px;
-    margin-top: 57px;
+    position: absolute;
+    right: 20px;
+    top: 75%;
+    transform: translateY(-50%);
 }
 
 .unit-card .button-container {
@@ -1451,8 +1453,10 @@ textarea#reason {
 }
 
 .resigned-button-container {
-    margin-left: 812px;
-    margin-top: 57px;
+    position: absolute;
+    right: 20px;
+    top: 75%;
+    transform: translateY(-50%);
 }
 
 .profile i {
