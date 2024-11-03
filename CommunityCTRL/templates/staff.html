@@ -12,7 +12,7 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Owner</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
             <div class="menu-item" onclick="window.location.href='/home'">
@@ -55,42 +55,21 @@
             </div>
             <div class="staff-section">
                 <div class="staff-card-container">
+                    {% for staff in staffs %}
                     <div class="staff-card">
-                        <div class="avatar"></div>
+                        <div class="avatar">
+                            {% if staff.profile_picture %}
+                            <img src="{{ staff.profile_picture }}" alt="Profile Picture">
+                            {% endif %}
+                        </div>
                         <div class="staff-info">
-                            <div class="staff-name">Samantha Joe</div>
-                            <div class="staff-details">Position: Manager</div>
-                            <div class="staff-details">Phone: 041232569</div>
-                            <div class="staff-details">Email: samantha@gmail.com</div>
+                            <div class="staff-name">{{ staff.name }}</div>
+                            <div class="staff-details">Position: {{ staff.position }}</div>
+                            <div class="staff-details">Phone: {{ staff.phone }}</div>
+                            <div class="staff-details">Email: {{ staff.email }}</div>
                         </div>
                     </div>
-                    <div class="staff-card">
-                        <div class="avatar"></div>
-                        <div class="staff-info">
-                            <div class="staff-name">Samantha Joe</div>
-                            <div class="staff-details">Position: Manager</div>
-                            <div class="staff-details">Phone: 041232569</div>
-                            <div class="staff-details">Email: samantha@gmail.com</div>
-                        </div>
-                    </div>
-                    <div class="staff-card">
-                        <div class="avatar"></div>
-                        <div class="staff-info">
-                            <div class="staff-name">Samantha Joe</div>
-                            <div class="staff-details">Position: Manager</div>
-                            <div class="staff-details">Phone: 041232569</div>
-                            <div class="staff-details">Email: samantha@gmail.com</div>
-                        </div>
-                    </div>
-                    <div class="staff-card">
-                        <div class="avatar"></div>
-                        <div class="staff-info">
-                            <div class="staff-name">Samantha Joe</div>
-                            <div class="staff-details">Position: Manager</div>
-                            <div class="staff-details">Phone: 041232569</div>
-                            <div class="staff-details">Email: samantha@gmail.com</div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
