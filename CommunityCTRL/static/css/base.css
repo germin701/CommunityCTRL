@@ -1057,7 +1057,6 @@ textarea::placeholder {
     border: 2px #DBE0E5 solid;
     background-color: #f3f3f3;
     margin-bottom: 3px;
-    gap: 21px;
 }
 
 .request-list-card {
