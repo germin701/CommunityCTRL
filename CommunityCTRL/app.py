@@ -641,8 +641,8 @@ def visitor():
         LEFT JOIN invitations i ON v.visitor_id=i.visitor_id
         AND i.date=(SELECT MAX(date) FROM invitations WHERE visitor_id=v.visitor_id AND status=0)
         LEFT JOIN visit_history h ON i.invitation_id=h.invitation_id
-        LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id = vv.visitor_vehicle_id
-        LEFT JOIN vehicle_types vt ON vv.type_id = vt.type_id
+        LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id=vv.visitor_vehicle_id
+        LEFT JOIN vehicle_types vt ON vv.type_id=vt.type_id
         WHERE v.status=1 AND v.unit_id=?
         """, (session['unit'],))
     visitor_list = cursor.fetchall()
@@ -687,8 +687,8 @@ def admin_visitor():
         LEFT JOIN invitations i ON v.visitor_id=i.visitor_id
         AND i.date=(SELECT MAX(date) FROM invitations WHERE visitor_id=v.visitor_id AND status=0)
         LEFT JOIN visit_history h ON i.invitation_id=h.invitation_id
-        LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id = vv.visitor_vehicle_id
-        LEFT JOIN vehicle_types vt ON vv.type_id = vt.type_id
+        LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id=vv.visitor_vehicle_id
+        LEFT JOIN vehicle_types vt ON vv.type_id=vt.type_id
         WHERE v.status=1
         """)
     visitor_list = cursor.fetchall()
@@ -716,9 +716,47 @@ def admin_visitor():
     return render_template('admin_visitor.html', visitors_list=visitors_list)
 
 
-@app.route('/visitor_detail')
-def visitor_detail():
-    return render_template('visitor_detail.html')
+@app.route('/visitor_detail/<visitor_id>')
+def visitor_detail(visitor_id):
+    cursor = get_db().cursor()
+
+    # Get visitor details
+    cursor.execute("""
+        SELECT v.name, v.gender, v.ic, v.email, v.phone, v.unit_id, v.picture, i.invitation_id, i.date, 
+        i.visitor_vehicle_id, vv.vehicle_number, vt.type, h.arrive_time, h.exit_time, u.name
+        FROM visitors v
+        LEFT JOIN invitations i ON v.visitor_id=i.visitor_id
+        INNER JOIN visit_history h ON i.invitation_id = h.invitation_id
+        LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id = vv.visitor_vehicle_id
+        LEFT JOIN vehicle_types vt ON vv.type_id = vt.type_id
+        LEFT JOIN users u ON i.user_id=u.user_id
+        WHERE v.status=1 AND v.visitor_id=?
+        """, (visitor_id,))
+    visitor_lists = cursor.fetchall()
+    print(visitor_lists)
+
+    # Process visitors to convert profile pictures to Base64
+    visitors_list = []
+    for visitors in visitor_lists:
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if visitors[6]:
+            # Detect image type
+            image_type = imghdr.what(None, h=visitors[6])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(visitors[6]).decode('utf-8')
+
+        # Create a dictionary for the visitor with the Base64-encoded picture
+        visitor_data = {"name": visitors[0], "gender": visitors[1], "ic": visitors[2], "email": visitors[3],
+                        "phone": visitors[4], "unit_id": visitors[5],  "picture": profile_picture,
+                        "invitation_id": visitors[7], "date": visitors[8], "vehicle_id": visitors[9],
+                        "vehicle": f"{visitors[11]} ({visitors[10]})" if visitors[10] and visitors[11] else "None",
+                        "arrive_time": visitors[12], "exit_time": visitors[13], "invitor": visitors[14]}
+        visitors_list.append(visitor_data)
+
+    return render_template('visitor_detail.html', role=session['role'], visitors_list=visitors_list)
 
 
 @app.route('/edit_visitor')
