@@ -851,6 +851,16 @@ def edit_visitor(visitor_id):
                            currentProfilePic=visitor_picture, visitor_vehicles=visitor_vehicles)
 
 
+@app.route('/block-visitor/<visitor_id>', methods=['POST'])
+def block_visitor(visitor_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE visitors SET status=0 WHERE visitor_id=?", (visitor_id,))
+    cursor.execute("UPDATE visitor_vehicles SET status=0 WHERE visitor_id=?", (visitor_id,))
+    conn.commit()
+    return jsonify({"message": "Visitor blocked successfully."})
+
+
 @app.route('/new_visitor')
 def new_visitor():
     return render_template('new_visitor.html')
