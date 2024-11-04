@@ -892,7 +892,6 @@ def admin_staff():
         staff_data = {"user_id": staffs[0], "name": staffs[1], "position": staffs[2], "phone": staffs[3],
                       "email": staffs[4], "profile_picture": profile_picture, "status": staffs[6]}
         staff_list.append(staff_data)
-    print(staff_list)
     return render_template('admin_staff.html', staffs=staff_list)
 
 
@@ -1036,9 +1035,34 @@ def new_staff():
     return render_template('new_staff.html')
 
 
-@app.route('/edit_staff')
-def edit_staff():
-    return render_template('edit_staff.html')
+@app.route('/edit_staff/<staff_id>', methods=['GET', 'POST'])
+def edit_staff(staff_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Get staff details
+    cursor.execute("SELECT u.user_id, u.name, u.gender, u.ic, u.email, u.phone, u.picture, s.staff_id, s.phone, "
+                   "s.position FROM staffs s, users u WHERE u.user_id=s.user_id AND u.status=1 AND u.user_id=?",
+                   (staff_id,))
+    staff_details = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the staff picture
+    staff_picture = None
+    if staff_details[6]:
+        # Detect image type
+        image_type = imghdr.what(None, h=staff_details[6])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            staff_picture = (f"data:image/{image_type};base64," + base64.b64encode(staff_details[6]).decode('utf-8'))
+
+    # Get staff vehicles details
+    cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
+                   "v.type_id AND v.status=1 AND v.user_id=?", (staff_id,))
+    staff_vehicles = cursor.fetchall()
+
+    return render_template('edit_staff.html', staff_details=staff_details, currentProfilePic=staff_picture,
+                           staff_vehicles=staff_vehicles)
 
 
 @app.route('/resignee')
