@@ -43,7 +43,7 @@
                 <h1>Visitors</h1>
                 <div class="search-container">
                     <img src="{{ url_for('static', filename='asset/magnifier.png') }}" alt="Magnifier" class="magnifier-icon">
-                    <input type="text" class="search-input" placeholder="Search Visitor">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search Visitor">
                 </div>
                 <div class="button-container">
                     <button class="blue-button" onclick="window.location.href='/new_visitor'">+ New</button>
@@ -61,7 +61,7 @@
             </div>
             <div class="visitor-section">
                 {% for visitor in visitors_list %}
-                <div class="visitor-card">
+                <div class="visitor-card" data-name="{{ visitor.name|lower }}">
                     <div class="avatar">
                         {% if visitor.picture %}
                         <img src="{{ visitor.picture }}" alt="Profile Picture">
@@ -187,6 +187,20 @@
                 });
             }
         }
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            const staffCards = document.querySelectorAll('.visitor-card');
+
+            staffCards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(searchValue)) {
+                    card.style.display = 'inline-flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
