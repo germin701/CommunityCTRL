@@ -1150,15 +1150,33 @@ def edit_staff(staff_id):
                            staff_vehicles=staff_vehicles)
 
 
-@app.route('/resignee')
-def resignee():
-    # Example list of existing vehicles fetched from the database
-    vehicles = [
-        {"type": "Car", "number": "XYZ 1234"},
-        {"type": "Motorcycle", "number": "ABC 5678"}
-    ]
+@app.route('/resignee/<staff_id>')
+def resignee(staff_id):
+    conn = get_db()
+    cursor = conn.cursor()
 
-    return render_template('resignee.html', vehicles=vehicles)
+    # Get resigned staff details
+    cursor.execute("SELECT u.user_id, u.name, u.gender, u.ic, u.email, u.phone, u.picture, s.staff_id, s.position "
+                   "FROM staffs s, users u WHERE u.user_id=s.user_id AND u.status=0 AND u.user_id=?", (staff_id,))
+    staff_details = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the staff picture
+    staff_picture = None
+    if staff_details[6]:
+        # Detect image type
+        image_type = imghdr.what(None, h=staff_details[6])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            staff_picture = (f"data:image/{image_type};base64," + base64.b64encode(staff_details[6]).decode('utf-8'))
+
+    # Get staff vehicles details
+    cursor.execute("SELECT t.type, v.vehicle_number FROM user_vehicles v, vehicle_types t WHERE t.type_id = "
+                   "v.type_id AND v.user_id=?", (staff_id,))
+    staff_vehicles = cursor.fetchall()
+
+    return render_template('resignee.html', staff_details=staff_details, staff_picture=staff_picture,
+                           staff_vehicles=staff_vehicles)
 
 
 @app.route('/unit', methods=['GET', 'POST'])
