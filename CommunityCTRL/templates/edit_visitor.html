@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommunityCTRL</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body class="no-scroll">
     <div class="screen-container">
@@ -12,9 +13,31 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Owner</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
+            {% if role == 'Admin' %}
+            <div class="menu-item" onclick="window.location.href='/admin_home'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/home_unselect.png') }}" alt="dashboard_icon">
+                <div class="menu-text">Dashboard</div>
+            </div>
+            <div class="menu-item active" onclick="window.location.href='/admin_visitor'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/visitor_select.png') }}" alt="visitors_icon">
+                <div class="menu-text">Visitors</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/security_footage'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/cctv_unselect.png') }}" alt="security_footage_icon">
+                <div class="menu-text">Security Footage</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/admin_staff'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/staff_unselect.png') }}" alt="staff_icon">
+                <div class="menu-text">Staff</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/unit'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/unit_unselect.png') }}" alt="unit_icon">
+                <div class="menu-text">Unit</div>
+            </div>
+            {% else %}
             <div class="menu-item" onclick="window.location.href='/home'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/home_unselect.png') }}" alt="dashboard_icon">
                 <div class="menu-text">Dashboard</div>
@@ -22,10 +45,6 @@
             <div class="menu-item active" onclick="window.location.href='/visitor'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/visitor_select.png') }}" alt="visitors_icon">
                 <div class="menu-text">Visitors</div>
-            </div>
-            <div class="menu-item" onclick="window.location.href='/security_footage'">
-                <img class="menu-icon" src="{{ url_for('static', filename='asset/cctv_unselect.png') }}" alt="security_footage_icon">
-                <div class="menu-text">Security Footage</div>
             </div>
             <div class="menu-item" onclick="window.location.href='/staff'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/staff_unselect.png') }}" alt="staff_icon">
@@ -35,6 +54,7 @@
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/unit_unselect.png') }}" alt="unit_icon">
                 <div class="menu-text">Unit</div>
             </div>
+            {% endif %}
             <div class="theme-toggle-section">
                 <span class="theme-text">Dark Mode</span>
                 <div id="theme-toggle" class="switch-container">
@@ -63,19 +83,19 @@
                             <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                         </div>
                         <div class="infos">
-                            <label>Samantha Joe</label>
-                            <div class="visitor-details">Female</div>
-                            <div class="visitor-details">990520080234</div>
+                            <label>{{ visitor_info[1] }}</label>
+                            <div class="visitor-details">{{ visitor_info[2] }}</div>
+                            <div class="visitor-details">{{ visitor_info[3] }}</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
                             <label for="phone">Phone Number</label>
-                            <input type="text" id="phone" name="phone" class="phone" value="01233334444" required>
+                            <input type="text" id="phone" name="phone" class="phone" value="{{ visitor_info[5] }}" required>
                         </div>
                         <div class="input-field">
                             <label for="email">Email (Optional)</label>
-                            <input type="email" id="email" name="email" class="email-field" value="samantha520@gmail.com">
+                            <input type="email" id="email" name="email" class="email-field" value="{{ visitor_info[4] }}">
                         </div>
                     </div>
                     <h3>Vehicle Detail</h3>
@@ -83,14 +103,15 @@
                         <label>Vehicle Type </label>
                         <label>Vehicle Number</label>
                     </div>
-                    {% for vehicle in vehicles %}
+                    {% for vehicle in visitor_vehicles %}
                     <div class="row">
                         <div class="input-field">
-                            <input type="text" id="vehicle-type{{ loop.index }}" name="vehicle-type[]" class="type" value="{{ vehicle.type }}" readonly>
+                            <input type="text" id="vehicle-type{{ loop.index }}" name="vehicle-type[]" class="type" value="{{ vehicle[0] }}" readonly>
                         </div>
                         <div class="input-field">
-                            <input type="text" id="vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ vehicle.number }}" readonly>
+                            <input type="text" id="vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ vehicle[1] }}" readonly>
                         </div>
+                        <i class="fa fa-minus-circle" onclick="removeVehicle('{{ vehicle[0] }}', '{{ vehicle[1] }}', {{ visitor_info[0] }})"></i>
                     </div>
                     {% endfor %}
                     <div id="new-vehicle-list"></div>
@@ -257,6 +278,27 @@
             // Append the new vehicle row to the list
             newVehicleList.appendChild(newVehicleRow);
         });
+
+        function removeVehicle(vehicleType, vehicleNum, user_id) {
+            const userId = {{ visitor_info[0] }}
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to remove this vehicle?");
+
+            if (userConfirmed) {
+                fetch(`/remove-visitor-vehicle/${vehicleType}/${vehicleNum}/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = `/edit_visitor/${userId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to remove vehicle. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
