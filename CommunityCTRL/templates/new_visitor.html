@@ -12,7 +12,7 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Owner</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
             <div class="menu-item" onclick="window.location.href='/home'">
@@ -51,9 +51,9 @@
                 </div>
             </div>
             <div class="details-section">
-                <form>
+                <form method="POST" action="{{ url_for('new_visitor') }}" enctype="multipart/form-data">
                     <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
-                        <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
+                        <input type="file" id="imageUpload" name="visitor-pic" accept="image/*" onchange="displayImage(this)" style="display: none;" />
                         <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
                         <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                     </div>
@@ -66,7 +66,7 @@
                     <div class="row">
                         <div class="input-field">
                             <label for="email">Email (Optional)</label>
-                            <input type="email" id="email" name="email" class="email-field" placeholder="example@gmail.com" required>
+                            <input type="email" id="email" name="email" class="email-field" placeholder="example@gmail.com">
                         </div>
                     </div>
                     <div class="row">
@@ -93,20 +93,6 @@
                     <div class="row-label">
                         <label>Vehicle Type</label>
                         <label>Vehicle Number</label>
-                    </div>
-                    <div class="row">
-                        <div class="input-field">
-                            <div class="select-wrapper">
-                                <select id="vehicle-type" name="vehicle-type" required>
-                                    <option value="">Select Vehicle Type</option>
-                                    <option value="Car">Car</option>
-                                    <option value="Motorcycle">Motorcycle</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-field">
-                            <input type="text" id="vehicle-number" name="vehicle-number" class="new-number" placeholder="Enter vehicle number" required>
-                        </div>
                     </div>
                     <div id="new-vehicle-list"></div>
                     <button id="add-vehicle-btn" class="add-vehicle">+ Add Vehicle</button>
