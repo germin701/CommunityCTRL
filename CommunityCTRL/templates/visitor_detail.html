@@ -12,9 +12,31 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Owner</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
+            {% if role == 'Admin' %}
+            <div class="menu-item" onclick="window.location.href='/admin_home'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/home_unselect.png') }}" alt="dashboard_icon">
+                <div class="menu-text">Dashboard</div>
+            </div>
+            <div class="menu-item active" onclick="window.location.href='/admin_visitor'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/visitor_select.png') }}" alt="visitors_icon">
+                <div class="menu-text">Visitors</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/security_footage'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/cctv_unselect.png') }}" alt="security_footage_icon">
+                <div class="menu-text">Security Footage</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/admin_staff'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/staff_unselect.png') }}" alt="staff_icon">
+                <div class="menu-text">Staff</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='/unit'">
+                <img class="menu-icon" src="{{ url_for('static', filename='asset/unit_unselect.png') }}" alt="unit_icon">
+                <div class="menu-text">Unit</div>
+            </div>
+            {% else %}
             <div class="menu-item" onclick="window.location.href='/home'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/home_unselect.png') }}" alt="dashboard_icon">
                 <div class="menu-text">Dashboard</div>
@@ -22,10 +44,6 @@
             <div class="menu-item active" onclick="window.location.href='/visitor'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/visitor_select.png') }}" alt="visitors_icon">
                 <div class="menu-text">Visitors</div>
-            </div>
-            <div class="menu-item" onclick="window.location.href='/security_footage'">
-                <img class="menu-icon" src="{{ url_for('static', filename='asset/cctv_unselect.png') }}" alt="security_footage_icon">
-                <div class="menu-text">Security Footage</div>
             </div>
             <div class="menu-item" onclick="window.location.href='/staff'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/staff_unselect.png') }}" alt="staff_icon">
@@ -35,6 +53,7 @@
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/unit_unselect.png') }}" alt="unit_icon">
                 <div class="menu-text">Unit</div>
             </div>
+            {% endif %}
             <div class="theme-toggle-section">
                 <span class="theme-text">Dark Mode</span>
                 <div id="theme-toggle" class="switch-container">
@@ -56,22 +75,26 @@
             </div>
             <div class="details-section">
                 <div class="profile">
-                    <div class="profile-pic"></div>
+                    <div class="profile-picture">
+                        {% if visitors_list[0].picture %}
+                        <img src="{{ visitors_list[0].picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
                     <div class="infos">
-                        <label>Samantha Joe</label>
-                        <div class="visitor-details">Female</div>
-                        <div class="visitor-details">990520080234</div>
+                        <label>{{ visitors_list[0].name }}</label>
+                        <div class="visitor-details">{{ visitors_list[0].gender }}</div>
+                        <div class="visitor-details">{{ visitors_list[0].ic }}</div>
                     </div>
                     <div class="contact-container">
                         <label>Contact Details</label>
                         <div class="contact-infos">
                             <div class="contact">
                                 Phone Number
-                                <div class="visitor-details">+6012 333 4444</div>
+                                <div class="visitor-details">{{ visitors_list[0].phone }}</div>
                             </div>
                             <div class="contact">
                                 Email
-                                <div class="visitor-details">joe@gmail.com</div>
+                                <div class="visitor-details">{{ visitors_list[0].email }}</div>
                             </div>
                         </div>
                     </div>
@@ -90,22 +113,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for visitor in visitors_list %}
                             <tr>
-                                <td>Car (PPP 111)</td>
-                                <td>1003</td>
-                                <td>12-02-2024</td>
-                                <td>15:15</td>
-                                <td>17:03</td>
-                                <td>Samantha Joe</td>
+                                <td>{{ visitor.vehicle }}</td>
+                                <td>{{ visitor.unit_id }}</td>
+                                <td>{{ visitor.date }}</td>
+                                <td>{{ visitor.arrive_time }}</td>
+                                <td>{{ visitor.exit_time }}</td>
+                                <td>{{ visitor.invitor }}</td>
                             </tr>
-                            <tr>
-                                <td>Motorcycle (PPP 1111)</td>
-                                <td>1003</td>
-                                <td>12-02-2024</td>
-                                <td>15:15</td>
-                                <td>17:03</td>
-                                <td>Samantha Joe</td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
