@@ -1090,7 +1090,33 @@ def admin_new_invite():
 
 @app.route('/blacklist')
 def blacklist():
-    return render_template('blacklist.html')
+    cursor = get_db().cursor()
+
+    # Get blacklist
+    cursor.execute("SELECT visitor_id, name, gender, ic, picture FROM visitors WHERE status=0 AND unit_id=?",
+                   (session['unit'],))
+    blacklists_data = cursor.fetchall()
+
+    # Process blacklist to convert profile pictures to Base64
+    blacklists = []
+    for blacklist_data in blacklists_data:
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if blacklist_data[4]:
+            # Detect image type
+            image_type = imghdr.what(None, h=blacklist_data[4])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = (f"data:image/{image_type};base64," + base64.b64encode(blacklist_data[4])
+                                   .decode('utf-8'))
+
+        # Create a dictionary for the blacklist with the Base64-encoded picture
+        data = {"visitor_id": blacklist_data[0], "name": blacklist_data[1], "gender": blacklist_data[2],
+                "ic": blacklist_data[3], "profile_picture": profile_picture}
+        blacklists.append(data)
+
+    return render_template('blacklist.html', role=session['role'], blacklists=blacklists)
 
 
 @app.route('/admin_blacklist')
