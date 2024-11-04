@@ -76,7 +76,7 @@
                     <div class="button-container">
                         <button class="blues-button" onclick="window.location.href='/visitor_detail/{{ visitor.visitor_id }}'">View Details</button>
                         <button class="blues-button" onclick="window.location.href='/edit_visitor/{{ visitor.visitor_id }}'">Edit</button>
-                        <button class="blues-button">Block</button>
+                        <button class="blues-button" onclick="blockVisitor({{ visitor.visitor_id }})">Block</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -167,6 +167,26 @@
                 }
             });
         });
+
+        function blockVisitor(user_id) {
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to block this visitor?");
+
+            if (userConfirmed) {
+                fetch(`/block-visitor/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = `/visitor`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to block visitor. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
