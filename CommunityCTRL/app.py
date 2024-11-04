@@ -528,6 +528,7 @@ def create_announcement():
                 return f'''
                     <script>
                         alert("{error}");
+                        window.location.href = "{url_for('create_announcement')}";
                     </script>
                     '''
 
@@ -571,6 +572,7 @@ def edit_announcement(announcement_id):
                 return f'''
                     <script>
                         alert("{error}");
+                        window.location.href = "{url_for('edit_announcement', announcement_id=announcement_id)}";
                     </script>
                     '''
 
@@ -918,6 +920,7 @@ def new_staff():
                 return f'''
                     <script>
                         alert("{error}");
+                        window.location.href = "{url_for('new_staff')}";
                     </script>
                     '''
 
@@ -1039,6 +1042,88 @@ def new_staff():
 def edit_staff(staff_id):
     conn = get_db()
     cursor = conn.cursor()
+
+    if request.method == 'POST':
+        picture = request.files.get('staff-pic')
+        position = request.form['position']
+        email = request.form['email']
+        office_number = request.form['office-phone']
+        personal_number = request.form['personal-phone']
+        new_vehicle_types = request.form.getlist('newVehicleType[]')
+        new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
+
+        # Validate and process picture
+        if picture and picture.filename:
+            error = validate_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                        window.location.href = "{url_for('edit_staff', staff_id=staff_id)}";
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        else:
+            picture_data = None
+
+        # Validate contains only digits and length is 9
+        if not re.match(r'^\d{9}$', office_number):
+            return f'''
+                <script>
+                    alert("Please enter a valid office phone and only digits are allowed.");
+                    window.location.href = "{url_for('edit_staff', staff_id=staff_id)}";
+                </script>
+                '''
+
+        # Validate contains only digits and length is 10/11
+        elif not re.match(r'^\d{10,11}$', personal_number):
+            return f'''
+                <script>
+                    alert("Please enter a valid phone and only digits are allowed.");
+                    window.location.href = "{url_for('edit_staff', staff_id=staff_id)}";
+                </script>
+                '''
+
+        else:
+            # Update staff details
+            cursor.execute("UPDATE users SET email=?, phone=?, picture=? WHERE user_id=?", (email, personal_number,
+                                                                                            picture_data, staff_id))
+            cursor.execute("UPDATE staffs SET phone=?, position=? WHERE user_id=?", (office_number, position, staff_id))
+            conn.commit()
+
+            # Add staff vehicle details
+            if not new_vehicle_types:
+                pass
+            else:
+                # Insert new vehicles into the database
+                for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                    if vehicle_type and vehicle_number:
+                        if vehicle_type == 'Car':
+                            vehicle_id = 1
+                        else:
+                            vehicle_id = 2
+
+                        # Check if the vehicle already exists for the current user
+                        cursor.execute("SELECT user_vehicle_id FROM user_vehicles WHERE type_id=? AND "
+                                       "vehicle_number=? AND user_id=?", (vehicle_id, vehicle_number, staff_id))
+                        existing_vehicle = cursor.fetchone()
+                        if existing_vehicle is not None:
+                            existing_vehicle_id = existing_vehicle[0]
+                            cursor.execute("UPDATE user_vehicles SET status=1 WHERE user_vehicle_id=?",
+                                           (existing_vehicle_id,))
+                        else:
+                            cursor.execute("INSERT INTO user_vehicles (type_id, vehicle_number, user_id, status) "
+                                           "VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, staff_id))
+                        conn.commit()
+            return '''
+                <script>
+                    alert("Staff updated successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_staff'))
 
     # Get staff details
     cursor.execute("SELECT u.user_id, u.name, u.gender, u.ic, u.email, u.phone, u.picture, s.staff_id, s.phone, "
