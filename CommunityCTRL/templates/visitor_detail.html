@@ -76,31 +76,32 @@
             <div class="details-section">
                 <div class="profile">
                     <div class="profile-picture">
-                        {% if visitors_list[0].picture %}
-                        <img src="{{ visitors_list[0].picture }}" alt="Profile Picture">
+                        {% if visitor_picture %}
+                        <img src="{{ visitor_picture }}" alt="Profile Picture">
                         {% endif %}
                     </div>
                     <div class="infos">
-                        <label>{{ visitors_list[0].name }}</label>
-                        <div class="visitor-details">{{ visitors_list[0].gender }}</div>
-                        <div class="visitor-details">{{ visitors_list[0].ic }}</div>
+                        <label>{{ visitor_info[0] }}</label>
+                        <div class="visitor-details">{{ visitor_info[1] }}</div>
+                        <div class="visitor-details">{{ visitor_info[2] }}</div>
                     </div>
                     <div class="contact-container">
                         <label>Contact Details</label>
                         <div class="contact-infos">
                             <div class="contact">
                                 Phone Number
-                                <div class="visitor-details">{{ visitors_list[0].phone }}</div>
+                                <div class="visitor-details">{{ visitor_info[4] }}</div>
                             </div>
                             <div class="contact">
                                 Email
-                                <div class="visitor-details">{{ visitors_list[0].email }}</div>
+                                <div class="visitor-details">{{ visitor_info[3] }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="visited-history">
                     <h3>Visited History</h3>
+                    {% if visit_history_list %}
                     <table class="custom-table">
                         <thead>
                             <tr>
@@ -113,18 +114,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for visitor in visitors_list %}
+                            {% for history in visit_history_list %}
                             <tr>
-                                <td>{{ visitor.vehicle }}</td>
-                                <td>{{ visitor.unit_id }}</td>
-                                <td>{{ visitor.date }}</td>
-                                <td>{{ visitor.arrive_time }}</td>
-                                <td>{{ visitor.exit_time }}</td>
-                                <td>{{ visitor.invitor }}</td>
+                                <td>{{ history[0] }} ({{ history[1] }})</td>
+                                <td>{{ history[2] }}</td>
+                                <td>{{ history[3] }}</td>
+                                <td>{{ history[4] }}</td>
+                                <td>{{ history[5] }}</td>
+                                <td>{{ history[6] }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                    {% else %}
+                    <label>No tenant exists</label>
+                    {% endif %}
                 </div>
             </div>
         </div>
