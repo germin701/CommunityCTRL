@@ -626,7 +626,45 @@ def delete_announcement(announcement_id):
 
 @app.route('/visitor')
 def visitor():
-    return render_template('visitor.html')
+    cursor = get_db().cursor()
+    cursor.execute("""
+    SELECT v.visitor_id, v.name, v.picture, i.invitation_id, i.date, i.visitor_vehicle_id, vv.vehicle_number, vt.type,
+    CASE
+        WHEN h.arrive_time IS NOT NULL AND h.exit_time IS NOT NULL THEN 'Visited'
+        WHEN h.arrive_time IS NOT NULL AND h.exit_time IS NULL THEN 'Visiting'
+        ELSE NULL
+    END AS status
+    FROM visitors v
+    LEFT JOIN invitations i ON v.visitor_id=i.visitor_id
+    AND i.date=(SELECT MAX(date) FROM invitations WHERE visitor_id=v.visitor_id AND status=0)
+    LEFT JOIN visit_history h ON i.invitation_id=h.invitation_id
+    LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id = vv.visitor_vehicle_id
+    LEFT JOIN vehicle_types vt ON vv.type_id = vt.type_id
+    WHERE v.status=1 AND v.unit_id=?
+    """, (session['unit'],))
+    visitor_list = cursor.fetchall()
+
+    # Process visitors to convert profile pictures to Base64
+    visitors_list = []
+    for visitors in visitor_list:
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if visitors[2]:
+            # Detect image type
+            image_type = imghdr.what(None, h=visitors[2])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(visitors[2]).decode('utf-8')
+
+        # Create a dictionary for the visitor with the Base64-encoded picture
+        visitor_data = {"visitor_id": visitors[0], "name": visitors[1], "picture": profile_picture,
+                        "invitation_id": visitors[3], "date": visitors[4], "vehicle_id": visitors[5],
+                        "vehicle": f"{visitors[7]} ({visitors[6]})" if visitors[6] and visitors[7] else "None",
+                        "status": visitors[8]}
+        visitors_list.append(visitor_data)
+
+    return render_template('visitor.html', role=session['role'], visitors_list=visitors_list)
 
 
 @app.route('/admin_visitor')
