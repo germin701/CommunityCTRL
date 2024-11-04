@@ -12,7 +12,7 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Owner</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
             <div class="menu-item" onclick="window.location.href='/home'">
@@ -58,83 +58,23 @@
                 </div>
             </div>
             <div class="blacklist-section">
+                {% for blacklist in blacklists %}
                 <div class="blacklist-card">
-                    <div class="avatar"></div>
+                    <div class="avatar">
+                        {% if blacklist.profile_picture %}
+                        <img src="{{ blacklist.profile_picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
                     <div class="blacklist-info">
-                        <div class="blacklist-name">Samantha Joe</div>
-                        <div class="blacklist-details">Gender: Female</div>
-                        <div class="blacklist-details">IC: 840525145013</div>
+                        <div class="blacklist-name">{{ blacklist.name }}</div>
+                        <div class="blacklist-details">Gender: {{ blacklist.gender }}</div>
+                        <div class="blacklist-details">IC: {{ blacklist.ic }}</div>
                     </div>
                     <div class="button-container">
                         <button class="blues-button">Unblock</button>
                     </div>
                 </div>
-                <div class="blacklist-card">
-                    <div class="avatar"></div>
-                    <div class="blacklist-info">
-                        <div class="blacklist-name">Samantha Joe</div>
-                        <div class="blacklist-details">Gender: Female</div>
-                        <div class="blacklist-details">IC: 840525145013</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">Unblock</button>
-                    </div>
-                </div>
-                <div class="blacklist-card">
-                    <div class="avatar"></div>
-                    <div class="blacklist-info">
-                        <div class="blacklist-name">Samantha Joe</div>
-                        <div class="blacklist-details">Gender: Female</div>
-                        <div class="blacklist-details">IC: 840525145013</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">Unblock</button>
-                    </div>
-                </div>
-                <div class="blacklist-card">
-                    <div class="avatar"></div>
-                    <div class="blacklist-info">
-                        <div class="blacklist-name">Samantha Joe</div>
-                        <div class="blacklist-details">Gender: Female</div>
-                        <div class="blacklist-details">IC: 840525145013</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">Unblock</button>
-                    </div>
-                </div>
-                <div class="blacklist-card">
-                    <div class="avatar"></div>
-                    <div class="blacklist-info">
-                        <div class="blacklist-name">Samantha Joe</div>
-                        <div class="blacklist-details">Gender: Female</div>
-                        <div class="blacklist-details">IC: 840525145013</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">Unblock</button>
-                    </div>
-                </div>
-                <div class="blacklist-card">
-                    <div class="avatar"></div>
-                    <div class="blacklist-info">
-                        <div class="blacklist-name">Samantha Joe</div>
-                        <div class="blacklist-details">Gender: Female</div>
-                        <div class="blacklist-details">IC: 840525145013</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">Unblock</button>
-                    </div>
-                </div>
-                <div class="blacklist-card">
-                    <div class="avatar"></div>
-                    <div class="blacklist-info">
-                        <div class="blacklist-name">Samantha Joe</div>
-                        <div class="blacklist-details">Gender: Female</div>
-                        <div class="blacklist-details">IC: 840525145013</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button">Unblock</button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
