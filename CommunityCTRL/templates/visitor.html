@@ -12,7 +12,7 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Owner</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
             <div class="menu-item" onclick="window.location.href='/home'">
@@ -60,13 +60,18 @@
                 </div>
             </div>
             <div class="visitor-section">
+                {% for visitor in visitors_list %}
                 <div class="visitor-card">
-                    <div class="avatar"></div>
+                    <div class="avatar">
+                        {% if visitor.picture %}
+                        <img src="{{ visitor.picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
                     <div class="visitor-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="visitor-details">Status: Visiting</div>
-                        <div class="visitor-details">Vehicle: Car (PPP 111)</div>
-                        <div class="visitor-details">Last visit: 07/09/2024</div>
+                        <div class="visitor-name">{{ visitor.name }}</div>
+                        <div class="visitor-details">Status: {{ visitor.status }}</div>
+                        <div class="visitor-details">Vehicle: {{ visitor.vehicle }}</div>
+                        <div class="visitor-details">Last visit: {{ visitor.date }}</div>
                     </div>
                     <div class="button-container">
                         <button class="blues-button" onclick="window.location.href='/visitor_detail'">View Details</button>
@@ -74,62 +79,7 @@
                         <button class="blues-button">Block</button>
                     </div>
                 </div>
-                <div class="visitor-card">
-                    <div class="avatar"></div>
-                    <div class="visitor-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="visitor-details">Status: Visiting</div>
-                        <div class="visitor-details">Vehicle: Car (PPP 111)</div>
-                        <div class="visitor-details">Last visit: 07/09/2024</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button" onclick="window.location.href='/visitor_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/edit_visitor'">Edit</button>
-                        <button class="blues-button">Block</button>
-                    </div>
-                </div>
-                <div class="visitor-card">
-                    <div class="avatar"></div>
-                    <div class="visitor-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="visitor-details">Status: Visiting</div>
-                        <div class="visitor-details">Vehicle: Car (PPP 111)</div>
-                        <div class="visitor-details">Last visit: 07/09/2024</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button" onclick="window.location.href='/visitor_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/edit_visitor'">Edit</button>
-                        <button class="blues-button">Block</button>
-                    </div>
-                </div>
-                <div class="visitor-card">
-                    <div class="avatar"></div>
-                    <div class="visitor-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="visitor-details">Status: Visiting</div>
-                        <div class="visitor-details">Vehicle: Car (PPP 111)</div>
-                        <div class="visitor-details">Last visit: 07/09/2024</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button" onclick="window.location.href='/visitor_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/edit_visitor'">Edit</button>
-                        <button class="blues-button">Block</button>
-                    </div>
-                </div>
-                <div class="visitor-card">
-                    <div class="avatar"></div>
-                    <div class="visitor-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="visitor-details">Status: Visiting</div>
-                        <div class="visitor-details">Vehicle: Car (PPP 111)</div>
-                        <div class="visitor-details">Last visit: 07/09/2024</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="blues-button" onclick="window.location.href='/visitor_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/edit_visitor'">Edit</button>
-                        <button class="blues-button">Block</button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
