@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommunityCTRL</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body class="no-scroll">
     <div class="screen-container">
@@ -55,10 +56,10 @@
                 </div>
             </div>
             <div class="details-section">
-                <form action="/edit_staff/{{ staff_details[0] }}" method="POST">
+                <form action="/edit_staff/{{ staff_details[0] }}" method="POST" enctype="multipart/form-data">
                     <div class="profile">
                         <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
-                            <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
+                            <input type="file" id="imageUpload" name="staff-pic" accept="image/*" onchange="displayImage(this)" style="display: none;" />
                             <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
                             <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                         </div>
@@ -104,8 +105,8 @@
                         <div class="input-field">
                             <input type="text" id="vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ vehicle[1] }}" readonly>
                         </div>
+                        <i class="fa fa-minus-circle" onclick="removeVehicle('{{ vehicle[0] }}', '{{ vehicle[1] }}', {{ staff_details[0] }})"></i>
                     </div>
-                    <i class="fa fa-minus-circle" onclick="removeVehicle('{{ vehicle[0] }}', '{{ vehicle[1] }}', {{ staff_details[0] }})"></i>
                     {% endfor %}
                     <div id="new-vehicle-list"></div>
                     <button id="add-vehicle-btn" class="add-vehicle">+ Add Vehicle</button>
@@ -202,6 +203,78 @@
                     updateIcons('light');
                 }
             });
+        });
+
+        // Function to trigger the image upload input
+        function triggerImageUpload() {
+            const imageUploadInput = document.getElementById('imageUpload');
+            imageUploadInput.click();
+        }
+
+        function displayImage(input) {
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const placeholderText = document.getElementById('placeholderText');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    // Display the uploaded image
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.style.display = 'block';
+                    placeholderText.style.display = 'none';
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUploadInput = document.getElementById('imageUpload');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const placeholderText = document.getElementById('placeholderText');
+
+            // If no image is present, display the placeholder text
+            if (!uploadedImage.src) {
+                uploadedImage.style.display = 'none';
+                placeholderText.style.display = 'block';
+            }
+
+            // Attach the displayImage function to the input's onchange event
+            imageUploadInput.addEventListener('change', function() {
+                displayImage(this);
+            });
+        });
+
+        let vehicleCount = 0;
+
+        // Add a new vehicle input row
+        document.getElementById('add-vehicle-btn').addEventListener('click', function () {
+            const newVehicleList = document.getElementById('new-vehicle-list');
+            vehicleCount++;
+
+            // Create a new row for vehicle type and number
+            const newVehicleRow = document.createElement('div');
+            newVehicleRow.classList.add('row');
+
+            newVehicleRow.innerHTML = `
+                <div class="input-field">
+                    <div class="select-wrapper">
+                        <select id="newVehicleType${vehicleCount}" name="newVehicleType[]" required>
+                            <option value="">Select Vehicle Type</option>
+                            <option value="Car">Car</option>
+                            <option value="Motorcycle">Motorcycle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-field">
+                    <input type="text" id="newVehicleNumber${vehicleCount}" name="newVehicleNumber[]" class="new-number" placeholder="Enter vehicle number" required>
+                </div>
+            `;
+
+            // Append the new vehicle row to the list
+            newVehicleList.appendChild(newVehicleRow);
         });
 
         function removeVehicle(vehicleType, vehicleNum, user_id) {
