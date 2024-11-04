@@ -919,7 +919,93 @@ def new_visitor():
             conn.commit()
 
             # Get new visitor_id
-            cursor.execute("SELECT visitor_id FROM visitors WHERE ic=? AND status=1 AND unit_id=?", (ic, session['unit']))
+            cursor.execute("SELECT visitor_id FROM visitors WHERE ic=? AND status=1 AND unit_id=?",
+                           (ic, session['unit']))
+            visitor_id = cursor.fetchone()[0]
+
+            # Add visitor vehicle details
+            if not new_vehicle_types:
+                pass
+            else:
+                # Insert new vehicles into the database
+                for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                    if vehicle_type and vehicle_number:
+                        if vehicle_type == 'Car':
+                            vehicle_id = 1
+                        else:
+                            vehicle_id = 2
+                        cursor.execute("INSERT INTO visitor_vehicles (type_id, vehicle_number, visitor_id, "
+                                       "status) VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, visitor_id))
+                        conn.commit()
+            return '''
+                <script>
+                    alert("New visitor created successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('visitor'))
+
+    return render_template('new_visitor.html', role=session['role'])
+
+
+@app.route('/admin_new_visitor', methods=['GET', 'POST'])
+def admin_new_visitor():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        picture = request.files.get('visitor-pic')
+        name = request.form['name']
+        email = request.form['email']
+        gender = request.form['gender']
+        unit_num = request.form['unit']
+        ic = request.form['ic']
+        phone = request.form['phone']
+        new_vehicle_types = request.form.getlist('newVehicleType[]')
+        new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
+
+        # Validate and process picture
+        if picture and picture.filename:
+            error = validate_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                        window.location.href = "{url_for('admin_new_visitor')}";
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        else:
+            picture_data = None
+
+        # Validate contains only digits and length is 12
+        if not re.match(r'^\d{12}$', ic):
+            return '''
+                <script>
+                    alert("Please enter a valid ic and only digits are allowed.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_new_visitor'))
+
+        # Validate contains only digits and length is 10/11
+        elif not re.match(r'^\d{10,11}$', phone):
+            return '''
+                <script>
+                    alert("Please enter a valid phone and only digits are allowed.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_new_visitor'))
+
+        else:
+            # Add new visitor
+            cursor.execute("INSERT INTO visitors (name, gender, ic, email, phone, unit_id, picture, status)"
+                           " VALUES (?, ?, ?, ?, ?, ?, ?, 1)", (name, gender, ic, email, phone, unit_num, picture_data))
+            conn.commit()
+
+            # Get new visitor_id
+            cursor.execute("SELECT visitor_id FROM visitors WHERE ic=? AND status=1 AND unit_id=?", (ic, unit_num))
             visitor_id = cursor.fetchone()[0]
 
             # Add visitor vehicle details
@@ -941,14 +1027,13 @@ def new_visitor():
                     alert("New visitor created successfully!");
                     window.location.href = "{}";
                 </script>
-                '''.format(url_for('visitor'))
+                '''.format(url_for('admin_visitor'))
 
-    return render_template('new_visitor.html', role=session['role'])
+    # Get unit list
+    cursor.execute("SELECT unit_id FROM units")
+    unit_list = cursor.fetchall()
 
-
-@app.route('/admin_new_visitor')
-def admin_new_visitor():
-    return render_template('admin_new_visitor.html')
+    return render_template('admin_new_visitor.html', unit_list=unit_list)
 
 
 @app.route('/invitation_list')
