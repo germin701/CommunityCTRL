@@ -1179,6 +1179,16 @@ def resignee(staff_id):
                            staff_vehicles=staff_vehicles)
 
 
+@app.route('/remove-staff/<user_id>', methods=['POST'])
+def remove_staff(user_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET status=0 WHERE user_id=?", (user_id,))
+    cursor.execute("UPDATE user_vehicles SET status=0 WHERE user_id=?", (user_id,))
+    conn.commit()
+    return jsonify({"message": "Staff removed successfully."})
+
+
 @app.route('/unit', methods=['GET', 'POST'])
 def unit():
     conn = get_db()
