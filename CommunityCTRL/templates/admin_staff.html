@@ -78,7 +78,7 @@
                     {% if staff.status == 1 %}
                     <div class="button-container">
                         <button class="blues-button" onclick="window.location.href='/edit_staff/{{ staff.user_id }}'">Edit</button>
-                        <button class="blues-button">Resign</button>
+                        <button class="blues-button" onclick="removeStaff({{ staff.user_id }})">Resign</button>
                     </div>
                     {% else %}
                     <div class="resigned-button-container">
@@ -190,6 +190,26 @@
                 }
             });
         });
+
+        function removeStaff(user_id) {
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to remove this staff?");
+
+            if (userConfirmed) {
+                fetch(`/remove-staff/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = `/admin_staff`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to remove staff. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
