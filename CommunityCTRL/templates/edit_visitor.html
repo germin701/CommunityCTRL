@@ -75,10 +75,10 @@
                 </div>
             </div>
             <div class="details-section">
-                <form>
+                <form method="POST" action="/edit_visitor/{{ visitor_info[0] }}" enctype="multipart/form-data">
                     <div class="profile">
                         <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
-                            <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
+                            <input type="file" id="imageUpload" name="visitor-pic" accept="image/*" onchange="displayImage(this)" style="display: none;" />
                             <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
                             <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                         </div>
@@ -95,7 +95,7 @@
                         </div>
                         <div class="input-field">
                             <label for="email">Email (Optional)</label>
-                            <input type="email" id="email" name="email" class="email-field" value="{{ visitor_info[4] }}">
+                            <input type="email" id="email" name="email" class="email-field" value="{{ visitor_info[4] or '' }}">
                         </div>
                     </div>
                     <h3>Vehicle Detail</h3>
@@ -118,7 +118,11 @@
                     <button id="add-vehicle-btn" class="add-vehicle">+ Add Vehicle</button>
                     <div class="button-container">
                         <button type="submit" class="blue-button">Save</button>
+                        {% if role == 'Admin' %}
+                        <button type="button" class="blue-button" onclick="window.location.href='/admin_visitor'">Cancel</button>
+                        {% else %}
                         <button type="button" class="blue-button" onclick="window.location.href='/visitor'">Cancel</button>
+                        {% endif %}
                     </div>
                 </form>
             </div>
@@ -217,15 +221,19 @@
             imageUploadInput.click();
         }
 
-        // Function to display the uploaded image
         function displayImage(input) {
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const placeholderText = document.getElementById('placeholderText');
+
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
 
-                reader.onload = function (e) {
+                reader.onload = function(e) {
+                    // Display the uploaded image
                     uploadedImage.src = e.target.result;
                     uploadedImage.style.display = 'block';
-                    placeholderText.style.display = 'none';  // Hide the placeholder text
+                    placeholderText.style.display = 'none';
                 };
 
                 reader.readAsDataURL(input.files[0]);
@@ -237,7 +245,7 @@
             const uploadedImage = document.getElementById('uploadedImage');
             const placeholderText = document.getElementById('placeholderText');
 
-            // If no image is present (i.e., the src is empty), display the placeholder text
+            // If no image is present, display the placeholder text
             if (!uploadedImage.src) {
                 uploadedImage.style.display = 'none';
                 placeholderText.style.display = 'block';
