@@ -43,7 +43,7 @@
                 <h1>Blacklist</h1>
                 <div class="search-container">
                     <img src="{{ url_for('static', filename='asset/magnifier.png') }}" alt="Magnifier" class="magnifier-icon">
-                    <input type="text" class="search-input" placeholder="Search Blacklisted">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search Blacklisted">
                 </div>
                 <div class="button-container">
                     <button class="blue-button" onclick="window.location.href='/add_blacklist'">+ Add</button>
@@ -59,7 +59,7 @@
             </div>
             <div class="blacklist-section">
                 {% for blacklist in blacklists %}
-                <div class="blacklist-card">
+                <div class="blacklist-card" data-name="{{ blacklist.name|lower }}">
                     <div class="avatar">
                         {% if blacklist.profile_picture %}
                         <img src="{{ blacklist.profile_picture }}" alt="Profile Picture">
@@ -159,6 +159,20 @@
                     logo.src = "{{ url_for('static', filename='asset/logo.png') }}";
                     localStorage.setItem('theme', 'light');
                     updateIcons('light');
+                }
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            const staffCards = document.querySelectorAll('.blacklist-card');
+
+            staffCards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(searchValue)) {
+                    card.style.display = 'inline-flex';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         });
