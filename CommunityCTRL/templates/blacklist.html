@@ -71,7 +71,7 @@
                         <div class="blacklist-details">IC: {{ blacklist.ic }}</div>
                     </div>
                     <div class="button-container">
-                        <button class="blues-button">Unblock</button>
+                        <button class="blues-button" onclick="unblockVisitor({{ blacklist.visitor_id }})">Unblock</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -176,6 +176,26 @@
                 }
             });
         });
+
+        function unblockVisitor(user_id) {
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to unblock this visitor?");
+
+            if (userConfirmed) {
+                fetch(`/unblock-visitor/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = `/blacklist`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to unblock visitor. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
