@@ -1121,8 +1121,10 @@ textarea::placeholder {
 }
 
 .visitor-card .button-container, .invitation-card .button-container {
-    margin-left: 639px;
-    margin-top: 54px;
+    position: absolute;
+    right: 20px;
+    top: 75%;
+    transform: translateY(-50%);
 }
 
 .blacklist-card .button-container {
