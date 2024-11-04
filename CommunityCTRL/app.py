@@ -751,15 +751,33 @@ def visitor_detail(visitor_id):
                            visitor_picture=visitor_picture, visit_history_list=visit_history_list)
 
 
-@app.route('/edit_visitor')
-def edit_visitor():
-    # Example list of existing vehicles fetched from the database
-    vehicles = [
-        {"type": "Car", "number": "XYZ 1234"},
-        {"type": "Motorcycle", "number": "ABC 5678"}
-    ]
+@app.route('/edit_visitor/<visitor_id>')
+def edit_visitor(visitor_id):
+    conn = get_db()
+    cursor = conn.cursor()
 
-    return render_template('edit_visitor.html', vehicles=vehicles)
+    # Get visitor info
+    cursor.execute("SELECT visitor_id, name, gender, ic, email, phone, picture FROM visitors WHERE status=1 AND "
+                   "visitor_id=?", (visitor_id,))
+    visitor_info = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the visitor picture
+    visitor_picture = None
+    if visitor_info[6]:
+        # Detect image type
+        image_type = imghdr.what(None, h=visitor_info[6])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            visitor_picture = (f"data:image/{image_type};base64," + base64.b64encode(visitor_info[6]).decode('utf-8'))
+
+    # Get visitor vehicles
+    cursor.execute("SELECT t.type, v.vehicle_number FROM visitor_vehicles v, vehicle_types t WHERE v.type_id=t.type_id "
+                   "AND v.status=1 AND v.visitor_id=?", (visitor_id,))
+    visitor_vehicles = cursor.fetchall()
+
+    return render_template('edit_visitor.html', role=session['role'], visitor_info=visitor_info,
+                           currentProfilePic=visitor_picture, visitor_vehicles=visitor_vehicles)
 
 
 @app.route('/new_visitor')
@@ -1738,6 +1756,20 @@ def remove_vehicle(vehicle_type, vehicle_num, user_id):
     else:
         type_id = 2
     cursor.execute("UPDATE user_vehicles SET status=0 WHERE type_id=? AND vehicle_number=? AND user_id=?",
+                   (type_id, vehicle_num, user_id))
+    conn.commit()
+    return jsonify({"message": "Vehicle removed successfully."})
+
+
+@app.route('/remove-visitor-vehicle/<vehicle_type>/<vehicle_num>/<user_id>', methods=['POST'])
+def remove_visitor_vehicle(vehicle_type, vehicle_num, user_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    if vehicle_type == 'Car':
+        type_id = 1
+    else:
+        type_id = 2
+    cursor.execute("UPDATE visitor_vehicles SET status=0 WHERE type_id=? AND vehicle_number=? AND visitor_id=?",
                    (type_id, vehicle_num, user_id))
     conn.commit()
     return jsonify({"message": "Vehicle removed successfully."})
