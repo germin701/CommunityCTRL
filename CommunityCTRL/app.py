@@ -712,7 +712,6 @@ def admin_visitor():
                         "vehicle": f"{visitors[7]} ({visitors[6]})" if visitors[6] and visitors[7] else "None",
                         "status": visitors[10], "unit": visitors[8], "ic": visitors[9]}
         visitors_list.append(visitor_data)
-        print(visitors_list)
 
     return render_template('admin_visitor.html', visitors_list=visitors_list)
 
