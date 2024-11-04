@@ -710,8 +710,9 @@ def admin_visitor():
         visitor_data = {"visitor_id": visitors[0], "name": visitors[1], "picture": profile_picture,
                         "invitation_id": visitors[3], "date": visitors[4], "vehicle_id": visitors[5],
                         "vehicle": f"{visitors[7]} ({visitors[6]})" if visitors[6] and visitors[7] else "None",
-                        "status": visitors[8], "unit": visitors[9], "ic": visitors[10]}
+                        "status": visitors[10], "unit": visitors[8], "ic": visitors[9]}
         visitors_list.append(visitor_data)
+        print(visitors_list)
 
     return render_template('admin_visitor.html', visitors_list=visitors_list)
 
