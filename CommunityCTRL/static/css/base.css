@@ -1128,8 +1128,10 @@ textarea::placeholder {
 }
 
 .blacklist-card .button-container {
-    margin-left: 876px;
-    margin-top: 39px;
+    position: absolute;
+    right: 20px;
+    top: 69%;
+    transform: translateY(-50%);
 }
 
 .admin-visitor-card .button-container {
