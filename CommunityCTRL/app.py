@@ -751,10 +751,81 @@ def visitor_detail(visitor_id):
                            visitor_picture=visitor_picture, visit_history_list=visit_history_list)
 
 
-@app.route('/edit_visitor/<visitor_id>')
+@app.route('/edit_visitor/<visitor_id>', methods=['GET', 'POST'])
 def edit_visitor(visitor_id):
     conn = get_db()
     cursor = conn.cursor()
+
+    if request.method == 'POST':
+        picture = request.files.get('visitor-pic')
+        phone = request.form['phone']
+        email = request.form['email']
+        new_vehicle_types = request.form.getlist('newVehicleType[]')
+        new_vehicle_numbers = request.form.getlist('newVehicleNumber[]')
+
+        # Validate and process picture
+        picture_data = None
+        if picture and picture.filename:
+            error = validate_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                        window.location.href = "{url_for('edit_visitor', visitor_id=visitor_id)}";
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        # Validate contains only digits and length is 10/11
+        if not re.match(r'^\d{10,11}$', phone):
+            return f'''
+                <script>
+                    alert("Please enter a valid phone and only digits are allowed.");
+                    window.location.href = "{url_for('edit_visitor', visitor_id=visitor_id)}";
+                </script>
+                '''
+
+        else:
+            # Update visitor details
+            if picture_data:
+                cursor.execute("UPDATE visitors SET phone=?, email=?, picture=? WHERE visitor_id=?",
+                               (phone, email, picture_data, visitor_id))
+            else:
+                cursor.execute("UPDATE visitors SET phone=?, email=? WHERE visitor_id=?", (phone, email, visitor_id))
+            conn.commit()
+
+            # Add visitor vehicle details
+            if not new_vehicle_types:
+                pass
+            else:
+                # Insert new vehicles into the database
+                for vehicle_type, vehicle_number in zip(new_vehicle_types, new_vehicle_numbers):
+                    if vehicle_type and vehicle_number:
+                        if vehicle_type == 'Car':
+                            vehicle_id = 1
+                        else:
+                            vehicle_id = 2
+
+                        # Check if the vehicle already exists for the current user
+                        cursor.execute("SELECT visitor_vehicle_id FROM visitor_vehicles WHERE type_id=? AND "
+                                       "vehicle_number=? AND visitor_id=?", (vehicle_id, vehicle_number, visitor_id))
+                        existing_vehicle = cursor.fetchone()
+                        if existing_vehicle is not None:
+                            existing_vehicle_id = existing_vehicle[0]
+                            cursor.execute("UPDATE visitor_vehicles SET status=1 WHERE user_vehicle_id=?",
+                                           (existing_vehicle_id,))
+                        else:
+                            cursor.execute("INSERT INTO visitor_vehicles (type_id, vehicle_number, visitor_id, "
+                                           "status) VALUES (?, ?, ?, 1)", (vehicle_id, vehicle_number, visitor_id))
+                        conn.commit()
+            return '''
+                <script>
+                    alert("Visitor updated successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_visitor'))
 
     # Get visitor info
     cursor.execute("SELECT visitor_id, name, gender, ic, email, phone, picture FROM visitors WHERE status=1 AND "
