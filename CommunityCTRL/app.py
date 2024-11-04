@@ -720,43 +720,35 @@ def admin_visitor():
 def visitor_detail(visitor_id):
     cursor = get_db().cursor()
 
-    # Get visitor details
+    # Get visitor info
+    cursor.execute("SELECT name, gender, ic, email, phone, unit_id, picture FROM visitors WHERE status=1 AND "
+                   "visitor_id=?", (visitor_id,))
+    visitor_info = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the visitor picture
+    visitor_picture = None
+    if visitor_info[6]:
+        # Detect image type
+        image_type = imghdr.what(None, h=visitor_info[6])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            visitor_picture = (f"data:image/{image_type};base64," + base64.b64encode(visitor_info[6]).decode('utf-8'))
+
+    # Get visit history
     cursor.execute("""
-        SELECT v.name, v.gender, v.ic, v.email, v.phone, v.unit_id, v.picture, i.invitation_id, i.date, 
-        i.visitor_vehicle_id, vv.vehicle_number, vt.type, h.arrive_time, h.exit_time, u.name
-        FROM visitors v
-        LEFT JOIN invitations i ON v.visitor_id=i.visitor_id
-        INNER JOIN visit_history h ON i.invitation_id = h.invitation_id
-        LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id = vv.visitor_vehicle_id
-        LEFT JOIN vehicle_types vt ON vv.type_id = vt.type_id
+        SELECT t.type, v.vehicle_number, i.unit_id, i.date, h.arrive_time, h.exit_time, u.name
+        FROM visit_history h
+        LEFT JOIN invitations i ON h.invitation_id=i.invitation_id
+        LEFT JOIN visitor_vehicles v ON i.visitor_vehicle_id=v.visitor_vehicle_id
+        LEFT JOIN vehicle_types t ON v.type_id=t.type_id
         LEFT JOIN users u ON i.user_id=u.user_id
-        WHERE v.status=1 AND v.visitor_id=?
+        WHERE i.visitor_id=?
         """, (visitor_id,))
-    visitor_lists = cursor.fetchall()
-    print(visitor_lists)
+    visit_history_list = cursor.fetchall()
 
-    # Process visitors to convert profile pictures to Base64
-    visitors_list = []
-    for visitors in visitor_lists:
-        # Convert BLOB to Base64 for the profile picture
-        profile_picture = None
-        if visitors[6]:
-            # Detect image type
-            image_type = imghdr.what(None, h=visitors[6])
-
-            # Check if image type is valid
-            if image_type in ['jpg', 'jpeg', 'png']:
-                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(visitors[6]).decode('utf-8')
-
-        # Create a dictionary for the visitor with the Base64-encoded picture
-        visitor_data = {"name": visitors[0], "gender": visitors[1], "ic": visitors[2], "email": visitors[3],
-                        "phone": visitors[4], "unit_id": visitors[5],  "picture": profile_picture,
-                        "invitation_id": visitors[7], "date": visitors[8], "vehicle_id": visitors[9],
-                        "vehicle": f"{visitors[11]} ({visitors[10]})" if visitors[10] and visitors[11] else "None",
-                        "arrive_time": visitors[12], "exit_time": visitors[13], "invitor": visitors[14]}
-        visitors_list.append(visitor_data)
-
-    return render_template('visitor_detail.html', role=session['role'], visitors_list=visitors_list)
+    return render_template('visitor_detail.html', role=session['role'], visitor_info=visitor_info,
+                           visitor_picture=visitor_picture, visit_history_list=visit_history_list)
 
 
 @app.route('/edit_visitor')
