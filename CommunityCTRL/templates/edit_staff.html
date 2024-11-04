@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="details-section">
-                <form>
+                <form action="/edit_staff/{{ staff_details[0] }}" method="POST">
                     <div class="profile">
                         <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
                             <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
@@ -63,32 +63,32 @@
                             <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                         </div>
                         <div class="infos">
-                            <label>Samantha Joe</label>
-                            <div class="visitor-details">Female</div>
-                            <div class="visitor-details">120988</div>
-                            <div class="visitor-details">990520080234</div>
+                            <label>{{ staff_details[1] }}</label>
+                            <div class="visitor-details">{{ staff_details[2] }}</div>
+                            <div class="visitor-details">{{ staff_details[7] }}</div>
+                            <div class="visitor-details">{{ staff_details[3] }}</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
                             <label for="position">Position</label>
-                            <input type="text" id="position" name="position" class="position" value="Manager" required>
+                            <input type="text" id="position" name="position" class="position" value="{{ staff_details[9] }}" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" class="email-field" value="samantha520@gmail.com" required>
+                            <input type="email" id="email" name="email" class="email-field" value="{{ staff_details[4] }}" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
                             <label for="office-phone">Office Phone</label>
-                            <input type="text" id="office-phone" name="office-phone" class="phone" value="041232469" required>
+                            <input type="text" id="office-phone" name="office-phone" class="phone" value="{{ staff_details[8] }}" required>
                         </div>
                         <div class="input-field">
                             <label for="personal-phone">Personal Phone</label>
-                            <input type="text" id="personal-phone" name="personal-phone" class="phone" value="01234567890" required>
+                            <input type="text" id="personal-phone" name="personal-phone" class="phone" value="{{ staff_details[5] }}" required>
                         </div>
                     </div>
                     <h3>Vehicle Detail</h3>
@@ -96,15 +96,16 @@
                         <label>Vehicle Type </label>
                         <label>Vehicle Number</label>
                     </div>
-                    {% for vehicle in vehicles %}
+                    {% for vehicle in staff_vehicles %}
                     <div class="row">
                         <div class="input-field">
-                            <input type="text" id="vehicle-type{{ loop.index }}" name="vehicle-type[]" class="type" value="{{ vehicle.type }}" readonly>
+                            <input type="text" id="vehicle-type{{ loop.index }}" name="vehicle-type[]" class="type" value="{{ vehicle[0] }}" readonly>
                         </div>
                         <div class="input-field">
-                            <input type="text" id="vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ vehicle.number }}" readonly>
+                            <input type="text" id="vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ vehicle[1] }}" readonly>
                         </div>
                     </div>
+                    <i class="fa fa-minus-circle" onclick="removeVehicle('{{ vehicle[0] }}', '{{ vehicle[1] }}', {{ staff_details[0] }})"></i>
                     {% endfor %}
                     <div id="new-vehicle-list"></div>
                     <button id="add-vehicle-btn" class="add-vehicle">+ Add Vehicle</button>
@@ -202,6 +203,27 @@
                 }
             });
         });
+
+        function removeVehicle(vehicleType, vehicleNum, user_id) {
+            const userId = {{ staff_details[0] }}
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to remove this vehicle?");
+
+            if (userConfirmed) {
+                fetch(`/remove-vehicle/${vehicleType}/${vehicleNum}/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = `/edit_staff/${userId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to remove vehicle. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
