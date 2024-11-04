@@ -1057,7 +1057,7 @@ textarea::placeholder {
     display: inline-flex;
     margin-left: 12px;
     margin-right: 9px;
-    margin-top: 18px;
+    margin-bottom: 18px;
 }
 
 .staff-card {
@@ -1137,7 +1137,10 @@ textarea::placeholder {
 }
 
 .admin-visitor-card .button-container {
-    margin-left: 639px;
+    display: flex;
+    gap: 9px;
+    margin-left: auto;
+    margin-right: 24px;
     margin-top: 105px;
 }
 
