@@ -77,7 +77,7 @@
                     </div>
                     {% if staff.status == 1 %}
                     <div class="button-container">
-                        <button class="blues-button" onclick="window.location.href='/edit_staff'">Edit</button>
+                        <button class="blues-button" onclick="window.location.href='/edit_staff/{{ staff.user_id }}'">Edit</button>
                         <button class="blues-button">Resign</button>
                     </div>
                     {% else %}
