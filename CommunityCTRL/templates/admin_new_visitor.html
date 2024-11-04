@@ -55,9 +55,9 @@
                 </div>
             </div>
             <div class="details-section">
-                <form>
+                <form method="POST" action="{{ url_for('admin_new_visitor') }}" enctype="multipart/form-data">
                     <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
-                        <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
+                        <input type="file" id="imageUpload" name="visitor-pic" accept="image/*" onchange="displayImage(this)" style="display: none;" />
                         <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
                         <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                     </div>
@@ -70,7 +70,7 @@
                     <div class="row">
                         <div class="input-field">
                             <label for="email">Email (Optional)</label>
-                            <input type="email" id="email" name="email" class="email-field" placeholder="example@gmail.com" required>
+                            <input type="email" id="email" name="email" class="email-field" placeholder="example@gmail.com">
                         </div>
                     </div>
                     <div class="row">
@@ -89,8 +89,9 @@
                             <div class="select-wrapper">
                                 <select id="unit" name="unit" required>
                                     <option value="">Select Unit</option>
-                                    <option value="1001">1001</option>
-                                    <option value="1002">1002</option>
+                                    {% for unit in unit_list %}
+                                    <option value="{{ unit[0] }}">{{ unit[0] }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
@@ -110,25 +111,11 @@
                         <label>Vehicle Type</label>
                         <label>Vehicle Number</label>
                     </div>
-                    <div class="row">
-                        <div class="input-field">
-                            <div class="select-wrapper">
-                                <select id="vehicle-type" name="vehicle-type" required>
-                                    <option value="">Select Vehicle Type</option>
-                                    <option value="Car">Car</option>
-                                    <option value="Motorcycle">Motorcycle</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-field">
-                            <input type="text" id="vehicle-number" name="vehicle-number" class="new-number" placeholder="Enter vehicle number" required>
-                        </div>
-                    </div>
                     <div id="new-vehicle-list"></div>
                     <button id="add-vehicle-btn" class="add-vehicle">+ Add Vehicle</button>
                     <div class="button-container">
                         <button type="submit" class="blue-button">Save</button>
-                        <button type="button" class="blue-button" onclick="window.location.href='/visitor'">Cancel</button>
+                        <button type="button" class="blue-button" onclick="window.location.href='/admin_visitor'">Cancel</button>
                     </div>
                 </form>
             </div>
