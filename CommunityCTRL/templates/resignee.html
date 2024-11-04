@@ -56,42 +56,48 @@
             </div>
             <div class="details-section">
                 <div class="profile">
-                    <div class="profile-pic"></div>
-                    <div class="info">
-                        <label>Samantha Joe</label>
-                        <div class="visitor-details">Female</div>
-                        <div class="visitor-details">120988</div>
-                        <div class="visitor-details">Manager</div>
-                        <div class="visitor-details">990520080234</div>
+                    <div class="profile-picture">
+                        {% if staff_picture %}
+                        <img src="{{ staff_picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
+                    <div class="infos">
+                        <label>{{ staff_details[1] }}</label>
+                        <div class="visitor-details">{{ staff_details[2] }}</div>
+                        <div class="visitor-details">{{ staff_details[7] }}</div>
+                        <div class="visitor-details">{{ staff_details[8] }}</div>
+                        <div class="visitor-details">{{ staff_details[3] }}</div>
                     </div>
                     <div class="contact-container">
                         <label>Contact Details</label>
                         <div class="contact-infos">
                             <div class="contact">
                                 Phone Number
-                                <div class="visitor-details">+6012 333 4444</div>
+                                <div class="visitor-details">{{ staff_details[5] }}</div>
                             </div>
                             <div class="contact">
                                 Email
-                                <div class="visitor-details">joe@gmail.com</div>
+                                <div class="visitor-details">{{ staff_details[4] }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% if staff_vehicles %}
                 <div class="row-label">
                     <label>Vehicle Type</label>
                     <label>Vehicle Number</label>
                 </div>
-                {% for vehicle in vehicles %}
+                {% for vehicle in staff_vehicles %}
                 <div class="row">
                     <div class="input-field">
-                        <input type="text" id="vehicle-type{{ loop.index }}" name="vehicle-type[]" class="type" value="{{ vehicle.type }}" readonly>
+                        <input type="text" id="vehicle-type{{ loop.index }}" name="vehicle-type[]" class="type" value="{{ vehicle[0] }}" readonly>
                     </div>
                     <div class="input-field">
-                        <input type="text" id="vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ vehicle.number }}" readonly>
+                        <input type="text" id="vehicle-number{{ loop.index }}" name="vehicle-number[]" class="number" value="{{ vehicle[1] }}" readonly>
                     </div>
                 </div>
                 {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
