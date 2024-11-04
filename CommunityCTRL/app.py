@@ -861,6 +861,16 @@ def block_visitor(visitor_id):
     return jsonify({"message": "Visitor blocked successfully."})
 
 
+@app.route('/unblock-visitor/<visitor_id>', methods=['POST'])
+def unblock_visitor(visitor_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE visitors SET status=1 WHERE visitor_id=?", (visitor_id,))
+    cursor.execute("UPDATE visitor_vehicles SET status=1 WHERE visitor_id=?", (visitor_id,))
+    conn.commit()
+    return jsonify({"message": "Visitor unblocked successfully."})
+
+
 @app.route('/new_visitor', methods=['GET', 'POST'])
 def new_visitor():
     if request.method == 'POST':
