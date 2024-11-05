@@ -12,7 +12,7 @@
             <div class="logo-section">
                 <img src="{{ url_for('static', filename='asset/logo.png') }}" alt="CommunityCtrl Logo" id="logo" class="menu-logo">
                 <div class="badge">
-                    <div class="badge-background">Owner</div>
+                    <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
             <div class="menu-item" onclick="window.location.href='/home'">
@@ -52,22 +52,26 @@
             </div>
             <div class="details-section">
                 <div class="profile">
-                    <div class="profile-pic"></div>
+                    <div class="profile-picture">
+                        {% if profile_picture %}
+                        <img src="{{ profile_picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
                     <div class="infos">
-                        <label>Samantha Joe</label>
-                        <div class="visitor-details">Female</div>
-                        <div class="visitor-details">990520080234</div>
+                        <label>{{ invitation_info[0] }}</label>
+                        <div class="visitor-details">{{ invitation_info[1] }}</div>
+                        <div class="visitor-details">{{ invitation_info[2] }}</div>
                     </div>
                     <div class="contact-container">
                         <label>Contact Details</label>
                         <div class="contact-infos">
                             <div class="contact">
                                 Phone Number
-                                <div class="visitor-details">+6012 333 4444</div>
+                                <div class="visitor-details">{{ invitation_info[4] }}</div>
                             </div>
                             <div class="contact">
                                 Email
-                                <div class="visitor-details">joe@gmail.com</div>
+                                <div class="visitor-details">{{ invitation_info[3] }}</div>
                             </div>
                         </div>
                     </div>
@@ -77,10 +81,11 @@
                         <div class="input-field">
                             <label for="vehicle">Vehicle</label>
                             <div class="select-wrapper">
-                                <select id="vehicle" name="vehicle" value="Motorcycle PPP 1234" required>
-                                    <option value="Car ABC 1234">Car ABC 1234</option>
-                                    <option value="Motorcycle PPP 1234">Motorcycle PPP 1234</option>
-                                    <option value="Motorcycle KFC 9999">Motorcycle KFC 9999</option>
+                                <select id="vehicle" name="vehicle" required>
+                                    {% for v in vehicle %}
+                                        {% set is_selected = 'selected' if v.vehicle == current_vehicle else '' %}
+                                        <option value="{{ v.vehicle }}" {{ is_selected }}>{{ v.vehicle }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
@@ -91,8 +96,8 @@
                     </div>
                     <div class="row">
                         <div class="input-field">
-                            <label for="reason">Reason for visit</label>
-                            <input type="text" id="reason" name="reason" class="reason" placeholder="Write reason..." value="{{ reason }}">
+                            <label for="reason">Reason for visit (Optional)</label>
+                            <input type="text" id="reason" name="reason" class="reason" placeholder="Write reason..." value="{{ invitation_info[10] }}">
                         </div>
                     </div>
                     <div class="button-container">
