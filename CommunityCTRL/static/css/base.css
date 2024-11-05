@@ -1120,14 +1120,14 @@ textarea::placeholder {
     word-wrap: break-word;
 }
 
-.visitor-card .button-container, .invitation-card .button-container {
+.visitor-card .button-container {
     position: absolute;
     right: 20px;
     top: 75%;
     transform: translateY(-50%);
 }
 
-.blacklist-card .button-container {
+.blacklist-card .button-container, .invitation-card .button-container {
     position: absolute;
     right: 20px;
     top: 69%;
