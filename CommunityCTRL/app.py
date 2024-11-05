@@ -1159,12 +1159,60 @@ def admin_blacklist():
     return render_template('admin_blacklist.html', blacklists=blacklists)
 
 
-@app.route('/add_blacklist')
+@app.route('/add_blacklist', methods=['GET', 'POST'])
 def add_blacklist():
-    return render_template('add_blacklist.html')
+    if request.method == 'POST':
+        picture = request.files.get('visitor-pic')
+        name = request.form['name']
+        gender = request.form['gender']
+        ic = request.form['ic']
+
+        # Validate and process picture
+        if picture and picture.filename:
+            error = validate_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                        window.location.href = "{url_for('add_blacklist')}";
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        else:
+            picture_data = None
+
+        # Validate contains only digits and length is 12
+        if not re.match(r'^\d{12}$', ic):
+            return '''
+                <script>
+                    alert("Please enter a valid ic and only digits are allowed.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('add_blacklist'))
+
+        else:
+            conn = get_db()
+            cursor = conn.cursor()
+
+            # Add new blacklisted visitor
+            cursor.execute("INSERT INTO visitors (name, gender, ic, unit_id, picture, status) VALUES (?, ?, ?, ?,"
+                           " ?, 0)", (name, gender, ic, session['unit'], picture_data))
+            conn.commit()
+
+            return '''
+                <script>
+                    alert("New blacklisted visitor added successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('blacklist'))
+
+    return render_template('add_blacklist.html', role=session['role'])
 
 
-@app.route('/admin_add_blacklist')
+@app.route('/admin_add_blacklist', methods=['GET', 'POST'])
 def admin_add_blacklist():
     return render_template('admin_add_blacklist.html')
 
