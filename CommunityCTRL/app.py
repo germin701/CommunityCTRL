@@ -1360,11 +1360,13 @@ def get_vehicles(visitor_id):
     cursor = conn.cursor()
 
     # Get vehicles associated with the visitor
-    cursor.execute("SELECT vt.type || ' (' || vv.vehicle_number || ')' AS vehicle FROM visitor_vehicles vv, "
-                   "vehicle_types vt WHERE vv.type_id=vt.type_id AND vv.status=1 AND vv.visitor_id=?", (visitor_id,))
-    vehicles = [row[0] for row in cursor.fetchall()]
+    cursor.execute("SELECT vv.visitor_vehicle_id, vt.type || ' (' || vv.vehicle_number || ')' AS vehicle FROM "
+                   "visitor_vehicles vv, vehicle_types vt WHERE vv.type_id=vt.type_id AND vv.status=1 AND "
+                   "vv.visitor_id=?", (visitor_id,))
+    vehicles = cursor.fetchall()
+    vehicle_data = [{"id": row[0], "vehicle": row[1]} for row in vehicles]
 
-    return jsonify(vehicles)
+    return jsonify(vehicle_data)
 
 
 @app.route('/new_invite')
