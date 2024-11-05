@@ -51,7 +51,7 @@
                 </div>
             </div>
             <div class="details-section">
-                <form>
+                <form method="POST" action="{{ url_for('new_invite') }}">
                     <div class="row" id="first-row">
                         <div class="input-field">
                             <label for="visitor">Visitor</label>
@@ -70,20 +70,20 @@
                         <div class="row">
                             <div class="input-field">
                                 <label for="name">Name</label>
-                                <input type="text" id="name" name="name" class="name" required>
+                                <input type="text" id="name" name="name" class="name">
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field">
                                 <label for="email">Email (Optional)</label>
-                                <input type="email" id="email" name="email" class="email-field" placeholder="example@gmail.com" required>
+                                <input type="email" id="email" name="email" class="email-field" placeholder="example@gmail.com">
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field">
                                 <label for="gender">Gender</label>
                                 <div class="select-wrapper">
-                                    <select id="gender" name="gender" required>
+                                    <select id="gender" name="gender">
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
@@ -92,11 +92,11 @@
                             </div>
                             <div class="input-field" id="ic-field">
                                 <label for="ic">IC Number</label>
-                                <input type="text" id="ic" name="ic" class="ic" required>
+                                <input type="text" id="ic" name="ic" class="ic">
                             </div>
                             <div class="input-field">
                                 <label for="phone">Phone Number</label>
-                                <input type="text" id="phone" name="phone" class="phone" required>
+                                <input type="text" id="phone" name="phone" class="phone">
                             </div>
                         </div>
                     </div>
@@ -119,7 +119,7 @@
                         <div class="row">
                             <div class="input-field">
                                 <div class="select-wrapper">
-                                    <select id="vehicle-type" name="vehicle-type" required>
+                                    <select id="vehicle-type" name="vehicle-type">
                                         <option value="">Select Vehicle Type</option>
                                         <option value="Car">Car</option>
                                         <option value="Motorcycle">Motorcycle</option>
@@ -127,7 +127,7 @@
                                 </div>
                             </div>
                             <div class="input-field">
-                                <input type="text" id="vehicle-number" name="vehicle-number" class="new-number" placeholder="Enter vehicle number" required>
+                                <input type="text" id="vehicle-number" name="vehicle-number" class="new-number" placeholder="Enter vehicle number">
                             </div>
                         </div>
                     </div>
@@ -239,24 +239,42 @@
         // JavaScript to handle showing and hiding new visitor fields
         const visitorSelect = document.getElementById('visitor');
         const newVisitorFields = document.getElementById('newVisitorFields');
+        const nameField = document.getElementById('name');
+        const genderField = document.getElementById('gender');
+        const icField = document.getElementById('ic');
+        const phoneField = document.getElementById('phone');
 
         visitorSelect.addEventListener('change', function() {
             if (this.value === 'new_visitor') {
-                newVisitorFields.style.display = 'block'; // Show the fields
+                newVisitorFields.style.display = 'block';
+                nameField.required = true;
+                genderField.required = true;
+                icField.required = true;
+                phoneField.required = true;
             } else {
-                newVisitorFields.style.display = 'none'; // Hide the fields
+                newVisitorFields.style.display = 'none';
+                nameField.required = false;
+                genderField.required = false;
+                icField.required = false;
+                phoneField.required = false;
             }
         });
 
         // JavaScript to handle showing and hiding new vehicle fields
         const vehicleSelect = document.getElementById('vehicle');
         const newVehicleFields = document.getElementById('newVehicleFields');
+        const vehicleTypeField = document.getElementById('vehicle-type');
+        const vehicleNumberField = document.getElementById('vehicle-number');
 
         vehicleSelect.addEventListener('change', function() {
             if (this.value === 'new_vehicle') {
-                newVehicleFields.style.display = 'block'; // Show the fields
+                newVehicleFields.style.display = 'block';
+                vehicleTypeField.required = true;
+                vehicleNumberField.required = true;
             } else {
-                newVehicleFields.style.display = 'none'; // Hide the fields
+                newVehicleFields.style.display = 'none';
+                vehicleTypeField.required = false;
+                vehicleNumberField.required = false;
             }
         });
 
