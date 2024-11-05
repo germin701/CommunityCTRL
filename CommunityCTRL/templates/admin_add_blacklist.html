@@ -55,9 +55,9 @@
                 </div>
             </div>
             <div class="details-section">
-                <form>
+                <form method="POST" action="/admin_add_blacklist" enctype="multipart/form-data">
                     <div class="upload-area" id="uploadArea" onclick="triggerImageUpload()">
-                        <input type="file" id="imageUpload" accept="image/*" onchange="displayImage(this)" style="display: none;" />
+                        <input type="file" id="imageUpload" name="visitor-pic" accept="image/*" onchange="displayImage(this)" style="display: none;" />
                         <img id="uploadedImage" src="{{ currentProfilePic }}" style="display: {{ 'block' if currentProfilePic else 'none' }};" alt="Profile Picture" />
                         <div id="placeholderText" style="display: {{ 'none' if currentProfilePic else 'block' }};">Click to upload an image</div>
                     </div>
@@ -87,8 +87,9 @@
                             <div class="select-wrapper">
                                 <select id="unit" name="unit" required>
                                     <option value="">Select Unit</option>
-                                    <option value="1001">1001</option>
-                                    <option value="1002">1002</option>
+                                    {% for unit in unit_list %}
+                                    <option value="{{ unit[0] }}">{{ unit[0] }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
