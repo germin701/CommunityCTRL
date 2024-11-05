@@ -267,7 +267,7 @@
             vehicleSelect.innerHTML = '<option value="">Select your vehicle</option><option value="new_vehicle">New Vehicle</option>';
             vehicleSelect.disabled = false;
 
-            // Do nothing if 'New Visitor' or no visitor is selected
+            // Disable vehicle field if no visitor is selected
             if (visitorId === '') {
                 vehicleSelect.disabled = true;
                 return;
