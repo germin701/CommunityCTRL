@@ -76,7 +76,7 @@
                         <div class="invitation-details">Visit Date: {{ invitation.date }}</div>
                     </div>
                     <div class="button-container admin-invite-button-container">
-                        <button class="blues-button" onclick="window.location.href='/admin_invitation_detail'">View Details</button>
+                        <button class="blues-button" onclick="window.location.href='/admin_invitation_detail/{{ invitation.invitation_id }}'">View Details</button>
                         <button class="blues-button" onclick="window.location.href='/admin_edit_invitation'">Edit</button>
                         <button class="blues-button">Cancel</button>
                     </div>
