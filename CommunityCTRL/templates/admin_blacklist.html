@@ -76,7 +76,7 @@
                         <div class="blacklist-details">IC: {{ blacklist.ic }}</div>
                     </div>
                     <div class="button-container admin-blacklist-button-container">
-                        <button class="blues-button">Unblock</button>
+                        <button class="blues-button" onclick="unblockVisitor({{ blacklist.visitor_id }})">Unblock</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -169,6 +169,40 @@
                 }
             });
         });
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            const staffCards = document.querySelectorAll('.blacklist-card');
+
+            staffCards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(searchValue)) {
+                    card.style.display = 'inline-flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        function unblockVisitor(user_id) {
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to unblock this visitor?");
+
+            if (userConfirmed) {
+                fetch(`/unblock-visitor/${user_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = `/admin_blacklist`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to unblock visitor. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
