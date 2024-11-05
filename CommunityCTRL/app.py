@@ -1088,7 +1088,41 @@ def invitation_list():
 
 @app.route('/admin_invitation_list')
 def admin_invitation_list():
-    return render_template('admin_invitation_list.html')
+    cursor = get_db().cursor()
+
+    # Get invitation list
+    cursor.execute("""
+            SELECT v.visitor_id, v.name, v.picture, i.invitation_id, i.date, i.visitor_vehicle_id, vv.vehicle_number, 
+            vt.type, v.unit_id
+            FROM visitors v
+            INNER JOIN invitations i ON v.visitor_id=i.visitor_id
+            LEFT JOIN visitor_vehicles vv ON i.visitor_vehicle_id=vv.visitor_vehicle_id
+            LEFT JOIN vehicle_types vt ON vv.type_id=vt.type_id
+            WHERE v.status=1 AND i.status=1
+            """)
+    invitation_lists = cursor.fetchall()
+
+    # Process visitors to convert profile pictures to Base64
+    invitations = []
+    for invitation in invitation_lists:
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if invitation[2]:
+            # Detect image type
+            image_type = imghdr.what(None, h=invitation[2])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(invitation[2]).decode('utf-8')
+
+        # Create a dictionary for the invitation with the Base64-encoded picture
+        invitation_data = {"visitor_id": invitation[0], "name": invitation[1], "picture": profile_picture,
+                           "invitation_id": invitation[3], "date": invitation[4], "vehicle_id": invitation[5],
+                           "vehicle": f"{invitation[7]} ({invitation[6]})" if invitation[6] and invitation[7] else
+                           "None", "unit_num": invitation[8]}
+        invitations.append(invitation_data)
+
+    return render_template('admin_invitation_list.html', invitations=invitations)
 
 
 @app.route('/invitation_detail')
