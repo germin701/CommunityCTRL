@@ -1214,7 +1214,62 @@ def add_blacklist():
 
 @app.route('/admin_add_blacklist', methods=['GET', 'POST'])
 def admin_add_blacklist():
-    return render_template('admin_add_blacklist.html')
+    cursor = get_db().cursor()
+
+    if request.method == 'POST':
+        picture = request.files.get('visitor-pic')
+        name = request.form['name']
+        gender = request.form['gender']
+        ic = request.form['ic']
+        unit_num = request.form['unit']
+
+        # Validate and process picture
+        if picture and picture.filename:
+            error = validate_image(picture)
+            if error:
+                return f'''
+                    <script>
+                        alert("{error}");
+                        window.location.href = "{url_for('admin_add_blacklist')}";
+                    </script>
+                    '''
+
+            # Read the picture as binary for database storage
+            picture_data = picture.read()
+
+        else:
+            picture_data = None
+
+        # Validate contains only digits and length is 12
+        if not re.match(r'^\d{12}$', ic):
+            return '''
+                <script>
+                    alert("Please enter a valid ic and only digits are allowed.");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_add_blacklist'))
+
+        else:
+            conn = get_db()
+            cursor = conn.cursor()
+
+            # Add new blacklisted visitor
+            cursor.execute("INSERT INTO visitors (name, gender, ic, unit_id, picture, status) VALUES (?, ?, ?, ?,"
+                           " ?, 0)", (name, gender, ic, unit_num, picture_data))
+            conn.commit()
+
+            return '''
+                <script>
+                    alert("New blacklisted visitor added successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_blacklist'))
+
+    # Get unit list
+    cursor.execute("SELECT unit_id FROM units")
+    unit_list = cursor.fetchall()
+
+    return render_template('admin_add_blacklist.html', unit_list=unit_list)
 
 
 @app.route('/security_footage')
