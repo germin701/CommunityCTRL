@@ -278,8 +278,8 @@
                     // Populate the vehicle dropdown with the returned vehicles
                     vehicles.forEach(vehicle => {
                         const option = document.createElement('option');
-                        option.value = vehicle;
-                        option.textContent = vehicle;
+                        option.value = vehicle.id;
+                        option.textContent = vehicle.vehicle;
                         vehicleSelect.insertBefore(option, vehicleSelect.lastChild);
                     });
                 })
