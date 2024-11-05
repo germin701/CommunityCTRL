@@ -171,6 +171,20 @@
                 }
             });
         });
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            const staffCards = document.querySelectorAll('.invitation-card');
+
+            staffCards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(searchValue)) {
+                    card.style.display = 'inline-flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
