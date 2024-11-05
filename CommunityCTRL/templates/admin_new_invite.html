@@ -60,21 +60,19 @@
                         <div class="input-field">
                             <label for="unit">Unit</label>
                             <div class="select-wrapper">
-                                <select id="unit" name="unit" required>
+                                <select id="unit" name="unit" onchange="loadVisitors(this.value)" required>
                                     <option value="">Select unit</option>
-                                    <option value="1001">1001</option>
-                                    <option value="1002">1002</option>
-                                    <option value="1003">1003</option>
+                                    {% for unit in units %}
+                                    <option value="{{ unit[0] }}">{{ unit[0] }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
                         <div class="input-field">
                             <label for="visitor">Visitor</label>
                             <div class="select-wrapper">
-                                <select id="visitor" name="visitor" required>
+                                <select id="visitor" name="visitor" onchange="loadVehicles(this.value)" disabled required>
                                     <option value="">Select your visitor</option>
-                                    <option value="visitor1">Visitor 1</option>
-                                    <option value="visitor2">Visitor 2</option>
                                     <option value="new_visitor">New Visitor</option>
                                 </select>
                             </div>
@@ -118,11 +116,8 @@
                         <div class="input-field">
                             <label for="vehicle">Vehicle</label>
                             <div class="select-wrapper">
-                                <select id="vehicle" name="vehicle" required>
-                                    <option value="">Select your visitor</option>
-                                    <option value="Car ABC 1234">Car ABC 1234</option>
-                                    <option value="Motorcycle PPP 1234">Motorcycle PPP 1234</option>
-                                    <option value="Motorcycle KFC 9999">Motorcycle KFC 9999</option>
+                                <select id="vehicle" name="vehicle" disabled required>
+                                    <option value="">Select your vehicle</option>
                                     <option value="new_vehicle">New Vehicle</option>
                                 </select>
                             </div>
@@ -273,11 +268,71 @@
 
         vehicleSelect.addEventListener('change', function() {
             if (this.value === 'new_vehicle') {
-                newVehicleFields.style.display = 'block'; // Show the fields
+                newVehicleFields.style.display = 'block';
             } else {
-                newVehicleFields.style.display = 'none'; // Hide the fields
+                newVehicleFields.style.display = 'none';
             }
         });
+
+        function loadVisitors(unitId) {
+            const visitorSelect = document.getElementById('visitor');
+
+            // Clear existing options, but keep the "Select your visitor" option
+            visitorSelect.innerHTML = '<option value="">Select your visitor</option><option value="new_visitor">New Visitor</option>';
+            visitorSelect.disabled = false;
+
+            // Disable visitor field if no unit is selected
+            if (unitId === '') {
+                visitorSelect.disabled = true;
+                return;
+            }
+
+            // Fetch visitors for the selected unit
+            fetch(`/get_visitors/${unitId}`)
+                .then(response => response.json())
+                .then(visitors => {
+                    // Populate the visitor dropdown with the returned visitors
+                    visitors.forEach(visitor => {
+                        const option = document.createElement('option');
+                        option.value = visitor.id;
+                        option.textContent = visitor.name;
+                        visitorSelect.insertBefore(option, visitorSelect.lastChild);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicles:', error);
+                });
+        }
+
+        function loadVehicles(visitorId) {
+            const vehicleSelect = document.getElementById('vehicle');
+
+            // Clear existing options, but keep the "Select your vehicle" and "New Vehicle" options
+            vehicleSelect.innerHTML = '<option value="">Select your vehicle</option><option value="new_vehicle">New Vehicle</option>';
+            vehicleSelect.disabled = false;
+
+            // Disable vehicle field if no visitor is selected
+            if (visitorId === '') {
+                vehicleSelect.disabled = true;
+                return;
+            }
+
+            // Fetch vehicles for the selected visitor
+            fetch(`/get_vehicles/${visitorId}`)
+                .then(response => response.json())
+                .then(vehicles => {
+                    // Populate the vehicle dropdown with the returned vehicles
+                    vehicles.forEach(vehicle => {
+                        const option = document.createElement('option');
+                        option.value = vehicle.id;
+                        option.textContent = vehicle.vehicle;
+                        vehicleSelect.insertBefore(option, vehicleSelect.lastChild);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicles:', error);
+                });
+        }
     </script>
 </body>
 </html>
