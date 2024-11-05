@@ -1498,7 +1498,7 @@ def new_invite():
     return render_template('new_invite.html', current_date=current_date, visitors=visitors)
 
 
-@app.route('/get_visitors/<unit_id>', methods=['GET', 'POST'])
+@app.route('/get_visitors/<unit_id>')
 def get_visitors(unit_id):
     conn = get_db()
     cursor = conn.cursor()
@@ -1511,10 +1511,123 @@ def get_visitors(unit_id):
     return jsonify(visitor_list)
 
 
-@app.route('/admin_new_invite')
+@app.route('/admin_new_invite', methods=['GET', 'POST'])
 def admin_new_invite():
     conn = get_db()
     cursor = conn.cursor()
+
+    if request.method == 'POST':
+        unit_id = request.form['unit']
+        visitor_id = request.form['visitor']
+        name = request.form['name']
+        email = request.form['email']
+        gender = request.form['gender']
+        ic = request.form['ic']
+        phone = request.form['phone']
+        vehicle = request.form['vehicle']
+        vehicle_type = request.form['vehicle-type']
+        vehicle_number = request.form['vehicle-number']
+        iso_date = request.form['date-picker']
+        reason = request.form['reason']
+
+        # Convert the ISO format date to DD-MM-YYYY format
+        formatted_date = datetime.strptime(iso_date, '%Y-%m-%d').strftime('%d-%m-%Y')
+
+        if visitor_id == 'new_visitor':
+            # Validate contains only digits and length is 12
+            if not re.match(r'^\d{12}$', ic):
+                return '''
+                    <script>
+                        alert("Please enter a valid ic and only digits are allowed.");
+                        window.location.href = "{}";
+                    </script>
+                    '''.format(url_for('admin_new_invite'))
+
+            # Validate contains only digits and length is 10/11
+            elif not re.match(r'^\d{10,11}$', phone):
+                return '''
+                    <script>
+                        alert("Please enter a valid phone and only digits are allowed.");
+                        window.location.href = "{}";
+                    </script>
+                    '''.format(url_for('admin_new_invite'))
+
+            else:
+                # Add new visitor
+                cursor.execute("INSERT INTO visitors (name, gender, ic, email, phone, unit_id, status) VALUES (?,"
+                               " ?, ?, ?, ?, ?, 1)", (name, gender, ic, email, phone, unit_id))
+                conn.commit()
+
+                # Get new visitor_id
+                cursor.execute("SELECT visitor_id FROM visitors WHERE ic=? AND status=1 AND unit_id=?", (ic, unit_id))
+                visitor_id = cursor.fetchone()[0]
+
+                # Insert new vehicles into the database
+                if vehicle_type == 'Car':
+                    vehicle_id = 1
+                else:
+                    vehicle_id = 2
+                cursor.execute("INSERT INTO visitor_vehicles (type_id, vehicle_number, visitor_id, status) VALUES"
+                               " (?, ?, ?, 1)", (vehicle_id, vehicle_number, visitor_id))
+                conn.commit()
+
+                # Get new vehicle_id
+                cursor.execute("SELECT visitor_vehicle_id FROM visitor_vehicles WHERE type_id=? AND "
+                               "vehicle_number=? AND visitor_id=? AND status=1", (vehicle_id, vehicle_number,
+                                                                                  visitor_id))
+                visitor_vehicle_id = cursor.fetchone()[0]
+
+                # Insert new invitation details
+                cursor.execute("INSERT INTO invitations (visitor_id, visitor_vehicle_id, date, reason, user_id, unit_id"
+                               ", status) VALUES (?, ?, ?, ?, ?, ?, 1)", (visitor_id, visitor_vehicle_id,
+                                                                          formatted_date, reason, session['user_id'],
+                                                                          unit_id))
+                conn.commit()
+
+                return '''
+                    <script>
+                        alert("Invitation created successfully!");
+                        window.location.href = "{}";
+                    </script>
+                    '''.format(url_for('admin_invitation_list'))
+
+        else:
+            if vehicle == 'new_vehicle':
+                # Insert new vehicles into the database
+                if vehicle_type == 'Car':
+                    vehicle_id = 1
+                else:
+                    vehicle_id = 2
+                cursor.execute("INSERT INTO visitor_vehicles (type_id, vehicle_number, visitor_id, status) VALUES"
+                               " (?, ?, ?, 1)", (vehicle_id, vehicle_number, visitor_id))
+                conn.commit()
+
+                # Get new vehicle_id
+                cursor.execute("SELECT visitor_vehicle_id FROM visitor_vehicles WHERE type_id=? AND "
+                               "vehicle_number=? AND visitor_id=? AND status=1", (vehicle_id, vehicle_number,
+                                                                                  visitor_id))
+                visitor_vehicle_id = cursor.fetchone()[0]
+
+                # Insert new invitation details
+                cursor.execute("INSERT INTO invitations (visitor_id, visitor_vehicle_id, date, reason, user_id, unit_id"
+                               ", status) VALUES (?, ?, ?, ?, ?, ?, 1)", (visitor_id, visitor_vehicle_id,
+                                                                          formatted_date, reason, session['user_id'],
+                                                                          unit_id))
+                conn.commit()
+
+            else:
+                # Insert new invitation details
+                cursor.execute("INSERT INTO invitations (visitor_id, visitor_vehicle_id, date, reason, user_id, unit_id"
+                               ", status) VALUES (?, ?, ?, ?, ?, ?, 1)", (visitor_id, vehicle, formatted_date, reason,
+                                                                          session['user_id'], unit_id))
+                conn.commit()
+
+            return '''
+                <script>
+                    alert("Invitation created successfully!");
+                    window.location.href = "{}";
+                </script>
+                '''.format(url_for('admin_invitation_list'))
 
     # Get current date
     current_date = date.today().isoformat()
