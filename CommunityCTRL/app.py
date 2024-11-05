@@ -1266,13 +1266,47 @@ def admin_edit_invitation(invitation_id):
     conn = get_db()
     cursor = conn.cursor()
 
+    if request.method == 'POST':
+        vehicle_value = request.form['vehicle']
+        iso_date = request.form['date-picker']
+        reason = request.form['reason']
+
+        # Extract type and vehicle number
+        type_part, vehicle_number_part = vehicle_value.split('(', 1)
+        vehicle_type = type_part.strip()
+        vehicle_number = vehicle_number_part.strip(' )')
+
+        # Convert the ISO format date to DD-MM-YYYY format
+        formatted_date = datetime.strptime(iso_date, '%Y-%m-%d').strftime('%d-%m-%Y')
+
+        # Get vehicle id
+        if vehicle_type == 'Car':
+            type_id = 1
+        else:
+            type_id = 2
+        cursor.execute("SELECT visitor_vehicle_id FROM visitor_vehicles WHERE type_id=? AND vehicle_number=?",
+                       (type_id, vehicle_number))
+        vehicle_id = cursor.fetchone()[0]
+
+        # Update database
+        cursor.execute("UPDATE invitations SET visitor_vehicle_id=?, date=?, reason=? WHERE invitation_id=?",
+                       (vehicle_id, formatted_date, reason, invitation_id))
+        conn.commit()
+
+        return '''
+            <script>
+                alert("Invitation updated successfully.");
+                window.location.href = "{}";
+            </script>
+            '''.format(url_for('admin_invitation_list'))
+
     # Get current date
     current_date = date.today().isoformat()
 
     # Get invitation details
     cursor.execute("SELECT v.name, v.gender, v.ic, v.email, v.phone, v.picture, i.date, vv.vehicle_number, "
-                   "vt.type, u.name, i.reason, i.visitor_id, i.unit_id FROM invitations i, visitors v, visitor_vehicles"
-                   " vv, vehicle_types vt, users u WHERE i.visitor_id=v.visitor_id AND "
+                   "vt.type, u.name, i.reason, i.visitor_id, i.unit_id, i.invitation_id FROM invitations i, visitors v,"
+                   " visitor_vehicles vv, vehicle_types vt, users u WHERE i.visitor_id=v.visitor_id AND "
                    "i.visitor_vehicle_id=vv.visitor_vehicle_id AND vv.type_id=vt.type_id AND i.user_id=u.user_id AND "
                    "i.invitation_id=?", (invitation_id,))
     invitation_info = cursor.fetchone()
