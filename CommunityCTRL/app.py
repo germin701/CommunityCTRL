@@ -1384,10 +1384,32 @@ def new_invite():
     return render_template('new_invite.html', current_date=current_date, visitors=visitors)
 
 
+@app.route('/get_visitors/<unit_id>')
+def get_visitors(unit_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Get visitors associated with the unit
+    cursor.execute("SELECT visitor_id, name FROM visitors WHERE status=1 AND unit_id=?", (unit_id,))
+    visitors = cursor.fetchall()
+    visitor_list = [{"id": row[0], "name": row[1]} for row in visitors]
+
+    return jsonify(visitor_list)
+
+
 @app.route('/admin_new_invite')
 def admin_new_invite():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Get current date
     current_date = date.today().isoformat()
-    return render_template('admin_new_invite.html', current_date=current_date)
+
+    # Get unit list
+    cursor.execute("SELECT unit_id FROM units")
+    units = cursor.fetchall()
+
+    return render_template('admin_new_invite.html', current_date=current_date, units=units)
 
 
 @app.route('/blacklist')
