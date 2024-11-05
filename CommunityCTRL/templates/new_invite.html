@@ -104,7 +104,7 @@
                         <div class="input-field">
                             <label for="vehicle">Vehicle</label>
                             <div class="select-wrapper">
-                                <select id="vehicle" name="vehicle" required>
+                                <select id="vehicle" name="vehicle" disabled required>
                                     <option value="">Select your visitor</option>
                                     <option value="new_vehicle">New Vehicle</option>
                                 </select>
@@ -265,9 +265,11 @@
 
             // Clear existing options, but keep the "Select your vehicle" and "New Vehicle" options
             vehicleSelect.innerHTML = '<option value="">Select your vehicle</option><option value="new_vehicle">New Vehicle</option>';
+            vehicleSelect.disabled = false;
 
             // Do nothing if 'New Visitor' or no visitor is selected
-            if (visitorId === 'new_visitor' || visitorId === '') {
+            if (visitorId === '') {
+                vehicleSelect.disabled = true;
                 return;
             }
 
