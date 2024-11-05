@@ -1227,14 +1227,54 @@ def edit_invitation(invitation_id):
                            current_vehicle=current_vehicle, invitation_info=invitation_info)
 
 
-@app.route('/admin_edit_invitation')
-def admin_edit_invitation():
+@app.route('/admin_edit_invitation/<invitation_id>')
+def admin_edit_invitation(invitation_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Get current date
     current_date = date.today().isoformat()
-    original_date = '2024-11-15'
-    vehicle = 'Motorcycle PPP 1234'
-    reason = 'renovation'
-    return render_template('admin_edit_invitation.html', current_date=current_date, original_date=original_date,
-                           vehicle=vehicle, reason=reason)
+
+    # Get invitation details
+    cursor.execute("SELECT v.name, v.gender, v.ic, v.email, v.phone, v.picture, i.date, vv.vehicle_number, "
+                   "vt.type, u.name, i.reason, i.visitor_id, i.unit_id FROM invitations i, visitors v, visitor_vehicles"
+                   " vv, vehicle_types vt, users u WHERE i.visitor_id=v.visitor_id AND "
+                   "i.visitor_vehicle_id=vv.visitor_vehicle_id AND vv.type_id=vt.type_id AND i.user_id=u.user_id AND "
+                   "i.invitation_id=?", (invitation_id,))
+    invitation_info = cursor.fetchone()
+
+    # Convert BLOB to Base64 for the profile picture
+    profile_picture = None
+    if invitation_info[5]:
+        # Detect image type
+        image_type = imghdr.what(None, h=invitation_info[5])
+
+        # Check if image type is valid
+        if image_type in ['jpg', 'jpeg', 'png']:
+            profile_picture = f"data:image/{image_type};base64," + base64.b64encode(invitation_info[5]).decode(
+                'utf-8')
+
+    # Convert to ISO format
+    date_object = datetime.strptime(invitation_info[6], '%d-%m-%Y')
+    original_date = date_object.strftime('%Y-%m-%d')
+
+    # Get visitor's vehicles
+    cursor.execute("SELECT vt.type, vv.vehicle_number FROM visitor_vehicles vv, vehicle_types vt WHERE "
+                   "vv.type_id=vt.type_id AND vv.visitor_id=?", (invitation_info[11],))
+    vehicles = cursor.fetchall()
+
+    # Process visitor's vehicles data
+    vehicle = []
+    for v in vehicles:
+        # Create a dictionary for combine vehicle type and number
+        vehicle_data = {"vehicle": f"{v[0]} ({v[1]})"}
+        vehicle.append(vehicle_data)
+
+    # Get current vehicle
+    current_vehicle = f"{invitation_info[8]} ({invitation_info[7]})"
+    return render_template('admin_edit_invitation.html', current_date=current_date,
+                           profile_picture=profile_picture, original_date=original_date, vehicle=vehicle,
+                           current_vehicle=current_vehicle, invitation_info=invitation_info)
 
 
 @app.route('/new_invite')
