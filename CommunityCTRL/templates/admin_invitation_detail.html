@@ -56,22 +56,26 @@
             </div>
             <div class="details-section">
                 <div class="profile">
-                    <div class="profile-pic"></div>
+                    <div class="profile-picture">
+                        {% if profile_picture %}
+                        <img src="{{ profile_picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
                     <div class="infos">
-                        <label>Samantha Joe</label>
-                        <div class="visitor-details">Female</div>
-                        <div class="visitor-details">990520080234</div>
+                        <label>{{ invitation_info[0] }}</label>
+                        <div class="visitor-details">{{ invitation_info[1] }}</div>
+                        <div class="visitor-details">{{ invitation_info[2] }}</div>
                     </div>
                     <div class="contact-container">
                         <label>Contact Details</label>
                         <div class="contact-infos">
                             <div class="contact">
                                 Phone Number
-                                <div class="visitor-details">+6012 333 4444</div>
+                                <div class="visitor-details">{{ invitation_info[4] }}</div>
                             </div>
                             <div class="contact">
                                 Email
-                                <div class="visitor-details">joe@gmail.com</div>
+                                <div class="visitor-details">{{ invitation_info[3] }}</div>
                             </div>
                         </div>
                     </div>
@@ -79,25 +83,25 @@
                 <div class="row">
                     <div class="info-block">
                         <label>Unit</label>
-                        <label class="invitation-details">1003</label>
+                        <label class="invitation-details">{{ invitation_info[11] }}</label>
                     </div>
                     <div class="info-block">
                         <label>Visit Date</label>
-                        <label class="invitation-details">08/09/2024</label>
+                        <label class="invitation-details">{{ invitation_info[6] }}</label>
                     </div>
                     <div class="info-block">
                         <label>Vehicle Details</label>
-                        <label class="invitation-details">Car PPP 111</label>
+                        <label class="invitation-details">{{ invitation_info[8] }} ({{ invitation_info[7] }})</label>
                     </div>
                     <div class="info-block">
                         <label>Invited By</label>
-                        <label class="invitation-details">Jonathan</label>
+                        <label class="invitation-details">{{ invitation_info[9] }}</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="info-block">
-                        <label>Reason for visit (optional)</label>
-                        <label class="invitation-details">None</label>
+                        <label>Reason for visit</label>
+                        <label class="invitation-details">{{ invitation_info[10] }}</label>
                     </div>
                 </div>
                 <div class="button-container">
