@@ -47,7 +47,7 @@
                 <h1>Invitation List</h1>
                 <div class="search-container">
                     <img src="{{ url_for('static', filename='asset/magnifier.png') }}" alt="Magnifier" class="magnifier-icon">
-                    <input type="text" class="search-input" placeholder="Search Visitor">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search Visitor">
                 </div>
                 <div class="button-container">
                     <button class="blue-button" onclick="window.location.href='/admin_new_invite'">+ Invite</button>
@@ -62,14 +62,18 @@
                 </div>
             </div>
             <div class="invitation-section">
-                <div class="invitation-card">
-                    <div class="avatar"></div>
+                {% for invitation in invitations %}
+                <div class="invitation-card" data-name="{{ invitation.name|lower }}">
+                    <div class="avatar">
+                        {% if invitation.picture %}
+                        <img src="{{ invitation.picture }}" alt="Profile Picture">
+                        {% endif %}
+                    </div>
                     <div class="invitation-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="invitation-details">Unit: 1003</div>
-                        <div class="invitation-details">Status: Active</div>
-                        <div class="invitation-details">Vehicle: Car (PPP 111)</div>
-                        <div class="invitation-details">Visit Date: 07/09/2024</div>
+                        <div class="visitor-name">{{ invitation.name }}</div>
+                        <div class="invitation-details">Unit: {{ invitation.unit_num }}</div>
+                        <div class="invitation-details">Vehicle: {{ invitation.vehicle }}</div>
+                        <div class="invitation-details">Visit Date: {{ invitation.date }}</div>
                     </div>
                     <div class="button-container admin-invite-button-container">
                         <button class="blues-button" onclick="window.location.href='/admin_invitation_detail'">View Details</button>
@@ -77,66 +81,7 @@
                         <button class="blues-button">Cancel</button>
                     </div>
                 </div>
-                <div class="invitation-card">
-                    <div class="avatar"></div>
-                    <div class="invitation-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="invitation-details">Unit: 1003</div>
-                        <div class="invitation-details">Status: Active</div>
-                        <div class="invitation-details">Vehicle: Car (PPP 111)</div>
-                        <div class="invitation-details">Visit Date: 07/09/2024</div>
-                    </div>
-                    <div class="button-container admin-invite-button-container">
-                        <button class="blues-button" onclick="window.location.href='/admin_invitation_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/admin_edit_invitation'">Edit</button>
-                        <button class="blues-button">Cancel</button>
-                    </div>
-                </div>
-                <div class="invitation-card">
-                    <div class="avatar"></div>
-                    <div class="invitation-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="invitation-details">Unit: 1003</div>
-                        <div class="invitation-details">Status: Active</div>
-                        <div class="invitation-details">Vehicle: Car (PPP 111)</div>
-                        <div class="invitation-details">Visit Date: 07/09/2024</div>
-                    </div>
-                    <div class="button-container admin-invite-button-container">
-                        <button class="blues-button" onclick="window.location.href='/admin_invitation_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/admin_edit_invitation'">Edit</button>
-                        <button class="blues-button">Cancel</button>
-                    </div>
-                </div>
-                <div class="invitation-card">
-                    <div class="avatar"></div>
-                    <div class="invitation-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="invitation-details">Unit: 1003</div>
-                        <div class="invitation-details">Status: Active</div>
-                        <div class="invitation-details">Vehicle: Car (PPP 111)</div>
-                        <div class="invitation-details">Visit Date: 07/09/2024</div>
-                    </div>
-                    <div class="button-container admin-invite-button-container">
-                        <button class="blues-button" onclick="window.location.href='/admin_invitation_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/admin_edit_invitation'">Edit</button>
-                        <button class="blues-button">Cancel</button>
-                    </div>
-                </div>
-                <div class="invitation-card">
-                    <div class="avatar"></div>
-                    <div class="invitation-info">
-                        <div class="visitor-name">Samantha Joe</div>
-                        <div class="invitation-details">Unit: 1003</div>
-                        <div class="invitation-details">Status: Active</div>
-                        <div class="invitation-details">Vehicle: Car (PPP 111)</div>
-                        <div class="invitation-details">Visit Date: 07/09/2024</div>
-                    </div>
-                    <div class="button-container admin-invite-button-container">
-                        <button class="blues-button" onclick="window.location.href='/admin_invitation_detail'">View Details</button>
-                        <button class="blues-button" onclick="window.location.href='/admin_edit_invitation'">Edit</button>
-                        <button class="blues-button">Cancel</button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
