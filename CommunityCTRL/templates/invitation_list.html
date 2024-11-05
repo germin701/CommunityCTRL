@@ -73,7 +73,7 @@
                     <div class="button-container">
                         <button class="blues-button" onclick="window.location.href='/invitation_detail/{{ invitation.invitation_id }}'">View Details</button>
                         <button class="blues-button" onclick="window.location.href='/edit_invitation/{{ invitation.invitation_id }}'">Edit</button>
-                        <button class="blues-button">Cancel</button>
+                        <button class="blues-button" onclick="cancelInvitation({{ invitation.invitation_id }})">Cancel</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -178,6 +178,26 @@
                 }
             });
         });
+
+        function cancelInvitation(invitation_id) {
+            // Show a confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to cancel this invitation?");
+
+            if (userConfirmed) {
+                fetch(`/cancel-invitation/${invitation_id}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = `/admin_invitation_list`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to cancel invitation. Please try again.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
