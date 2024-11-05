@@ -1354,10 +1354,32 @@ def cancel_invitation(invitation_id):
     return jsonify({"message": "Invitation cancelled successfully."})
 
 
+@app.route('/get_vehicles/<visitor_id>')
+def get_vehicles(visitor_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Get vehicles associated with the visitor
+    cursor.execute("SELECT vt.type || ' (' || vv.vehicle_number || ')' AS vehicle FROM visitor_vehicles vv, "
+                   "vehicle_types vt WHERE vv.type_id=vt.type_id AND vv.status=1 AND vv.visitor_id=?", (visitor_id,))
+    vehicles = [row[0] for row in cursor.fetchall()]
+
+    return jsonify(vehicles)
+
+
 @app.route('/new_invite')
 def new_invite():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Get current date
     current_date = date.today().isoformat()
-    return render_template('new_invite.html', current_date=current_date)
+
+    # Get visitor
+    cursor.execute("SELECT visitor_id, name FROM visitors WHERE status=1 AND unit_id=?", (session['unit'],))
+    visitors = cursor.fetchall()
+
+    return render_template('new_invite.html', current_date=current_date, visitors=visitors)
 
 
 @app.route('/admin_new_invite')
