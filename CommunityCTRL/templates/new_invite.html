@@ -56,10 +56,11 @@
                         <div class="input-field">
                             <label for="visitor">Visitor</label>
                             <div class="select-wrapper">
-                                <select id="visitor" name="visitor" required>
+                                <select id="visitor" name="visitor" onchange="loadVehicles(this.value)" required>
                                     <option value="">Select your visitor</option>
-                                    <option value="visitor1">Visitor 1</option>
-                                    <option value="visitor2">Visitor 2</option>
+                                    {% for visitor in visitors %}
+                                    <option value="{{ visitor[0] }}">{{ visitor[1] }}</option>
+                                    {% endfor %}
                                     <option value="new_visitor">New Visitor</option>
                                 </select>
                             </div>
@@ -105,9 +106,6 @@
                             <div class="select-wrapper">
                                 <select id="vehicle" name="vehicle" required>
                                     <option value="">Select your visitor</option>
-                                    <option value="Car ABC 1234">Car ABC 1234</option>
-                                    <option value="Motorcycle PPP 1234">Motorcycle PPP 1234</option>
-                                    <option value="Motorcycle KFC 9999">Motorcycle KFC 9999</option>
                                     <option value="new_vehicle">New Vehicle</option>
                                 </select>
                             </div>
@@ -261,6 +259,34 @@
                 newVehicleFields.style.display = 'none'; // Hide the fields
             }
         });
+
+        function loadVehicles(visitorId) {
+            const vehicleSelect = document.getElementById('vehicle');
+
+            // Clear existing options, but keep the "Select your vehicle" and "New Vehicle" options
+            vehicleSelect.innerHTML = '<option value="">Select your vehicle</option><option value="new_vehicle">New Vehicle</option>';
+
+            // Do nothing if 'New Visitor' or no visitor is selected
+            if (visitorId === 'new_visitor' || visitorId === '') {
+                return;
+            }
+
+            // Fetch vehicles for the selected visitor
+            fetch(`/get_vehicles/${visitorId}`)
+                .then(response => response.json())
+                .then(vehicles => {
+                    // Populate the vehicle dropdown with the returned vehicles
+                    vehicles.forEach(vehicle => {
+                        const option = document.createElement('option');
+                        option.value = vehicle;
+                        option.textContent = vehicle;
+                        vehicleSelect.insertBefore(option, vehicleSelect.lastChild);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicles:', error);
+                });
+        }
     </script>
 </body>
 </html>
