@@ -1345,6 +1345,15 @@ def admin_edit_invitation(invitation_id):
                            current_vehicle=current_vehicle, invitation_info=invitation_info)
 
 
+@app.route('/cancel-invitation/<invitation_id>', methods=['POST'])
+def cancel_invitation(invitation_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE invitations SET status=0 WHERE invitation_id=?", (invitation_id,))
+    conn.commit()
+    return jsonify({"message": "Invitation cancelled successfully."})
+
+
 @app.route('/new_invite')
 def new_invite():
     current_date = date.today().isoformat()
