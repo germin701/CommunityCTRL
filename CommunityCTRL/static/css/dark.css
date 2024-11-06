@@ -257,6 +257,22 @@ footer a.footer-link:hover {
     opacity: 0.8;
 }
 
+header h2 {
+    padding-left: 45px;
+    margin-top: 45px;
+    margin-bottom: 0px;
+}
+
+section {
+    padding-left: 60px;
+    padding-right: 30px;
+    margin-bottom: 39px;
+}
+
+section p {
+    margin-top: -6px;
+}
+
 .header-container {
     display: flex;
     justify-content: space-between;
