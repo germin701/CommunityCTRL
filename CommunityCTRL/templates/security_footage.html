@@ -61,11 +61,11 @@
                 </div>
                 <div id="live" class="tab-content active">
                     <div class="video-thumbnail-container">
-                        <video class="video-thumbnail" onclick="openModal('entryVideo')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
+                        <video class="video-thumbnail" onclick="openModal('entry')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
                         <h4>Entry Gate</h4>
                     </div>
                     <div class="video-thumbnail-container">
-                        <video class="video-thumbnail" onclick="openModal('exitVideo')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
+                        <video class="video-thumbnail" onclick="openModal('exit')" src="{{ url_for('static', filename='asset/video4.mov') }}" muted></video>
                         <h4>Exit Gate</h4>
                     </div>
                 </div>
@@ -202,9 +202,9 @@
             evt.currentTarget.classList.add('active');
         }
 
-        function openModal() {
+        function openModal(gateType) {
             document.getElementById("videoModal").style.display = "flex";
-            document.getElementById("enlargedVideo").src = "/lpr_stream";
+            document.getElementById("enlargedVideo").src = `/lpr_stream?gate=${gateType}`;
             startPlateUpdates();
         }
 
