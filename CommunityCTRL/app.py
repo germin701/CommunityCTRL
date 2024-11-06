@@ -13,7 +13,7 @@ from paddleocr import PaddleOCR
 
 app = Flask(__name__)
 app.secret_key = 'ger123min987'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
