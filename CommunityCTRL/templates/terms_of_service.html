@@ -4,8 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommunityCTRL</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
 </head>
 <body>
+    <header>
+        <h2>Terms of Service</h2>
+    </header>
+    <main>
+        <section>
+            <h3>1. Acceptance of Terms</h3>
+            <p>By accessing or using CommunityCTRL, you agree to abide by these Terms of Service.</p>
+        </section>
+        <section>
+            <h3>2. User Responsibilities</h3>
+            <p>Users are responsible for providing accurate information during registration and ensuring compliance with community access policies.</p>
+        </section>
+        <section>
+            <h3>3. Visitor Access</h3>
+            <p>Residents are responsible for notifying visitors about access policies and ensuring their compliance with the system's usage guidelines.</p>
+        </section>
+        <section>
+            <h3>4. Account Management</h3>
+            <p>CommunityCTRL administrators reserve the right to approve or deny account registrations and manage user access based on security policies.</p>
+        </section>
+        <section>
+            <h3>5. Security Measures</h3>
+            <p>CommunityCTRL is committed to maintaining high standards of data security and user privacy.</p>
+        </section>
+        <section>
+            <h3>6. License Plate Recognition (LPR) System</h3>
+            <p>The LPR system manages community access by collecting vehicle license plate information upon entry, with users consenting to this process. Residents must inform their visitors of LPR monitoring, and while it enhances security, CommunityCTRL is not liable for unauthorized access or data inaccuracies.</p>
+        </section>
+        <section>
+            <h3>7. Limitation of Liability</h3>
+            <p>CommunityCTRL is not liable for any indirect or consequential losses resulting from the use of the system.</p>
+        </section>
+        <section>
+            <h3>8. Changes to Terms</h3>
+            <p>CommunityCTRL may update these Terms of Service periodically. Continued use of the system implies acceptance of any revised terms.</p>
+        </section>
+        <section>
+            <h3>9. Contact Us</h3>
+            <p>If you have any questions about these Terms of Service, please contact us at communityctrl.service@gmail.com.</p>
+        </section>
+    </main>
+    <footer>
+        &copy; 2024 CommunityCTRL. All rights reserved.
+    </footer>
 
+    <!-- Script for toggling between Light Mode and Dark Mode -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeStyle = document.getElementById('theme-style');
+
+            // Check for user's theme preference in localStorage
+            const currentTheme = localStorage.getItem('theme') || 'light';
+
+            // Set the theme based on stored preference
+            if (currentTheme === 'dark') {
+                themeStyle.href = "{{ url_for('static', filename='css/dark.css') }}";
+            }
+        });
+    </script>
 </body>
 </html>
