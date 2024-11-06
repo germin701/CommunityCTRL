@@ -4,8 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommunityCTRL</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" id="theme-style">
 </head>
 <body>
+    <header>
+        <h2>Privacy Policy</h2>
+    </header>
+    <main>
+        <section>
+            <h3>1. Introduction</h3>
+            <p>This Privacy Policy outlines how CommunityCTRL collects, uses, and protects your personal data when using our services.</p>
+        </section>
+        <section>
+            <h3>2. Data Collection and Use</h3>
+            <p>We collect user data for providing and enhancing our services. This includes user registration, access control, and security purposes.</p>
+        </section>
+        <section>
+            <h3>3. User Information</h3>
+            <p>User data includes personal information such as name, email, phone number, and unit information. This data is used for managing access, communications, and administrative purposes.</p>
+        </section>
+        <section>
+            <h3>4. Visitor Management Data</h3>
+            <p>Visitor information collected through our system includes name, contact details, and access permissions for security monitoring and access control within the community.</p>
+        </section>
+        <section>
+            <h3>5. Security Measures</h3>
+            <p>We implement security practices to protect user data from unauthorized access, including encrypted data storage and restricted access to sensitive information.</p>
+        </section>
+        <section>
+            <h3>6. License Plate Recognition Data</h3>
+            <p>The system collects and securely stores license plate data for community access control, accessible only to authorized personnel. This data is retained for security purposes and is periodically reviewed, ensuring compliance with data protection standards and shared only when legally required.</p>
+        </section>
+        <section>
+            <h3>7. Data Retention</h3>
+            <p>User data is retained only for as long as necessary to fulfill our services. Data may be reviewed periodically to comply with data protection regulations.</p>
+        </section>
+        <section>
+            <h3>8. Contact Us</h3>
+            <p>If you have any questions about our Privacy Policy, please contact us at communityctrl.service@gmail.com.</p>
+        </section>
+    </main>
+    <footer>
+        &copy; 2024 CommunityCTRL. All rights reserved.
+    </footer>
 
+    <!-- Script for toggling between Light Mode and Dark Mode -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeStyle = document.getElementById('theme-style');
+
+            // Check for user's theme preference in localStorage
+            const currentTheme = localStorage.getItem('theme') || 'light';
+
+            // Set the theme based on stored preference
+            if (currentTheme === 'dark') {
+                themeStyle.href = "{{ url_for('static', filename='css/dark.css') }}";
+            }
+        });
+    </script>
 </body>
 </html>
