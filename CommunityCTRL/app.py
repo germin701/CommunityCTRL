@@ -1818,105 +1818,133 @@ def security_footage():
     return render_template('security_footage.html')
 
 
-def generate_video_feed(video_source):
-    # Reset the dictionary
-    detected_plates.clear()
+def generate_video_feed(video_source, gate):
+    with app.app_context():
+        conn = get_db()
+        cursor = conn.cursor()
 
-    # Load YOLO model
-    net = cv2.dnn.readNet("darknet/yolov4-obj_best.weights", "darknet/cfg/yolov4-obj.cfg")
-    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
+        # Reset the dictionary
+        detected_plates.clear()
 
-    # Initialize Detection Model
-    model = cv2.dnn.DetectionModel(net)
-    model.setInputParams(size=(416, 416), scale=1 / 255, swapRB=True)
+        # Load YOLO model
+        net = cv2.dnn.readNet("darknet/yolov4-obj_best.weights", "darknet/cfg/yolov4-obj.cfg")
+        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
 
-    # Initialize PaddleOCR model
-    ocr_model = PaddleOCR(lang='en')
+        # Initialize Detection Model
+        model = cv2.dnn.DetectionModel(net)
+        model.setInputParams(size=(416, 416), scale=1 / 255, swapRB=True)
 
-    # Start video capture
-    cap = cv2.VideoCapture(video_source)
+        # Initialize PaddleOCR model
+        ocr_model = PaddleOCR(lang='en')
 
-    # Get mask
-    mask = cv2.imread("static/asset/mask.png")
+        # Start video capture
+        cap = cv2.VideoCapture(video_source)
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+        # Get mask
+        mask = cv2.imread("static/asset/mask.png")
 
-        # Apply mask to the frame
-        region = cv2.bitwise_and(frame, mask)
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        # Perform detection
-        start = time.time()
-        classes, scores, boxes = model.detect(region, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
-        end = time.time()
+            if gate == 'entry':
+                # Retrieve the allowed plates and valid dates before each frame processing
+                cursor.execute("SELECT i.invitation_id, vv.vehicle_number, i.date FROM invitations i, "
+                               "visitor_vehicles vv WHERE i.visitor_vehicle_id=vv.visitor_vehicle_id AND i.status=1 AND"
+                               " i.date=?", (datetime.now().strftime('%d-%m-%Y'),))
+            else:
+                cursor.execute("SELECT i.invitation_id, vv.vehicle_number, i.date FROM invitations i, "
+                               "visitor_vehicles vv WHERE i.visitor_vehicle_id=vv.visitor_vehicle_id AND i.status=0 AND"
+                               " i.date=?", (datetime.now().strftime('%d-%m-%Y'),))
+            data = cursor.fetchall()
+            allowed_plates = [(row[0], re.sub(r'[\s,-.]', '', row[1]), row[2]) for row in data]
 
-        # Get current datetime
-        current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+            # Apply mask to the frame
+            region = cv2.bitwise_and(frame, mask)
 
-        # Process detections
-        for (classID, score, box) in zip(classes, scores, boxes):
-            color = (0, 255, 255)
-            cv2.rectangle(frame, box, color, 2)
+            # Perform detection
+            start = time.time()
+            classes, scores, boxes = model.detect(region, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
+            end = time.time()
 
-            # Extract the region specified by the bounding box
-            x, y, w, h = box
-            region = frame[y:y + h, x:x + w]
+            # Get current datetime
+            full_timestamp = time.strftime('%d-%m-%Y %H:%M:%S')
+            current_date, current_time = full_timestamp.split(' ')
 
-            # Perform OCR on the detected region
-            result = ocr_model.ocr(region)
+            # Process detections
+            for (classID, score, box) in zip(classes, scores, boxes):
+                color = (0, 255, 255)
+                cv2.rectangle(frame, box, color, 2)
 
-            # Extract recognized text
-            if result[0] is not None:
-                for line in result:
-                    recognized_text, confidence_text = line[-1][1]
+                # Extract the region specified by the bounding box
+                x, y, w, h = box
+                region = frame[y:y + h, x:x + w]
 
-                    # Standardize plate text by removing spaces, commas, hyphens, and dots
-                    standardized_plate = re.sub(r'[\s,-.]', '', recognized_text)
+                # Perform OCR on the detected region
+                result = ocr_model.ocr(region)
 
-                    label = "%s : %.2f, %.2f" % (standardized_plate, score * 100, confidence_text * 100)
-                    cv2.putText(frame, label, (box[0], box[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+                # Extract recognized text
+                if result[0] is not None:
+                    for line in result:
+                        recognized_text, confidence_text = line[-1][1]
 
-                    # Store only if this standardized plate hasn't been detected yet
-                    if standardized_plate not in detected_plates:
-                        detected_plates[standardized_plate] = current_time
+                        # Standardize plate text by removing spaces, commas, hyphens, and dots
+                        standardized_plate = re.sub(r'[\s,-.]', '', recognized_text)
 
-        # Calculates and displays the frames per second (FPS)
-        fps_text = "FPS: %.2f " % (1 / (end - start))
+                        label = "%s : %.2f, %.2f" % (standardized_plate, score * 100, confidence_text * 100)
+                        cv2.putText(frame, label, (box[0], box[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
-        # Define background color and rectangle coordinates
-        background_color = (0, 0, 0)  # Black background
-        fps_rect = (50, 40, 200, 40)  # (x, y, width, height) for FPS
-        time_rect = (50, 80, 390, 40)  # (x, y, width, height) for Time
+                        # Check if detected plate matches an allowed plate with valid date
+                        for invitation_id, db_plate, db_date in allowed_plates:
+                            if standardized_plate == db_plate:
+                                # Update the database with the detection timestamp
+                                if gate == 'entry':
+                                    cursor.execute("UPDATE invitations SET status=0 WHERE invitation_id=?",
+                                                   (invitation_id,))
+                                    cursor.execute("INSERT INTO visit_history (invitation_id, arrive_time) VALUES"
+                                                   " (?, ?)", (invitation_id, current_time))
+                                else:
+                                    cursor.execute("UPDATE visit_history SET exit_time=? WHERE invitation_id=?",
+                                                   (current_time, invitation_id))
+                                conn.commit()
 
-        # Draw rectangles for FPS and Time background
-        cv2.rectangle(frame, (fps_rect[0], fps_rect[1]), (fps_rect[0] + fps_rect[2], fps_rect[1] + fps_rect[3]),
-                      background_color, -1)
-        cv2.rectangle(frame, (time_rect[0], time_rect[1]), (time_rect[0] + time_rect[2], time_rect[1] + time_rect[3]),
-                      background_color, -1)
+                        # Store only if this standardized plate hasn't been detected yet
+                        if standardized_plate not in detected_plates:
+                            detected_plates[standardized_plate] = current_time
 
-        # Overlay the FPS and current time text on top of the rectangles
-        cv2.putText(frame, fps_text, (60, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2)
-        cv2.putText(frame, current_time, (60, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2)
+            # Calculates and displays the frames per second (FPS)
+            fps_text = "FPS: %.2f " % (1 / (end - start))
 
-        # Encode the frame for streaming
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            # Define background color and rectangle coordinates
+            background_color = (0, 0, 0)
+            fps_rect = (50, 40, 200, 40)
+            time_rect = (50, 80, 390, 40)
 
-    # Print unique detected plates with their first detection time
-    for plate, timestamp in detected_plates.items():
-        print(f"Plate: {plate}, Time: {timestamp}")
+            # Draw rectangles for FPS and Time background
+            cv2.rectangle(frame, (fps_rect[0], fps_rect[1]), (fps_rect[0] + fps_rect[2], fps_rect[1] + fps_rect[3]),
+                          background_color, -1)
+            cv2.rectangle(frame, (time_rect[0], time_rect[1]), (time_rect[0] + time_rect[2], time_rect[1] +
+                                                                time_rect[3]), background_color, -1)
+
+            # Overlay the FPS and current time text on top of the rectangles
+            cv2.putText(frame, fps_text, (60, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2)
+            cv2.putText(frame, full_timestamp, (60, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2)
+
+            # Encode the frame for streaming
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 
 @app.route('/lpr_stream')
 def lpr_stream():
     # Use the same video for demo purpose
     video_source = 'static/asset/video4.mov'
-    return Response(generate_video_feed(video_source), mimetype='multipart/x-mixed-replace; boundary=frame')
+    gate = request.args.get('gate')
+    return Response(generate_video_feed(video_source, gate), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/get_detected_plates')
