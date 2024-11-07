@@ -2207,8 +2207,12 @@ def edit_staff(staff_id):
 
         else:
             # Update staff details
-            cursor.execute("UPDATE users SET email=?, phone=?, picture=? WHERE user_id=?", (email, personal_number,
-                                                                                            picture_data, staff_id))
+            if picture_data:
+                cursor.execute("UPDATE users SET email=?, phone=?, picture=? WHERE user_id=?",
+                               (email, personal_number, picture_data, staff_id))
+            else:
+                cursor.execute("UPDATE users SET email=?, phone=? WHERE user_id=?", (email, personal_number, staff_id))
+
             cursor.execute("UPDATE staffs SET phone=?, position=? WHERE user_id=?", (office_number, position, staff_id))
             conn.commit()
 
