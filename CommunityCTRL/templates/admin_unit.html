@@ -17,11 +17,11 @@
                     <div class="badge-background">{{ role }}</div>
                 </div>
             </div>
-            <div class="menu-item" onclick="window.location.href='/home'">
+            <div class="menu-item" onclick="window.location.href='/admin_home'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/home_unselect.png') }}" alt="dashboard_icon">
                 <div class="menu-text">Dashboard</div>
             </div>
-            <div class="menu-item" onclick="window.location.href='/visitor'">
+            <div class="menu-item" onclick="window.location.href='/admin_visitor'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/visitor_unselect.png') }}" alt="visitors_icon">
                 <div class="menu-text">Visitors</div>
             </div>
@@ -29,7 +29,7 @@
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/cctv_unselect.png') }}" alt="security_footage_icon">
                 <div class="menu-text">Security Footage</div>
             </div>
-            <div class="menu-item" onclick="window.location.href='/staff'">
+            <div class="menu-item" onclick="window.location.href='/admin_staff'">
                 <img class="menu-icon" src="{{ url_for('static', filename='asset/staff_unselect.png') }}" alt="staff_icon">
                 <div class="menu-text">Staff</div>
             </div>
@@ -159,6 +159,52 @@
                         {% endfor %}
                     {% else %}
                         <label>No tenant exists</label>
+                    {% endif %}
+                    {% if owner_histories %}
+                    <div class="visited-history">
+                        <h3>Owner History</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Owner Name</th>
+                                    <th>IC</th>
+                                    <th>Removed Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for history in owner_histories %}
+                                <tr>
+                                    <td>{{ history[0] }}</td>
+                                    <td>{{ history[1] }}</td>
+                                    <td>{{ history[2] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    {% if tenant_histories %}
+                    <div class="visited-history">
+                        <h3>Tenant History</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tenant Name</th>
+                                    <th>IC</th>
+                                    <th>Removed Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for history in tenant_histories %}
+                                <tr>
+                                    <td>{{ history[0] }}</td>
+                                    <td>{{ history[1] }}</td>
+                                    <td>{{ history[2] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% endif %}
                     <div class="link-row">
                         <div class="link-container">
