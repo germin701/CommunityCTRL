@@ -300,7 +300,7 @@ def profile():
         # Check if image type is valid
         if image_type in ['jpg', 'jpeg', 'png']:
             profile_pic = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
-            
+
     return render_template('profile.html', user=user, role=session['role'], currentProfilePic=profile_pic)
 
 
