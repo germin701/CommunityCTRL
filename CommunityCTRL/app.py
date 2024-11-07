@@ -439,6 +439,14 @@ def save_email():
                 </script>
                 '''
 
+    else:
+        return '''
+            <script>
+                alert("OTP is not exist. Please get a new OTP.");
+                window.history.back();
+            </script>
+            '''
+
 
 @app.route('/save_password', methods=['POST'])
 def save_password():
