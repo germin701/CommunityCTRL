@@ -2676,9 +2676,20 @@ def admin_unit():
         tenant_s_vehicle = cursor.fetchall()
         tenant_vehicles[tenant_user_id[0]] = tenant_s_vehicle
 
+    # Get unit owner history
+    cursor.execute("SELECT u.name, u.ic, h.date FROM unit_history h, users u WHERE h.user_id=u.user_id AND "
+                   "u.role_id=2 AND h.unit_id=?", (unit_num,))
+    owner_histories = cursor.fetchall()
+
+    # Get unit tenant history
+    cursor.execute("SELECT u.name, u.ic, h.date FROM unit_history h, users u WHERE h.user_id=u.user_id AND "
+                   "u.role_id=3 AND h.unit_id=?", (unit_num,))
+    tenant_histories = cursor.fetchall()
+
     return render_template('admin_unit.html', unit=unit_num, role=session['role'], user=user,
                            profile_picture=profile_picture, vehicles=vehicles, tenants=tenants,
-                           tenant_vehicles=tenant_vehicles)
+                           tenant_vehicles=tenant_vehicles, owner_histories=owner_histories,
+                           tenant_histories=tenant_histories)
 
 
 @app.route('/remove-owner/<owner_id>/<unit_id>', methods=['POST'])
