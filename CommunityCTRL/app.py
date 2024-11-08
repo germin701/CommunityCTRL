@@ -372,7 +372,18 @@ def save_phone():
         conn.commit()
         cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
         user = cursor.fetchone()
-        return render_template('profile.html', user=user, role=session['role'],
+
+        # Convert BLOB to Base64 for the profile picture
+        profile_picture = None
+        if user[8]:
+            # Detect image type
+            image_type = imghdr.what(None, h=user[8])
+
+            # Check if image type is valid
+            if image_type in ['jpg', 'jpeg', 'png']:
+                profile_picture = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
+
+        return render_template('profile.html', user=user, role=session['role'], currentProfilePic=profile_picture,
                                alert_message="Phone number updated successfully!")
 
 
@@ -429,7 +440,18 @@ def save_email():
             session.pop('email', None)
             cursor.execute("SELECT * FROM users WHERE user_id=?", (session['user_id'],))
             user = cursor.fetchone()
-            return render_template('profile.html', user=user, role=session['role'],
+
+            # Convert BLOB to Base64 for the profile picture
+            profile_picture = None
+            if user[8]:
+                # Detect image type
+                image_type = imghdr.what(None, h=user[8])
+
+                # Check if image type is valid
+                if image_type in ['jpg', 'jpeg', 'png']:
+                    profile_picture = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
+
+            return render_template('profile.html', user=user, role=session['role'], currentProfilePic=profile_picture,
                                    alert_message="OTP verified! Email updated successfully!")
         else:
             return '''
@@ -504,7 +526,18 @@ def save_password():
         else:
             cursor.execute("UPDATE users SET password=? WHERE user_id=?", (new_password, session['user_id']))
             conn.commit()
-            return render_template('profile.html', user=user, role=session['role'],
+
+            # Convert BLOB to Base64 for the profile picture
+            profile_picture = None
+            if user[8]:
+                # Detect image type
+                image_type = imghdr.what(None, h=user[8])
+
+                # Check if image type is valid
+                if image_type in ['jpg', 'jpeg', 'png']:
+                    profile_picture = f"data:image/{image_type};base64," + base64.b64encode(user[8]).decode('utf-8')
+
+            return render_template('profile.html', user=user, role=session['role'], currentProfilePic=profile_picture,
                                    alert_message="Password updated successfully!")
 
 
